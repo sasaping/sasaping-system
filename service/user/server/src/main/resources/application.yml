@@ -1,0 +1,17 @@
+server:
+  port: 19092
+
+spring:
+  application:
+    name: user
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
