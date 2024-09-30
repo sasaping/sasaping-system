@@ -4,4 +4,8 @@ include(':common:domain')
 
 include(':service:user:server')
 include(':service:user:dto')
+
+include(':service:product:server')
+include(':service:product:product_dto')
+
 include(':service:eureka')
