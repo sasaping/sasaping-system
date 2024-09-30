@@ -6,17 +6,17 @@ spring:
     name: order
 
   datasource:
-    url: jdbc:mysql://localhost:3306/orderDB   # MySQL 컨테이너의 데이터베이스 URL
-    username: user                               # docker-compose.yml에서 설정한 사용자명
-    password: password                           # docker-compose.yml에서 설정한 비밀번호
-    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL JDBC 드라이버
+    url: jdbc:mysql://localhost:3306/orderDB
+    username: user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update                           # 스키마 자동 업데이트 (필요에 따라 설정)
+      ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect  # MySQL 방언 설정
+        dialect: org.hibernate.dialect.MySQLDialect
 
 management:
   endpoints:
