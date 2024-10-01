@@ -19,6 +19,11 @@ spring:
           predicates:
             - Path=/api/users/**
 
+        - id: product
+          uri: lb://product
+          predicates:
+            - Path=/api/products/**, /api/preproducts/**, /api/categories/**,
+
       discovery:
         locator:
           enabled: true

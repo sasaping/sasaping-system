@@ -1,0 +1,23 @@
+server:
+  port: 19041
+
+spring:
+  application:
+    name: notification
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/notificationDB
+    username: user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
