@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: payment
+  datasource:
+    url: jdbc:mysql://localhost:3306/{LOCAL_DB_NAME}
+    username: {LOCAL_DB_USERNAME}
+    password: {LOCAL_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 19061
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
