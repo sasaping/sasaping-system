@@ -51,8 +51,7 @@ jobs:
           
             if [ -f "$folder/build.gradle" ]; then
               echo "Building Gradle project in $folder..."
-              cd "$folder"
-              ./gradlew build
+              ./gradlew -p "$folder" build
             else
               echo "Skipping $folder: build.gradle not found."
             fi
