@@ -8,6 +8,13 @@ spring:
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
 
+  cassandra:
+    contact-points: 127.0.0.1
+    port: 9042
+    keyspace-name: product
+    schema-action: create_if_not_exists
+    local-datacenter: datacenter01
+
   jpa:
     database: MYSQL
     hibernate:
