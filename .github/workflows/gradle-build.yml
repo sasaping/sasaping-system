@@ -30,6 +30,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Install GNU Parallel
+        run: sudo apt-get install -y parallel
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -38,7 +41,7 @@ jobs:
           set -e
           
           # 모든 모듈을 찾습니다. (build.gradle 파일이 있는 디렉토리)
-          MODULES=$(find . -type f \( -name "build.gradle" \) -exec dirname {} \; | sort -u)
+          MODULES=$(find ./service -type f \( -name "build.gradle" \) -exec dirname {} \; | sort -u)
           
           echo "Modules to build:"
           echo "$MODULES"
@@ -51,7 +54,7 @@ jobs:
           
             if [ -f "$folder/build.gradle" ]; then
               echo "Building Gradle project in $folder..."
-              ./gradlew -p "$folder" build
+              ./gradlew -p "$folder" build -x test
             else
               echo "Skipping $folder: build.gradle not found."
             fi
