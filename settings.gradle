@@ -12,3 +12,6 @@ include(':service:payment:server')
 
 include(':service:eureka')
 include(':service:gateway:server')
+
+include(':service:order:server')
+include(':service:notification:server')
