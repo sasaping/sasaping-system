@@ -12,7 +12,7 @@ import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
-import com.sparta.user.dto.infrastructure.UserInternalDto;
+import com.sparta.user.dto.infrastructure.UserDto;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import java.util.Optional;
@@ -119,7 +119,7 @@ class UserApplicationTests {
     when(userRepository.findByUsername(username)).thenReturn(Optional.of(existingUser));
 
     // Act
-    UserInternalDto.Get userDto = userService.getUserByUsername(username);
+    UserDto userDto = userService.getUserByUsername(username);
 
     // Assert
     assertEquals(username, userDto.getUsername());

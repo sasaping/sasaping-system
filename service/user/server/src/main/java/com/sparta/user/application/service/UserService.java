@@ -5,7 +5,7 @@ import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
 
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.UserRepository;
-import com.sparta.user.dto.infrastructure.UserInternalDto;
+import com.sparta.user.dto.infrastructure.UserDto;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,10 @@ public class UserService {
     userRepository.save(User.create(request, request.getPassword()));
   }
 
-  public UserInternalDto.Get getUserByUsername(String username) {
+  public UserDto getUserByUsername(String username) {
     User user = userRepository.findByUsername(username).orElseThrow(
         () -> new UserException(USER_NOT_FOUND));
-    return new UserInternalDto.Get(
+    return new UserDto(
         user.getId(),
         user.getUsername(),
         user.getPassword(),
