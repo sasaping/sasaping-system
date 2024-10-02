@@ -12,6 +12,7 @@ import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
+import com.sparta.user.dto.infrastructure.UserInternalDto;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import java.util.Optional;
@@ -31,7 +32,7 @@ class UserApplicationTests {
   private UserService userService;
 
   @Test
-  void testSignUp_UserAlreadyExists_ThrowsUserException() {
+  void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
     UserRequest.Create request = new UserRequest.Create(
         "existinguser",
@@ -53,7 +54,7 @@ class UserApplicationTests {
   }
 
   @Test
-  void testSignUp_NewUser_SavesUser() {
+  void test_회원가입() {
     // Arrange
     UserRequest.Create request = new UserRequest.Create(
         "newuser",
@@ -85,6 +86,47 @@ class UserApplicationTests {
     assertEquals("nickname", savedUser.getNickname());
     assertEquals(0, savedUser.getPoint());
     assertEquals(UserRole.ROLE_ADMIN, savedUser.getRole());
+  }
+
+  @Test
+  void test_유저_조회_시_존재하지_않는_유저() {
+    // Arrange
+    String username = "nonexistentuser";
+    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+    // Act & Assert
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getUserByUsername(username));
+    assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
+
+    verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  void test_유저_조회_성공() {
+    // Arrange
+    String username = "existinguser";
+    UserRequest.Create request = new UserRequest.Create(
+        username,
+        "password123",
+        "nickname",
+        0,
+        UserRole.ROLE_ADMIN
+    );
+
+    User existingUser = User.create(request, "password123");
+
+    when(userRepository.findByUsername(username)).thenReturn(Optional.of(existingUser));
+
+    // Act
+    UserInternalDto.Get userDto = userService.getUserByUsername(username);
+
+    // Assert
+    assertEquals(username, userDto.getUsername());
+    assertEquals("password123", userDto.getPassword());
+    assertEquals(UserRole.ROLE_ADMIN.name(), userDto.getRole());
+
+    verify(userRepository, times(1)).findByUsername(username);
   }
 
 }
