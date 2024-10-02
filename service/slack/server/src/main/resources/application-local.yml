@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: slack
+  datasource:
+    url: jdbc:mysql://localhost:3306/slack
+    username: mysql
+    password: mysql123!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: 19031
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
