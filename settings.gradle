@@ -19,3 +19,5 @@ include(':service:order:server')
 include(':service:order:dto')
 
 include(':service:notification:server')
+
+include(':service:slack:server')
