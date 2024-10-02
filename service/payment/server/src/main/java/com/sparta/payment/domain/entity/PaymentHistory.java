@@ -1,4 +1,4 @@
-package com.sparta.payment.domain;
+package com.sparta.payment.domain.entity;
 
 import com.sparta.common.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
