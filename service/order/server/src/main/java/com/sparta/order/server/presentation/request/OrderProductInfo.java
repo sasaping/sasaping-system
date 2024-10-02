@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 public class OrderProductInfo {
 
   private UUID productId;
-  private Integer quantity;
+  private int quantity;
+  private int price;
   private Long couponId;
 
 }
