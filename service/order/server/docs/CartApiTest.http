@@ -13,3 +13,6 @@ Content-Type: application/json
     "quantity": 3
   }
 }
+
+### 장바구니 상품 조회
+GET http://localhost:{{Port}}/api/carts?userId=123456
