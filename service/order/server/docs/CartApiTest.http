@@ -1,0 +1,15 @@
+@Port=19071
+
+### 장바구니 상품 추가
+POST http://localhost:{{Port}}/api/carts/products
+Content-Type: application/json
+
+{
+  "userId": 123456,
+  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
+  "productInfoRequest": {
+    "productName": "붕어빵",
+    "price": 3000,
+    "quantity": 3
+  }
+}
