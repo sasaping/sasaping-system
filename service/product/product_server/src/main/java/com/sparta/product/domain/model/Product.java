@@ -1,10 +1,10 @@
 package com.sparta.product.domain.model;
 
 import com.sparta.common.domain.entity.BaseEntity;
-import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Builder;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
@@ -41,7 +41,7 @@ public class Product extends BaseEntity implements Persistable {
 
   @Override
   public Object getId() {
-    return null;
+    return this.productId;
   }
 
   @Transient
