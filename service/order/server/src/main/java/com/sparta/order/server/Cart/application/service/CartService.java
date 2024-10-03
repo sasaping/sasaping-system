@@ -62,9 +62,21 @@ public class CartService {
     }
   }
 
+  public void deleteCart(Long userId, String productId) {
+    String redisKey = createRedisKey(userId);
+    ProductInfo existingProductInfo = cartOps.get(redisKey, productId);
+
+    if (existingProductInfo != null) {
+      cartOps.delete(redisKey, productId);
+    } else {
+      throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
+    }
+  }
+
   private String createRedisKey(Long userId) {
     return "cart:" + userId.toString();
   }
+
 
 
 }
