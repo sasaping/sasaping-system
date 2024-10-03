@@ -1,0 +1,10 @@
+@Port=19091
+
+### 등급 생성
+POST http://localhost:{{Port}}/api/tier
+Content-Type: application/json
+
+{
+  "name": "골드핑",
+  "thresholdPrice": 150000
+}

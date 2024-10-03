@@ -1,0 +1,29 @@
+package com.sparta.user.application.service;
+
+import com.sparta.user.domain.model.Tier;
+import com.sparta.user.domain.repository.TierRepository;
+import com.sparta.user.exception.UserErrorCode;
+import com.sparta.user.exception.UserException;
+import com.sparta.user.presentation.request.TierRequest.Create;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Service
+public class TierService {
+
+  private final TierRepository tierRepository;
+
+  @Transactional
+  public void createTier(Create request) {
+    tierRepository
+        .findByName(request.getName())
+        .ifPresent(
+            tier -> {
+              throw new UserException(UserErrorCode.TIER_CONFLICT);
+            });
+    tierRepository.save(Tier.create(request));
+  }
+
+}
