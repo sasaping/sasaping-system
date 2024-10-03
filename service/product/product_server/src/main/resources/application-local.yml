@@ -22,6 +22,10 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+
 server:
   port: 19081
 
