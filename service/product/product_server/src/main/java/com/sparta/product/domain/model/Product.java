@@ -37,6 +37,7 @@ public class Product extends BaseEntity implements Persistable {
   @Column public int limitCountPerUser = 0;
   @Column public double averageRating = 0.0; // TODO :: 리뷰가 등록될떄마다 평균평점 계산
   @Column public boolean isPublic = true;
+  @Column public boolean soldout = false;
   @Column public boolean isDeleted = false;
   @Column public boolean isCoupon;
   @Transient private boolean isNew = false;
@@ -109,6 +110,14 @@ public class Product extends BaseEntity implements Persistable {
 
   public void setIsNew(boolean isNew) {
     this.isNew = isNew;
+  }
+
+  public void isDelete() {
+    this.isDeleted = true;
+  }
+
+  public void setSoldout(boolean status) {
+    this.soldout = status;
   }
 
   public void applyDiscount(Double discountPercent) {

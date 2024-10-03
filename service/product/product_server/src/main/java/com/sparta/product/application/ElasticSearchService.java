@@ -27,4 +27,11 @@ public class ElasticSearchService {
     elasticsearchRepository.save(product); // 덮어쓰기 방식
     log.info("update product in elastic search {}", product.getProductId());
   }
+
+  @Async
+  public void deleteProduct(ProductResponse response) {
+    ProductSearchDto product = ProductSearchDto.toDto(response);
+    elasticsearchRepository.delete(product);
+    log.info("delete product in elastic search {}", product.getProductId());
+  }
 }

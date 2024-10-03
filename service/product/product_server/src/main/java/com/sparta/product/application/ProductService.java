@@ -33,9 +33,25 @@ public class ProductService {
     return ProductResponse.fromEntity(product);
   }
 
+  @Transactional
+  public ProductResponse updateStatus(UUID productId, boolean status) {
+    Product product = getSavedProduct(productId);
+    product.setSoldout(status);
+    productRepository.save(product);
+    return ProductResponse.fromEntity(product);
+  }
+
+  @Transactional
+  public ProductResponse deleteProduct(UUID productId) {
+    Product product = getSavedProduct(productId);
+    product.isDelete();
+    productRepository.save(product);
+    return ProductResponse.fromEntity(product);
+  }
+
   private Product getSavedProduct(UUID productId) {
     return productRepository
-        .findByProductId(productId)
+        .findByProductIdAndIsDeletedFalse(productId)
         .orElseThrow(() -> new ProductServerException(ProductErrorCode.NOT_FOUND_PRODUCT));
   }
 }
