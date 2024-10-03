@@ -35,9 +35,9 @@ public class CartService {
     }
   }
 
-
   public Map<String, CartDto.ProductInfoDto> getCart(Long userId) {
     String redisKey = createRedisKey(userId);
+    validateUserCartExists(redisKey);
     Map<String, ProductInfo> cartProductInfos = cartOps.entries(redisKey);
     Map<String, CartDto.ProductInfoDto> response = cartProductInfos.entrySet().stream()
         .collect(Collectors.toMap(
@@ -45,18 +45,17 @@ public class CartService {
             entry -> CartDto.ProductInfoDto.fromModel(entry.getValue())
         ));
     return response;
-
-
   }
 
   public void updateCart(CartDto.UpdateRequest request) {
     String redisKey = createRedisKey(request.getUserId());
+    validateUserCartExists(redisKey);
     ProductInfo existingProductInfo = cartOps.get(redisKey, request.getProductId());
 
     if (existingProductInfo != null) {
       existingProductInfo.updateQuantity(request.getQuantity());
       cartOps.put(redisKey, request.getProductId(),
-              existingProductInfo);
+          existingProductInfo);
     } else {
       throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
     }
@@ -64,6 +63,7 @@ public class CartService {
 
   public void deleteCart(Long userId, String productId) {
     String redisKey = createRedisKey(userId);
+    validateUserCartExists(redisKey);
     ProductInfo existingProductInfo = cartOps.get(redisKey, productId);
 
     if (existingProductInfo != null) {
@@ -73,10 +73,20 @@ public class CartService {
     }
   }
 
+  public void clearCart(Long userId) {
+    String redisKey = createRedisKey(userId);
+    validateUserCartExists(redisKey);
+    cartOps.keys(redisKey).forEach(key -> cartOps.delete(redisKey, key));
+  }
+
   private String createRedisKey(Long userId) {
     return "cart:" + userId.toString();
   }
 
-
+  private void validateUserCartExists(String redisKey) {
+    if (cartOps.entries(redisKey).isEmpty()) {
+      throw new CartException(CartErrorCode.CART_NOT_FOUND);
+    }
+  }
 
 }

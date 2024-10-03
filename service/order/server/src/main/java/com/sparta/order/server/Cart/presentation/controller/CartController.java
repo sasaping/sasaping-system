@@ -5,7 +5,15 @@ import com.sparta.order.server.Cart.application.service.CartService;
 import com.sparta.order.server.Cart.presentation.dto.CartDto;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/carts")
@@ -18,7 +26,7 @@ public class CartController {
 
   @GetMapping
   public ApiResponse<Map<String, CartDto.ProductInfoDto>> getCartList(
-          @RequestParam(name = "userId") Long userId) {
+      @RequestParam(name = "userId") Long userId) {
     return ApiResponse.ok(cartService.getCart(userId));
   }
 
@@ -35,8 +43,15 @@ public class CartController {
   }
 
   @DeleteMapping("/products/{productId}")
-  public ApiResponse<?> deleteCart(@PathVariable(name = "productId") String productId, @RequestParam(name = "userId") Long userId) {
+  public ApiResponse<?> deleteCart(@PathVariable(name = "productId") String productId,
+      @RequestParam(name = "userId") Long userId) {
     cartService.deleteCart(userId, productId);
+    return ApiResponse.ok(null);
+  }
+
+  @DeleteMapping("/clear")
+  public ApiResponse<?> clearCart(@RequestParam(name = "userId") Long userId) {
+    cartService.clearCart(userId);
     return ApiResponse.ok(null);
   }
 

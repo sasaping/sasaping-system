@@ -6,9 +6,9 @@ Content-Type: application/json
 
 {
   "userId": 123456,
-  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb1g",
+  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
   "productInfoDto": {
-    "productName": "감자",
+    "productName": "붕어빵",
     "price": 3000,
     "quantity": 3
   }
@@ -28,5 +28,8 @@ Content-Type: application/json
 }
 
 ### 장바구니 상품 삭제
-DELETE http://localhost:{{Port}}/api/carts/products/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g?userId=123456
-Content-Type: application/json
+DELETE http://localhost:{{Port}}/api/carts/products/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb1g?
+    userId=123456
+
+### 장바구니 전체 삭제
+DELETE http://localhost:{{Port}}/api/carts/clear?userId=123456
