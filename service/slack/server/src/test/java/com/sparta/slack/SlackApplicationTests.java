@@ -1,11 +1,13 @@
-package com.sparta.user;
+package com.sparta.slack;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DtoApplicationTests {
+class SlackApplicationTests {
 
   @Test
-  void contextLoads() {}
+  void contextLoads() {
+  }
+
 }

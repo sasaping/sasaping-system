@@ -1,11 +1,13 @@
-package com.sparta.user;
+package com.sparta.order.dto;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ServerApplicationTests {
+class OrderDtoApplicationTests {
 
   @Test
-  void contextLoads() {}
+  void contextLoads() {
+  }
+
 }
