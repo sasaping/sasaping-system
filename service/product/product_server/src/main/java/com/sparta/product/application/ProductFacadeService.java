@@ -11,10 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProductFacadeService {
   private final ProductService productService;
+  private final ElasticSearchService elasticSearchService;
 
   public String createProduct(ProductCreateRequest request) {
     ProductResponse product = productService.createProduct(request);
-    // TODO :: insert messaging queue
+    elasticSearchService.saveProduct(product);
     return product.getProductId();
   }
 }
