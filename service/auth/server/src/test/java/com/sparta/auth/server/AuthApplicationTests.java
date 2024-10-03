@@ -2,14 +2,17 @@ package com.sparta.auth.server;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sparta.auth.server.application.dto.AuthResponse;
+import com.sparta.auth.server.application.dto.JwtClaim;
 import com.sparta.auth.server.application.service.AuthService;
 import com.sparta.auth.server.application.service.UserService;
 import com.sparta.auth.server.exception.AuthException;
+import com.sparta.auth.server.infrastructure.utils.JwtHandler;
 import com.sparta.auth.server.presentation.request.AuthRequest;
 import com.sparta.user.dto.infrastructure.UserDto;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,9 @@ class AuthApplicationTests {
   @MockBean
   private UserService userService;
 
+  @MockBean
+  private JwtHandler jwtHandler;
+
   @Autowired
   private AuthService authService;
 
@@ -31,17 +37,22 @@ class AuthApplicationTests {
     // Arrange
     AuthRequest.SignIn request = new AuthRequest.SignIn("testuser", "correctpassword");
     UserDto userDto = new UserDto(1L, "testuser", "correctpassword", "ROLE_ADMIN");
+
+    // Mock the user service to return the userDto when called
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
+
+    // Mock the jwtHandler to return a specific token when createToken is called
+    String expectedToken = "mockedToken123";
+    when(jwtHandler.createToken(any(JwtClaim.class))).thenReturn(expectedToken);
 
     // Act
     AuthResponse.SignIn response = authService.signIn(request);
 
     // Assert
-    assertEquals(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwic3ViIjoiMTIzNDU2Nzg5MCIsIm5hbWUiOiJreWVvbmtpbSIsImlhdCI6MTUxNjIzOTAyMn0.oUoAkEIz5XERVqsXw0RFEhvG3JXhbpvEGt9m_P-XBVE",
-        response.getToken());
+    assertEquals(expectedToken, response.getToken());
 
     verify(userService, times(1)).getUserByUsername("testuser");
+    verify(jwtHandler, times(1)).createToken(any(JwtClaim.class));
   }
 
   @Test
