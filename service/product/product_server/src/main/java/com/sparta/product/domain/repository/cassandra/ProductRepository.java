@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends CassandraRepository<Product, UUID> {
-  Optional<Product> findByProductId(UUID productId);
+  Optional<Product> findByProductIdAndIsDeletedFalse(UUID productId);
 }
