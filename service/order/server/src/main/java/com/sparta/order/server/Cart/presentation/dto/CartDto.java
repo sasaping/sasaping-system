@@ -24,6 +24,18 @@ public class CartDto {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class UpdateRequest {
+
+    // TODO 인증 인가 구현되면 제외 시키기
+    private Long userId;
+    private String productId;
+    private int quantity;
+
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class ProductInfoDto {
 
     @JsonProperty("productName")

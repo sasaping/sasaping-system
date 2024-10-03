@@ -2,6 +2,8 @@ package com.sparta.order.server.Cart.application.service;
 
 import com.sparta.order.server.Cart.domain.model.CartProduct;
 import com.sparta.order.server.Cart.domain.model.ProductInfo;
+import com.sparta.order.server.Cart.exception.CartErrorCode;
+import com.sparta.order.server.Cart.exception.CartException;
 import com.sparta.order.server.Cart.presentation.dto.CartDto;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.AddRequest;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class CartService {
   }
 
 
-  public Map<String, CartDto.ProductInfoDto> updateCart(Long userId) {
+  public Map<String, CartDto.ProductInfoDto> getCart(Long userId) {
     String redisKey = createRedisKey(userId);
     Map<String, ProductInfo> cartProductInfos = cartOps.entries(redisKey);
     Map<String, CartDto.ProductInfoDto> response = cartProductInfos.entrySet().stream()
@@ -47,9 +49,22 @@ public class CartService {
 
   }
 
+  public void updateCart(CartDto.UpdateRequest request) {
+    String redisKey = createRedisKey(request.getUserId());
+    ProductInfo existingProductInfo = cartOps.get(redisKey, request.getProductId());
+
+    if (existingProductInfo != null) {
+      existingProductInfo.updateQuantity(request.getQuantity());
+      cartOps.put(redisKey, request.getProductId(),
+              existingProductInfo);
+    } else {
+      throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
+    }
+  }
 
   private String createRedisKey(Long userId) {
     return "cart:" + userId.toString();
   }
+
 
 }
