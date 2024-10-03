@@ -7,7 +7,7 @@ Content-Type: application/json
 {
   "userId": 123456,
   "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
-  "productInfoRequest": {
+  "productInfoDto": {
     "productName": "붕어빵",
     "price": 3000,
     "quantity": 3
@@ -16,3 +16,13 @@ Content-Type: application/json
 
 ### 장바구니 상품 조회
 GET http://localhost:{{Port}}/api/carts?userId=123456
+
+### 장바구니 상품
+PATCH http://localhost:{{Port}}/api/carts/products
+Content-Type: application/json
+
+{
+  "userId": 123456,
+  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
+  "quantity": 7
+}
