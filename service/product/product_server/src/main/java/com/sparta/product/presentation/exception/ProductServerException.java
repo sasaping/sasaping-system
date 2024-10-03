@@ -9,6 +9,7 @@ public class ProductServerException extends BusinessException {
 
   public ProductServerException(ProductErrorCode errorCode) {
     super(errorCode.getStatus().name(), errorCode.getMessage());
+    this.errorCode = errorCode;
   }
 
   public ProductServerException(ProductErrorCode errorCode, Object... args) {
