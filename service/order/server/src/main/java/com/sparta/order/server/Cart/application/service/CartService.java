@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class CartService {
 
+  // TODO 상품 단건조회 API 구현 이후 상품 존재여부 검증 로직 추가
+  // TODO Redis 트랜잭션 추가
+
   private final HashOperations<String, String, ProductInfo> cartOps;
 
   public CartService(RedisTemplate<String, CartProduct> cartTemplate) {
