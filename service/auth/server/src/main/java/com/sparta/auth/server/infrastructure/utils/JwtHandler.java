@@ -1,6 +1,6 @@
 package com.sparta.auth.server.infrastructure.utils;
 
-import com.sparta.auth.server.application.dto.JwtClaim;
+import com.sparta.auth.dto.jwt.JwtClaim;
 import com.sparta.auth.server.infrastructure.properties.JwtProperties;
 import io.jsonwebtoken.Jwts;
 import java.nio.charset.StandardCharsets;

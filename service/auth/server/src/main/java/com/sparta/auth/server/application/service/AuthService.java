@@ -1,7 +1,7 @@
 package com.sparta.auth.server.application.service;
 
+import com.sparta.auth.dto.jwt.JwtClaim;
 import com.sparta.auth.server.application.dto.AuthResponse;
-import com.sparta.auth.server.application.dto.JwtClaim;
 import com.sparta.auth.server.exception.AuthErrorCode;
 import com.sparta.auth.server.exception.AuthException;
 import com.sparta.auth.server.infrastructure.utils.JwtHandler;

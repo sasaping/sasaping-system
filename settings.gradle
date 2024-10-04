@@ -14,6 +14,7 @@ include(':service:eureka')
 include(':service:gateway:server')
 
 include(':service:auth:server')
+include(':service:auth:dto')
 
 include(':service:order:server')
 include(':service:order:dto')
