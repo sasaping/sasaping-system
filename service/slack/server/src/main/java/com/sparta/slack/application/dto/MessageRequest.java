@@ -9,7 +9,6 @@ public class MessageRequest {
   @Setter
   public static class Create {
 
-    private Long userId;
     private String receiverEmail;
     private String message;
 

@@ -1,6 +1,5 @@
 package com.sparta.slack.domain.entity;
 
-import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.slack.application.dto.MessageRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,15 +20,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "p_message")
 @Entity
-public class Message extends BaseEntity {
+public class Message {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "message_id")
   private Long messageId;
-
-  @Column(name = "user_id")
-  private Long userId;
 
   @Column(name = "receiver_email")
   private String receiverEmail;
@@ -36,11 +33,14 @@ public class Message extends BaseEntity {
   @Column(name = "message")
   private String message;
 
+  @Column(name = "send_at")
+  private LocalDateTime sendAt;
+
   public static Message create(MessageRequest.Create request) {
     return Message.builder()
-        .userId(request.getUserId())
         .receiverEmail(request.getReceiverEmail())
         .message(request.getMessage())
+        .sendAt(LocalDateTime.now())
         .build();
   }
 

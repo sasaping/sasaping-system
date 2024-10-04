@@ -9,12 +9,10 @@ public class MessageResponse {
   @Setter
   public static class Create {
 
-    private Long userId;
     private String receiverEmail;
     private String message;
 
     public Create(MessageRequest.Create messageRequest) {
-      this.userId = messageRequest.getUserId();
       this.receiverEmail = messageRequest.getReceiverEmail();
       this.message = messageRequest.getMessage();
     }
