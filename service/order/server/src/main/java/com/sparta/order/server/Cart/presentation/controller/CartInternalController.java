@@ -1,5 +1,6 @@
 package com.sparta.order.server.Cart.presentation.controller;
 
+import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.order.server.Cart.application.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,8 +16,9 @@ public class CartInternalController {
   private final CartService cartService;
 
   @PatchMapping("/products/info-update/{productId}")
-  public void updateCartInfo(@PathVariable(name = "productId") String productId) {
+  public ApiResponse<?> updateCartInfo(@PathVariable(name = "productId") String productId) {
     cartService.updateCartInfo(productId);
+    return ApiResponse.ok(null);
   }
 
 }

@@ -33,3 +33,6 @@ DELETE http://localhost:{{Port}}/api/carts/products/9b1deb4d-3b7d-4bad-9bdd-2b0d
 
 ### 장바구니 전체 삭제
 DELETE http://localhost:{{Port}}/api/carts/clear?userId=123456
+
+### 장바구니 상품 정보 수정
+PATCH http://localhost:{{Port}}/internal/carts/products/info-update/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g

@@ -31,7 +31,7 @@ public class CartService {
   }
 
   public void addCart(AddRequest request) {
-    String userCartRedisKey = createUserCartRedisKey(request.getUserId());
+    String userCartRedisKey = createUserCartRedisKey(request.getUserId().toString());
     ProductInfo existingProductInfo = userCartOps.get(userCartRedisKey, request.getProductId());
 
     if (existingProductInfo != null) {
@@ -46,7 +46,7 @@ public class CartService {
   }
 
   public Map<String, CartDto.ProductInfoDto> getCart(Long userId) {
-    String userCartRedisKey = createUserCartRedisKey(userId);
+    String userCartRedisKey = createUserCartRedisKey(userId.toString());
     validateUserCartExists(userCartRedisKey);
     Map<String, ProductInfo> cartProductInfos = userCartOps.entries(userCartRedisKey);
     Map<String, CartDto.ProductInfoDto> response = cartProductInfos.entrySet().stream()
@@ -58,21 +58,20 @@ public class CartService {
   }
 
   public void updateCart(CartDto.UpdateRequest request) {
-    String userCartRedisKey = createUserCartRedisKey(request.getUserId());
+    String userCartRedisKey = createUserCartRedisKey(request.getUserId().toString());
     validateUserCartExists(userCartRedisKey);
     ProductInfo existingProductInfo = userCartOps.get(userCartRedisKey, request.getProductId());
 
     if (existingProductInfo != null) {
       existingProductInfo.updateQuantity(request.getQuantity());
-      userCartOps.put(userCartRedisKey, request.getProductId(),
-          existingProductInfo);
+      userCartOps.put(userCartRedisKey, request.getProductId(), existingProductInfo);
     } else {
       throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
     }
   }
 
   public void deleteCart(Long userId, String productId) {
-    String userCartRedisKey = createUserCartRedisKey(userId);
+    String userCartRedisKey = createUserCartRedisKey(userId.toString());
     validateUserCartExists(userCartRedisKey);
     ProductInfo existingProductInfo = userCartOps.get(userCartRedisKey, productId);
 
@@ -85,10 +84,25 @@ public class CartService {
   }
 
   public void updateCartInfo(String productId) {
+    String cartProductRedisKey = createCartProductRedisKey(productId);
+    Set<String> userIds = cartProductOps.members(cartProductRedisKey);
+
+    if (userIds != null && !userIds.isEmpty()) {
+      // TODO 변경된 product 단건 조회 API 호출
+      for (String userId : userIds) {
+        String userCartRedisKey = createUserCartRedisKey(userId);
+        // 임시 정보 생성
+        ProductInfo existingProductInfo = userCartOps.get(userCartRedisKey, productId);
+        existingProductInfo.updateQuantity(1000000);
+        
+        userCartOps.put(userCartRedisKey, productId, existingProductInfo);
+      }
+    }
+
   }
 
   public void clearCart(Long userId) {
-    String userCartRedisKey = createUserCartRedisKey(userId);
+    String userCartRedisKey = createUserCartRedisKey(userId.toString());
     validateUserCartExists(userCartRedisKey);
 
     Set<String> productIds = userCartOps.keys(userCartRedisKey);
@@ -112,8 +126,8 @@ public class CartService {
     }
   }
 
-  private String createUserCartRedisKey(Long userId) {
-    return "cart:" + userId.toString();
+  private String createUserCartRedisKey(String userId) {
+    return "cart:" + userId;
   }
 
   private String createCartProductRedisKey(String productId) {
