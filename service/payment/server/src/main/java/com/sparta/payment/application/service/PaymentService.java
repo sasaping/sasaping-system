@@ -5,6 +5,8 @@ import com.sparta.payment.application.dto.PaymentRequest.Create;
 import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.repository.PaymentRepository;
+import com.sparta.payment.exception.PaymentErrorCode;
+import com.sparta.payment.exception.PaymentException;
 import java.util.Base64;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +15,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -60,13 +60,9 @@ public class PaymentService {
       payment.setPaymentKey(Objects.requireNonNull(response.getBody()).getPaymentKey());
       paymentRepository.save(payment);
 
-      if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-        return response.getBody();
-      } else {
-        throw new RuntimeException("Failed to create payment");
-      }
-    } catch (HttpClientErrorException e) {
-      throw new RuntimeException("Error occurred while creating payment: " + e.getMessage());
+      return response.getBody();
+    } catch (Exception e) {
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
   }
 
