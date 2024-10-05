@@ -23,6 +23,7 @@ public class ProductSearchDto {
   private String thumbnailImgUrl;
   private double averageRating;
   private boolean isPublic;
+  private boolean soldout;
   private boolean isDeleted;
   private boolean isCoupon;
 
@@ -39,6 +40,7 @@ public class ProductSearchDto {
       String thumbnailImgUrl,
       double averageRating,
       boolean isPublic,
+      boolean soldout,
       boolean isDeleted,
       boolean isCoupon) {
     this.productId = productId;
@@ -52,6 +54,7 @@ public class ProductSearchDto {
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.averageRating = averageRating;
     this.isPublic = isPublic;
+    this.soldout = soldout;
     this.isDeleted = isDeleted;
     this.isCoupon = isCoupon;
   }
@@ -71,6 +74,7 @@ public class ProductSearchDto {
         .isPublic(product.isPublic())
         .isDeleted(product.isDeleted())
         .isCoupon(product.isCoupon())
+        .soldout(product.isSoldout())
         .build();
   }
 }

@@ -18,6 +18,20 @@ public class ElasticSearchService {
   public void saveProduct(ProductResponse response) {
     ProductSearchDto product = ProductSearchDto.toDto(response);
     elasticsearchRepository.save(product);
-    log.info("save product in elastic search");
+    log.info("save product in elastic search {}", product.getProductId());
+  }
+
+  @Async
+  public void updateProduct(ProductResponse response) {
+    ProductSearchDto product = ProductSearchDto.toDto(response);
+    elasticsearchRepository.save(product); // 덮어쓰기 방식
+    log.info("update product in elastic search {}", product.getProductId());
+  }
+
+  @Async
+  public void deleteProduct(ProductResponse response) {
+    ProductSearchDto product = ProductSearchDto.toDto(response);
+    elasticsearchRepository.delete(product);
+    log.info("delete product in elastic search {}", product.getProductId());
   }
 }

@@ -1,0 +1,9 @@
+@Port=19091
+
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}

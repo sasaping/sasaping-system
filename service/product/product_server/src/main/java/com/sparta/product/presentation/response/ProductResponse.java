@@ -23,6 +23,7 @@ public class ProductResponse {
   private int limitCountPerUser;
   private double averageRating;
   private boolean isPublic;
+  private boolean soldout;
   private boolean isDeleted;
   private boolean isCoupon;
 
@@ -41,6 +42,7 @@ public class ProductResponse {
       int limitCountPerUser,
       double averageRating,
       boolean isPublic,
+      boolean soldout,
       boolean isDeleted,
       boolean isCoupon) {
     this.productId = productId.toString();
@@ -56,6 +58,7 @@ public class ProductResponse {
     this.limitCountPerUser = limitCountPerUser;
     this.averageRating = averageRating;
     this.isPublic = isPublic;
+    this.soldout = soldout;
     this.isDeleted = isDeleted;
     this.isCoupon = isCoupon;
   }
@@ -77,6 +80,7 @@ public class ProductResponse {
         .isCoupon(product.isCoupon)
         .isDeleted(product.isDeleted)
         .isPublic(product.isPublic)
+        .soldout(product.soldout)
         .build();
   }
 }
