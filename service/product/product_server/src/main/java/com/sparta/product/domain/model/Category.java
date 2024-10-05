@@ -57,4 +57,8 @@ public class Category extends BaseEntity {
   public void addSubCategory(Category subCategory) {
     this.subCategories.add(subCategory);
   }
+
+  public void removeSubCategory(Category subCategory) {
+    this.subCategories.remove(subCategory);
+  }
 }

@@ -7,12 +7,14 @@ import com.sparta.product.presentation.exception.ProductServerException;
 import com.sparta.product.presentation.response.CategoryResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j(topic = "CategoryService")
 public class CategoryService {
   private final CategoryRepository categoryRepository;
   private final CategoryCacheService categoryCacheService;
@@ -35,8 +37,11 @@ public class CategoryService {
     Category target = findByCategoryId(targetCategoryId);
     Category parent =
         Optional.ofNullable(parentCategoryId).map(this::findByCategoryId).orElse(null);
+
     target.update(name, parent);
+    syncParentCategory(target, parent); // 변경된 부모의 기존 연결 끊기
     refreshCategoryCache();
+
     return CategoryResponse.fromEntity(target);
   }
 
@@ -45,6 +50,16 @@ public class CategoryService {
     Category category = findByCategoryId(categoryId);
     categoryRepository.delete(category);
     refreshCategoryCache();
+  }
+
+  private void syncParentCategory(Category target, Category newParent) {
+    Category oldParent = target.getParent();
+    if (oldParent != null) {
+      oldParent.removeSubCategory(target);
+    }
+    if (newParent != null) {
+      newParent.addSubCategory(target);
+    }
   }
 
   private void refreshCategoryCache() {
