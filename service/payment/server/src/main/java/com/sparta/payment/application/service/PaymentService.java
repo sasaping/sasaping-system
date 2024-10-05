@@ -3,7 +3,10 @@ package com.sparta.payment.application.service;
 import com.sparta.payment.application.dto.PaymentRequest;
 import com.sparta.payment.application.dto.PaymentRequest.Create;
 import com.sparta.payment.application.dto.PaymentResponse;
+import com.sparta.payment.domain.entity.Payment;
+import com.sparta.payment.domain.repository.PaymentRepository;
 import java.util.Base64;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -24,9 +27,12 @@ public class PaymentService {
   private String originalKey;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
 
+  private final PaymentRepository paymentRepository;
   private final RestTemplate restTemplate;
 
-  public PaymentService(RestTemplateBuilder restTemplateBuilder) {
+  public PaymentService(PaymentRepository paymentRepository,
+      RestTemplateBuilder restTemplateBuilder) {
+    this.paymentRepository = paymentRepository;
     this.restTemplate = restTemplateBuilder.build();
   }
 
@@ -48,8 +54,11 @@ public class PaymentService {
           tossPaymentsUrl, HttpMethod.POST, entity, PaymentResponse.Create.class
       );
 
-      // TODO : DB 저장, 예외처리
       sendPaymentUrltoUser(request.getOrderId(), request.getOrderName(), response.getBody());
+
+      Payment payment = Payment.create(request);
+      payment.setPaymentKey(Objects.requireNonNull(response.getBody()).getPaymentKey());
+      paymentRepository.save(payment);
 
       if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
         return response.getBody();

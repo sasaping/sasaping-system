@@ -9,7 +9,7 @@ public class PaymentRequest {
   @Setter
   public static class Create {
 
-    private String userId;
+    private Long userId;
     private Long orderId;
     private String orderName;
     private Long amount;
