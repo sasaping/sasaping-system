@@ -5,7 +5,9 @@ import com.sparta.product.domain.repository.jpa.CategoryRepository;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
 import com.sparta.product.presentation.response.CategoryResponse;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,13 @@ public class CategoryService {
   public void deleteCategory(Long categoryId) {
     Category category = findByCategoryId(categoryId);
     categoryRepository.delete(category);
+  }
+
+  public List<CategoryResponse> getCategories() {
+    return categoryRepository.findAllWithSubCategories().stream()
+        .filter(category -> category.getParent() == null)
+        .map(CategoryResponse::fromEntity)
+        .collect(Collectors.toList());
   }
 
   private Category findByCategoryId(Long categoryId) {

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -40,6 +41,7 @@ public class Category extends BaseEntity {
   @Column private boolean isDeleted = false;
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = 10)
   private List<Category> subCategories = new ArrayList<>();
 
   public Category(String name, Category parent) {
