@@ -12,8 +12,10 @@ import java.util.stream.Collectors;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class CartService {
 
   // TODO 상품 단건조회 API 구현 이후 상품 존재여부 검증 로직 추가
@@ -28,6 +30,7 @@ public class CartService {
     this.cartOps = cartTemplate.opsForHash();
   }
 
+  @Transactional
   public void addCart(AddRequest request) {
     String redisKey = createRedisKey(request.getUserId());
     ProductInfo existingProductInfo = cartOps.get(redisKey, request.getProductId());
@@ -55,6 +58,7 @@ public class CartService {
     return response;
   }
 
+  @Transactional
   public void updateCart(CartDto.UpdateRequest request) {
     String redisKey = createRedisKey(request.getUserId());
     validateUserCartExists(redisKey);
@@ -69,6 +73,7 @@ public class CartService {
     }
   }
 
+  @Transactional
   public void deleteCart(Long userId, String productId) {
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
@@ -81,6 +86,7 @@ public class CartService {
     }
   }
 
+  @Transactional
   public void clearCart(Long userId) {
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
