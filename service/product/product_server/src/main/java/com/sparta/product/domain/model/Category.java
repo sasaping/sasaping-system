@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
@@ -23,6 +24,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @NoArgsConstructor
 @SQLRestriction("is_deleted = false")
+@SQLDelete(sql = "UPDATE p_category SET is_deleted = true where category_id = ?")
 public class Category extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,10 +50,6 @@ public class Category extends BaseEntity {
   public void update(String name, Category category) {
     this.name = name;
     this.parent = category;
-  }
-
-  public void delete() {
-    this.isDeleted = true;
   }
 
   public void addSubCategory(Category subCategory) {

@@ -37,6 +37,12 @@ public class CategoryService {
     return CategoryResponse.fromEntity(target);
   }
 
+  @Transactional
+  public void deleteCategory(Long categoryId) {
+    Category category = findByCategoryId(categoryId);
+    categoryRepository.delete(category);
+  }
+
   private Category findByCategoryId(Long categoryId) {
     return categoryRepository
         .findByCategoryId(categoryId)

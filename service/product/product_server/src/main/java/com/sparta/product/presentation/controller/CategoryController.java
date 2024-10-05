@@ -7,6 +7,7 @@ import com.sparta.product.presentation.request.CategoryUpdateRequest;
 import com.sparta.product.presentation.response.CategoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,5 +33,11 @@ public class CategoryController {
       @PathVariable("categoryId") Long categoryId, @RequestBody CategoryUpdateRequest request) {
     return ApiResponse.ok(
         categoryService.updateCategory(categoryId, request.name(), request.parentCategoryId()));
+  }
+
+  @DeleteMapping("/{categoryId}")
+  public ApiResponse<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
+    categoryService.deleteCategory(categoryId);
+    return ApiResponse.ok();
   }
 }
