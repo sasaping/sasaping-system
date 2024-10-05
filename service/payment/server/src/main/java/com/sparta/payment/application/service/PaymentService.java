@@ -4,6 +4,8 @@ import com.sparta.payment.application.dto.PaymentRequest;
 import com.sparta.payment.application.dto.PaymentRequest.Create;
 import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.domain.entity.Payment;
+import com.sparta.payment.domain.entity.PaymentHistory;
+import com.sparta.payment.domain.repository.PaymentHistoryRepository;
 import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
@@ -28,11 +30,14 @@ public class PaymentService {
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
 
   private final PaymentRepository paymentRepository;
+  private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
 
   public PaymentService(PaymentRepository paymentRepository,
+      PaymentHistoryRepository paymentHistoryRepository,
       RestTemplateBuilder restTemplateBuilder) {
     this.paymentRepository = paymentRepository;
+    this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
   }
 
@@ -58,7 +63,11 @@ public class PaymentService {
 
       Payment payment = Payment.create(request);
       payment.setPaymentKey(Objects.requireNonNull(response.getBody()).getPaymentKey());
+
+      PaymentHistory paymentHistory = PaymentHistory.create(payment);
+
       paymentRepository.save(payment);
+      paymentHistoryRepository.save(paymentHistory);
 
       return response.getBody();
     } catch (Exception e) {
