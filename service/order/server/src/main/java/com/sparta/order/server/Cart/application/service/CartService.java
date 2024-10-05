@@ -7,6 +7,7 @@ import com.sparta.order.server.Cart.exception.CartException;
 import com.sparta.order.server.Cart.presentation.dto.CartDto;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.AddRequest;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,9 +19,12 @@ public class CartService {
   // TODO 상품 단건조회 API 구현 이후 상품 존재여부 검증 로직 추가
   // TODO Redis 트랜잭션 추가
 
+  private final RedisTemplate<String, CartProduct> cartTemplate;
   private final HashOperations<String, String, ProductInfo> cartOps;
+  private static final long CART_EXPIRE_TIME = 30 * 24 * 60 * 60;
 
   public CartService(RedisTemplate<String, CartProduct> cartTemplate) {
+    this.cartTemplate = cartTemplate;
     this.cartOps = cartTemplate.opsForHash();
   }
 
@@ -36,6 +40,7 @@ public class CartService {
       cartOps.put(redisKey, request.getProductId(),
           request.getProductInfoDto().toEntity());
     }
+    cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
   }
 
   public Map<String, CartDto.ProductInfoDto> getCart(Long userId) {
@@ -57,8 +62,8 @@ public class CartService {
 
     if (existingProductInfo != null) {
       existingProductInfo.updateQuantity(request.getQuantity());
-      cartOps.put(redisKey, request.getProductId(),
-          existingProductInfo);
+      cartOps.put(redisKey, request.getProductId(), existingProductInfo);
+      cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
     } else {
       throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
     }
