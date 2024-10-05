@@ -30,13 +30,24 @@ public class PaymentHistory extends BaseEntity {
   private Payment payment;
 
   private Long amount;
+
   private PaymentState type;
+
+  private String cancelReason;
 
   public static PaymentHistory create(Payment payment) {
     PaymentHistory paymentHistory = new PaymentHistory();
     paymentHistory.setPayment(payment);
     paymentHistory.setAmount(payment.getAmount());
     paymentHistory.setType(PaymentState.PENDING);
+    return paymentHistory;
+  }
+
+  public static PaymentHistory cancel(Payment payment) {
+    PaymentHistory paymentHistory = new PaymentHistory();
+    paymentHistory.setPayment(payment);
+    paymentHistory.setAmount(payment.getAmount());
+    paymentHistory.setType(PaymentState.CANCEL);
     return paymentHistory;
   }
 

@@ -54,7 +54,7 @@ public class PaymentService {
       body.setOrderName(request.getOrderName());
       body.setAmount(request.getAmount());
 
-      HttpEntity<PaymentRequest.Create> entity = new HttpEntity<>(body, headers);
+      HttpEntity<PaymentRequest.CreateExt> entity = new HttpEntity<>(body, headers);
 
       ResponseEntity<PaymentResponse.Create> response = restTemplate.exchange(
           tossPaymentsUrl, HttpMethod.POST, entity, PaymentResponse.Create.class
@@ -69,6 +69,7 @@ public class PaymentService {
 
       return response.getBody();
     } catch (Exception e) {
+      log.error(e.getMessage());
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
   }
@@ -84,6 +85,8 @@ public class PaymentService {
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
+
+    // TODO : 결제 승인 toss api 호출
 
     // TODO : 결제 완료 처리 -> 주문 상태 변경 feign API 호출
 
@@ -104,6 +107,42 @@ public class PaymentService {
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);
+  }
+
+  public void cancelPayment(PaymentRequest.Cancel cancelRequest) {
+    Payment payment = paymentRepository.findByOrderId(cancelRequest.getOrderId());
+    if (payment == null) {
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
+
+    try {
+      String secretKey = Base64.getEncoder().encodeToString(originalKey.getBytes());
+
+      HttpHeaders headers = new HttpHeaders();
+      headers.setBasicAuth(secretKey);
+
+      PaymentRequest.Cancel body = new PaymentRequest.Cancel();
+      body.setCancelReason(cancelRequest.getCancelReason());
+
+      HttpEntity<PaymentRequest.Cancel> entity = new HttpEntity<>(body, headers);
+
+      restTemplate.exchange(
+          tossPaymentsUrl + "/" + payment.getPaymentKey() + "/cancel", HttpMethod.POST, entity,
+          Object.class
+      );
+
+      PaymentHistory history = PaymentHistory.cancel(payment);
+      history.setCancelReason(cancelRequest.getCancelReason());
+      paymentHistoryRepository.save(history);
+
+      payment.setState(PaymentState.CANCEL);
+      paymentRepository.save(payment);
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
+
   }
 
 }

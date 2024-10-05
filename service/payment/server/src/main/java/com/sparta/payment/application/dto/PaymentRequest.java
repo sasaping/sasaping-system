@@ -28,4 +28,13 @@ public class PaymentRequest {
 
   }
 
+  @Getter
+  @Setter
+  public static class Cancel {
+
+    private Long orderId;
+    private String cancelReason;
+
+  }
+
 }

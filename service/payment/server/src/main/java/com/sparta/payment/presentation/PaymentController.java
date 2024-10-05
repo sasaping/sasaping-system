@@ -33,4 +33,9 @@ public class PaymentController {
     paymentService.paymentFail(paymentKey);
   }
 
+  @PostMapping("/internal/payments/cancel")
+  public void cancelPayment(@RequestBody PaymentRequest.Cancel cancelRequest) {
+    paymentService.cancelPayment(cancelRequest);
+  }
+
 }
