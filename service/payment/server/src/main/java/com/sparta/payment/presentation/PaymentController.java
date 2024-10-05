@@ -7,20 +7,30 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/internal/payments")
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentController {
 
   private final PaymentService paymentService;
 
-  @PostMapping("")
+  @PostMapping("/internal/payments")
   public PaymentResponse.Create createPayment(@RequestBody PaymentRequest.Create createRequest) {
     return paymentService.createPayment(createRequest);
+  }
+
+  @PostMapping("/payments/success")
+  public void paymentSuccess(@RequestParam String paymentKey) {
+    paymentService.paymentSuccess(paymentKey);
+  }
+
+
+  @PostMapping("/payments/fail")
+  public void paymentFail(@RequestParam String paymentKey) {
+    paymentService.paymentFail(paymentKey);
   }
 
 }

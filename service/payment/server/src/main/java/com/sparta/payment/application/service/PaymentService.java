@@ -5,6 +5,7 @@ import com.sparta.payment.application.dto.PaymentRequest.Create;
 import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
+import com.sparta.payment.domain.entity.PaymentState;
 import com.sparta.payment.domain.repository.PaymentHistoryRepository;
 import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
@@ -64,10 +65,7 @@ public class PaymentService {
       Payment payment = Payment.create(request);
       payment.setPaymentKey(Objects.requireNonNull(response.getBody()).getPaymentKey());
 
-      PaymentHistory paymentHistory = PaymentHistory.create(payment);
-
       paymentRepository.save(payment);
-      paymentHistoryRepository.save(paymentHistory);
 
       return response.getBody();
     } catch (Exception e) {
@@ -80,5 +78,32 @@ public class PaymentService {
     log.info("orderId={}, orderName={}, checkout={}", orderId, orderName, checkout);
   }
 
+
+  public void paymentSuccess(String paymentKey) {
+    Payment payment = paymentRepository.findByPaymentKey(paymentKey);
+    if (payment == null) {
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
+
+    // TODO : 결제 완료 처리 -> 주문 상태 변경 feign API 호출
+
+    payment.setState(PaymentState.PAYMENT);
+    PaymentHistory history = PaymentHistory.create(payment);
+    paymentHistoryRepository.save(history);
+    paymentRepository.save(payment);
+
+  }
+
+  public void paymentFail(String paymentKey) {
+    Payment payment = paymentRepository.findByPaymentKey(paymentKey);
+    if (payment == null) {
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
+
+    // TODO : 결제 실패 처리 -> 주문 상태 변경 feign API 호출
+
+    payment.setState(PaymentState.CANCEL);
+    paymentRepository.save(payment);
+  }
 
 }
