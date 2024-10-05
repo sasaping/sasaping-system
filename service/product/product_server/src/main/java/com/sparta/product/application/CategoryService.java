@@ -5,9 +5,7 @@ import com.sparta.product.domain.repository.jpa.CategoryRepository;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
 import com.sparta.product.presentation.response.CategoryResponse;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CategoryService {
   private final CategoryRepository categoryRepository;
+  private final CategoryCacheService categoryCacheService;
 
   @Transactional
   public Long createCategory(String name, Long parentCategoryId) {
@@ -26,6 +25,7 @@ public class CategoryService {
     Optional.ofNullable(parent).ifPresent(p -> p.addSubCategory(category));
 
     var saved = categoryRepository.save(category);
+    refreshCategoryCache();
     return saved.getCategoryId();
   }
 
@@ -36,6 +36,7 @@ public class CategoryService {
     Category parent =
         Optional.ofNullable(parentCategoryId).map(this::findByCategoryId).orElse(null);
     target.update(name, parent);
+    refreshCategoryCache();
     return CategoryResponse.fromEntity(target);
   }
 
@@ -43,13 +44,12 @@ public class CategoryService {
   public void deleteCategory(Long categoryId) {
     Category category = findByCategoryId(categoryId);
     categoryRepository.delete(category);
+    refreshCategoryCache();
   }
 
-  public List<CategoryResponse> getCategories() {
-    return categoryRepository.findAllWithSubCategories().stream()
-        .filter(category -> category.getParent() == null)
-        .map(CategoryResponse::fromEntity)
-        .collect(Collectors.toList());
+  private void refreshCategoryCache() {
+    categoryCacheService.clearCache();
+    categoryCacheService.fetchAndCacheCategories();
   }
 
   private Category findByCategoryId(Long categoryId) {
