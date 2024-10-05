@@ -37,12 +37,17 @@ public class Category extends BaseEntity {
 
   @Column private boolean isDeleted = false;
 
-  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Category> subCategories = new ArrayList<>();
 
   public Category(String name, Category parent) {
     this.name = name;
     this.parent = parent;
+  }
+
+  public void update(String name, Category category) {
+    this.name = name;
+    this.parent = category;
   }
 
   public void delete() {

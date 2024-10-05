@@ -4,6 +4,7 @@ import com.sparta.product.domain.model.Category;
 import com.sparta.product.domain.repository.jpa.CategoryRepository;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
+import com.sparta.product.presentation.response.CategoryResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,20 @@ public class CategoryService {
     Category parent =
         Optional.ofNullable(parentCategoryId).map(this::findByCategoryId).orElse(null);
     Category category = new Category(name, parent);
+    Optional.ofNullable(parent).ifPresent(p -> p.addSubCategory(category));
+
     var saved = categoryRepository.save(category);
     return saved.getCategoryId();
+  }
+
+  @Transactional
+  public CategoryResponse updateCategory(
+      Long targetCategoryId, String name, Long parentCategoryId) {
+    Category target = findByCategoryId(targetCategoryId);
+    Category parent =
+        Optional.ofNullable(parentCategoryId).map(this::findByCategoryId).orElse(null);
+    target.update(name, parent);
+    return CategoryResponse.fromEntity(target);
   }
 
   private Category findByCategoryId(Long categoryId) {
