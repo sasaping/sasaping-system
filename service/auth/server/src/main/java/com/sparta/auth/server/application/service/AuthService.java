@@ -5,7 +5,7 @@ import static com.sparta.auth.server.domain.JwtConstant.USER_ID;
 import static com.sparta.auth.server.domain.JwtConstant.USER_NAME;
 import static com.sparta.auth.server.domain.JwtConstant.USER_ROLE;
 
-import com.sparta.auth.dto.jwt.JwtClaim;
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.auth.server.application.dto.AuthResponse;
 import com.sparta.auth.server.exception.AuthErrorCode;
 import com.sparta.auth.server.exception.AuthException;

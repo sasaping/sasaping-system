@@ -1,6 +1,6 @@
 package com.sparta.auth.server.presentation.controller;
 
-import com.sparta.auth.dto.jwt.JwtClaim;
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.auth.server.application.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
