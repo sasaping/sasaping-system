@@ -23,8 +23,18 @@ public class PaymentRequest {
     private String flowMode = "DIRECT";
     private String easyPay = "토스페이";
     private String method = "";
-    private String successuUrl = "";
-    private String failUrl = "";
+    private String successUrl = "http://localhost:19061/payments/success";
+    private String failUrl = "http://localhost:19061/payments/fail";
+
+  }
+
+  @Getter
+  @Setter
+  public static class Confirm {
+
+    private String paymentKey;
+    private Long orderId;
+    private Long amount;
 
   }
 

@@ -5,6 +5,7 @@ import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.application.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,13 +23,13 @@ public class PaymentController {
     return paymentService.createPayment(createRequest);
   }
 
-  @PostMapping("/payments/success")
+  @GetMapping("/payments/success")
   public void paymentSuccess(@RequestParam String paymentKey) {
     paymentService.paymentSuccess(paymentKey);
   }
 
 
-  @PostMapping("/payments/fail")
+  @GetMapping("/payments/fail")
   public void paymentFail(@RequestParam String paymentKey) {
     paymentService.paymentFail(paymentKey);
   }

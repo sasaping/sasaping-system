@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -80,21 +81,33 @@ public class PaymentService {
   }
 
 
+  @Transactional
   public void paymentSuccess(String paymentKey) {
     Payment payment = paymentRepository.findByPaymentKey(paymentKey);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
-    // TODO : 결제 승인 toss api 호출
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBasicAuth(Base64.getEncoder().encodeToString(originalKey.getBytes()));
 
-    // TODO : 결제 완료 처리 -> 주문 상태 변경 feign API 호출
+    PaymentRequest.Confirm body = new PaymentRequest.Confirm();
+    body.setPaymentKey(paymentKey);
+    body.setOrderId(payment.getOrderId());
+    body.setAmount(payment.getAmount());
+
+    HttpEntity<PaymentRequest.Confirm> entity = new HttpEntity<>(body, headers);
+
+    restTemplate.exchange(
+        tossPaymentsUrl + "/confirm", HttpMethod.POST, entity,
+        Object.class
+    );
+
+    // TODO : 주문 상태 변경 Feign API 호출
 
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);
-    paymentRepository.save(payment);
-
   }
 
   public void paymentFail(String paymentKey) {

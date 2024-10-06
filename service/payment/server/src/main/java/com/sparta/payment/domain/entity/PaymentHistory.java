@@ -1,14 +1,16 @@
 package com.sparta.payment.domain.entity;
 
-import com.sparta.common.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +20,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "p_payment_history")
-public class PaymentHistory extends BaseEntity {
+public class PaymentHistory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +33,19 @@ public class PaymentHistory extends BaseEntity {
 
   private Long amount;
 
+  @Enumerated(EnumType.STRING)
   private PaymentState type;
 
   private String cancelReason;
+
+  private LocalDateTime createdAt;
 
   public static PaymentHistory create(Payment payment) {
     PaymentHistory paymentHistory = new PaymentHistory();
     paymentHistory.setPayment(payment);
     paymentHistory.setAmount(payment.getAmount());
-    paymentHistory.setType(PaymentState.PENDING);
+    paymentHistory.setType(PaymentState.PAYMENT);
+    paymentHistory.setCreatedAt(LocalDateTime.now());
     return paymentHistory;
   }
 
@@ -48,6 +54,7 @@ public class PaymentHistory extends BaseEntity {
     paymentHistory.setPayment(payment);
     paymentHistory.setAmount(payment.getAmount());
     paymentHistory.setType(PaymentState.CANCEL);
+    paymentHistory.setCreatedAt(LocalDateTime.now());
     return paymentHistory;
   }
 
