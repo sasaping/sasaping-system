@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 public class CartProduct {
 
   private UUID productId;
-  private ProductInfo productInfo;
+  private Integer quantity;
+
+  private String name;
+  private Integer price;
 
 }

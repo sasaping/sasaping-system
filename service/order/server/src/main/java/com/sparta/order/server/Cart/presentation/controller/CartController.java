@@ -26,19 +26,19 @@ public class CartController {
   // TODO userId 인증 객체로 변경 필요
 
   @GetMapping
-  public ApiResponse<Map<String, CartDto.ProductInfoDto>> getCartList(
+  public ApiResponse<Map<String, Integer>> getCartList(
       @RequestParam(name = "userId") Long userId) {
     return ApiResponse.ok(cartService.getCart(userId));
   }
 
   @PostMapping("/products")
-  public ApiResponse<?> addCart(@RequestBody @Valid CartDto.AddRequest request) {
+  public ApiResponse<?> addCart(@RequestBody @Valid CartDto.Request request) {
     cartService.addCart(request);
     return ApiResponse.created(null);
   }
 
   @PatchMapping("/products")
-  public ApiResponse<?> updateCart(@RequestBody @Valid CartDto.UpdateRequest request) {
+  public ApiResponse<?> updateCart(@RequestBody @Valid CartDto.Request request) {
     cartService.updateCart(request);
     return ApiResponse.ok(null);
   }
