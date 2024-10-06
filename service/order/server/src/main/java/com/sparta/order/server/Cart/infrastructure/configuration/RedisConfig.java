@@ -17,6 +17,7 @@ public class RedisConfig {
       RedisConnectionFactory connectionFactory) {
     RedisTemplate<String, CartProduct> template = new RedisTemplate<>();
     template.setConnectionFactory(connectionFactory);
+    template.setEnableTransactionSupport(true);
 
     template.setKeySerializer(new StringRedisSerializer());
     template.setValueSerializer(new Jackson2JsonRedisSerializer<>(CartProduct.class));
