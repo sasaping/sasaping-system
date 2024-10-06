@@ -17,7 +17,7 @@ import com.sparta.auth.server.application.service.UserService;
 import com.sparta.auth.server.exception.AuthErrorCode;
 import com.sparta.auth.server.exception.AuthException;
 import com.sparta.auth.server.presentation.request.AuthRequest;
-import com.sparta.user.dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
