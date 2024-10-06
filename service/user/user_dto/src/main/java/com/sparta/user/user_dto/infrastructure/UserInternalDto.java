@@ -1,4 +1,4 @@
-package com.sparta.user.dto.infrastructure;
+package com.sparta.user.user_dto.infrastructure;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

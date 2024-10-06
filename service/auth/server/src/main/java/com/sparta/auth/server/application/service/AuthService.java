@@ -5,13 +5,13 @@ import static com.sparta.auth.server.domain.JwtConstant.USER_ID;
 import static com.sparta.auth.server.domain.JwtConstant.USER_NAME;
 import static com.sparta.auth.server.domain.JwtConstant.USER_ROLE;
 
-import com.sparta.auth.dto.jwt.JwtClaim;
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.auth.server.application.dto.AuthResponse;
 import com.sparta.auth.server.exception.AuthErrorCode;
 import com.sparta.auth.server.exception.AuthException;
 import com.sparta.auth.server.infrastructure.properties.JwtProperties;
 import com.sparta.auth.server.presentation.request.AuthRequest;
-import com.sparta.user.dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

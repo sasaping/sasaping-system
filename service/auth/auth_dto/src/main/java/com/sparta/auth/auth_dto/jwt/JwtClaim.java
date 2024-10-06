@@ -1,4 +1,4 @@
-package com.sparta.auth.dto.jwt;
+package com.sparta.auth.auth_dto.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
