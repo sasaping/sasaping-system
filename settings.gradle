@@ -4,6 +4,20 @@ include(':common:domain')
 
 include(':service:user:server')
 include(':service:user:dto')
+
+include(':service:product:product_server')
+include(':service:product:product_dto')
+
 include(':service:payment:server')
+
 include(':service:eureka')
 include(':service:gateway:server')
+
+include(':service:auth:server')
+
+include(':service:order:server')
+include(':service:order:dto')
+
+include(':service:notification:server')
+
+include(':service:slack:server')
