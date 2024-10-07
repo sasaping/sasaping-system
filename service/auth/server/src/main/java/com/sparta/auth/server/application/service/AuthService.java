@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,18 +30,22 @@ public class AuthService {
   private final UserService userService;
   private final JwtProperties jwtProperties;
   private final SecretKey secretKey;
+  private final PasswordEncoder passwordEncoder;
 
-  public AuthService(UserService userService, JwtProperties jwtProperties) {
+  public AuthService(UserService userService, JwtProperties jwtProperties,
+      PasswordEncoder passwordEncoder) {
     this.userService = userService;
     this.jwtProperties = jwtProperties;
     this.secretKey = createSecretKey();
+    this.passwordEncoder = passwordEncoder;
   }
 
   public AuthResponse.SignIn signIn(AuthRequest.SignIn request) {
     UserDto userData = userService.getUserByUsername(request.getUsername());
 
-    // TODO(경민): 암호화 된 비밀번호로 비교해야함
-    if (userData == null || !userData.getPassword().equals(request.getPassword())) {
+    if (userData == null ||
+        !passwordEncoder.matches(request.getPassword(), userData.getPassword())
+    ) {
       throw new AuthException(AuthErrorCode.SIGN_IN_FAIL);
     }
 
