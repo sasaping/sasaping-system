@@ -18,4 +18,16 @@ public class UserInternalDto {
 
   }
 
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class UserOrderResponse {
+
+    private Long userId;
+    private String username;
+    private String role;
+    private Integer point;
+
+  }
+
 }

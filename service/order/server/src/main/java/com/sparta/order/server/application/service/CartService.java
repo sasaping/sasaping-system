@@ -6,7 +6,9 @@ import com.sparta.order.server.exception.CartErrorCode;
 import com.sparta.order.server.exception.CartException;
 import com.sparta.order.server.presentation.dto.CartDto;
 import com.sparta.order.server.presentation.dto.CartDto.AddRequest;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.springframework.data.redis.core.HashOperations;
@@ -56,6 +58,17 @@ public class CartService {
             entry -> CartDto.ProductInfoDto.fromModel(entry.getValue())
         ));
     return response;
+  }
+
+  public void validateProductsInCart(Long userId, List<String> productIds) {
+    String redisKey = createRedisKey(userId);
+    validateUserCartExists(redisKey);
+    Set<String> cartProductIds = cartOps.keys(userId.toString());
+    productIds.forEach(productId -> {
+      if (!cartProductIds.contains(productId)) {
+        throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
+      }
+    });
   }
 
   @Transactional
