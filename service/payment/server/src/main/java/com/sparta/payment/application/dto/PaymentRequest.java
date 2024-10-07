@@ -47,4 +47,16 @@ public class PaymentRequest {
 
   }
 
+  @Getter
+  @Setter
+  public static class Search {
+
+    private String keyword;
+    private Long userId;
+    private String startDate;
+    private String endDate;
+    
+
+  }
+
 }

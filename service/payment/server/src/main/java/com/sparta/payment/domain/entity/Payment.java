@@ -34,6 +34,9 @@ public class Payment {
   @Column(name = "order_id")
   private Long orderId;
 
+  @Column(name = "order_name")
+  private String orderName;
+
   @Column(name = "user_id")
   private Long userId;
 
@@ -50,10 +53,12 @@ public class Payment {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+
   public static Payment create(PaymentRequest.Create request) {
     return Payment.builder()
         .userId(request.getUserId())
         .orderId(request.getOrderId())
+        .orderName(request.getOrderName())
         .state(PaymentState.PENDING)
         .amount(request.getAmount())
         .createdAt(LocalDateTime.now())

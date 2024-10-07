@@ -1,8 +1,10 @@
 package com.sparta.payment.application.service;
 
+import com.sparta.payment.application.dto.PaymentHistoryResponse;
 import com.sparta.payment.application.dto.PaymentRequest;
 import com.sparta.payment.application.dto.PaymentRequest.Create;
 import com.sparta.payment.application.dto.PaymentResponse;
+import com.sparta.payment.application.dto.PaymentResponse.Get;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
 import com.sparta.payment.domain.entity.PaymentState;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -146,8 +150,7 @@ public class PaymentService {
           Object.class
       );
 
-      PaymentHistory history = PaymentHistory.cancel(payment);
-      history.setCancelReason(cancelRequest.getCancelReason());
+      PaymentHistory history = PaymentHistory.cancel(payment, cancelRequest.getCancelReason());
       paymentHistoryRepository.save(history);
 
       payment.setState(PaymentState.CANCEL);
@@ -161,7 +164,57 @@ public class PaymentService {
   }
 
 
-  public PaymentResponse.Get getPaymentByOrderId(Long orderId) {
+  public PaymentResponse.GetByOrderId getPaymentByOrderId(Long paymentId) {
+    Payment payment = paymentRepository.findByPaymentId(paymentId);
+    if (payment == null) {
+      throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
+    }
+
+    PaymentResponse.GetByOrderId response = new PaymentResponse.GetByOrderId();
+    response.setPaymentId(payment.getPaymentId());
+    response.setOrderId(payment.getOrderId());
+    response.setOrderName(payment.getOrderName());
+    response.setState(payment.getState());
+    response.setAmount(payment.getAmount());
+    response.setCreatedAt(payment.getCreatedAt());
+
+    return response;
+  }
+
+
+  public Page<PaymentResponse.Get> getAllPayments(Pageable pageable) {
+    Page<Payment> payments = paymentRepository.findAll(pageable);
+    return payments.map(this::convertToPaymentDto);
+  }
+
+  private Get convertToPaymentDto(Payment payment) {
+    Get response = new Get();
+    response.setPaymentId(payment.getPaymentId());
+    response.setOrderId(payment.getOrderId());
+    response.setState(payment.getState());
+    response.setOrderName(payment.getOrderName());
+    response.setAmount(payment.getAmount());
+    response.setCreatedAt(payment.getCreatedAt());
+
+    return response;
+  }
+
+  public List<PaymentHistoryResponse.Get> getPaymentHistory(Long paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+    List<PaymentHistory> histories = paymentHistoryRepository.findByPayment_PaymentId(paymentId);
+    return histories.stream()
+        .map(history -> PaymentHistoryResponse.Get.builder()
+            .amount(history.getAmount())
+            .type(history.getType())
+            .cancelReason(history.getCancelReason())
+            .createdAt(history.getCreatedAt())
+            .build())
+        .toList();
+  }
+
+  public PaymentResponse.Get getPaymentAndHistoryByOrderId(Long orderId) {
     Payment payment = paymentRepository.findByOrderId(orderId);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
@@ -192,5 +245,6 @@ public class PaymentService {
 
     return dto;
   }
+
 
 }

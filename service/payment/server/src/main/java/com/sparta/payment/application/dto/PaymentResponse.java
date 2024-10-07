@@ -29,6 +29,7 @@ public class PaymentResponse {
     private Long paymentId;
     private Long orderId;
     private PaymentState state;
+    private String orderName;
     private Long amount;
     private LocalDateTime createdAt;
     private List<PaymentHistoryDto> histories;
@@ -42,6 +43,19 @@ public class PaymentResponse {
     private Long amount;
     private PaymentState type;
     private String cancelReason;
+    private LocalDateTime createdAt;
+
+  }
+
+  @Getter
+  @Setter
+  public static class GetByOrderId {
+
+    private Long paymentId;
+    private Long orderId;
+    private String orderName;
+    private PaymentState state;
+    private Long amount;
     private LocalDateTime createdAt;
 
   }
