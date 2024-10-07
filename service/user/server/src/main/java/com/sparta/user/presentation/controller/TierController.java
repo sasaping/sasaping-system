@@ -46,6 +46,7 @@ public class TierController {
     return ApiResponse.ok(null);
   }
 
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @DeleteMapping("/{tierId}")
   public ApiResponse<?> deleteTier(@PathVariable(name = "tierId") Long tierId) {
     tierService.deleteTier(tierId);
