@@ -1,4 +1,4 @@
-package com.sparta.order.server.Cart.domain.model;
+package com.sparta.order.server.domain.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +18,9 @@ public class ProductInfo {
   public void addQuantity(int quantity) {
     this.quantity += quantity;
   }
-  public void updateQuantity(int quantity) {this.quantity = quantity; }
+
+  public void updateQuantity(int quantity) {
+    this.quantity = quantity;
+  }
 
 }

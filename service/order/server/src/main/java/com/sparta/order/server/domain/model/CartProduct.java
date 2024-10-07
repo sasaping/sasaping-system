@@ -1,4 +1,4 @@
-package com.sparta.order.server.Cart.domain.model;
+package com.sparta.order.server.domain.model;
 
 import java.util.UUID;
 import lombok.AllArgsConstructor;

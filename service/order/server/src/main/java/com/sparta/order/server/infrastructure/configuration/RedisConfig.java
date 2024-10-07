@@ -1,7 +1,7 @@
-package com.sparta.order.server.Cart.infrastructure.configuration;
+package com.sparta.order.server.infrastructure.configuration;
 
-import com.sparta.order.server.Cart.domain.model.CartProduct;
-import com.sparta.order.server.Cart.domain.model.ProductInfo;
+import com.sparta.order.server.domain.model.CartProduct;
+import com.sparta.order.server.domain.model.ProductInfo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

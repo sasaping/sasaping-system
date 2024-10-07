@@ -1,8 +1,8 @@
-package com.sparta.order.server.Cart.presentation.controller;
+package com.sparta.order.server.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.order.server.Cart.application.service.CartService;
-import com.sparta.order.server.Cart.presentation.dto.CartDto;
+import com.sparta.order.server.application.service.CartService;
+import com.sparta.order.server.presentation.dto.CartDto;
 import jakarta.validation.Valid;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

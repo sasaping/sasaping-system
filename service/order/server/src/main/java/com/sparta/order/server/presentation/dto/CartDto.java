@@ -1,8 +1,8 @@
-package com.sparta.order.server.Cart.presentation.dto;
+package com.sparta.order.server.presentation.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sparta.order.server.Cart.domain.model.ProductInfo;
+import com.sparta.order.server.domain.model.ProductInfo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

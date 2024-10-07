@@ -1,4 +1,4 @@
-package com.sparta.order.server.Cart.exception;
+package com.sparta.order.server.exception;
 
 import com.sparta.common.domain.exception.BusinessException;
 import com.sparta.common.domain.response.ApiResponse;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
-public class CartExceptionHandler {
+public class BusinessExceptionHandler {
 
   @ExceptionHandler(BusinessException.class)
   public ApiResponse<Void> handleBusinessException(BusinessException ex) {
