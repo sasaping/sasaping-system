@@ -34,3 +34,14 @@ Authorization: {{Token}}
 ### 등급 조회
 GET http://localhost:{{Port}}/api/tier
 Authorization: {{Token}}
+
+### 등급 수정
+@tierId = 1
+PATCH localhost:{{Port}}/api/tier/{{tierId}}
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "name": "골드핑그르르",
+  "thresholdPrice": 200000
+}

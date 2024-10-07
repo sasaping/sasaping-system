@@ -12,6 +12,7 @@ import com.sparta.user.application.dto.TierResponse;
 import com.sparta.user.application.service.TierService;
 import com.sparta.user.domain.model.Tier;
 import com.sparta.user.domain.repository.TierRepository;
+import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.TierRequest;
 import com.sparta.user.presentation.request.TierRequest.Create;
@@ -67,8 +68,8 @@ public class TierApplicationTests {
   void 티어_목록_조회시_모든_티어가_반환됨() {
     // given
     List<Tier> tiers = Arrays.asList(
-        new Tier(1L, "Bronze", 1000L),
-        new Tier(2L, "Silver", 5000L)
+        new Tier(1L, "애기핑", 1000L),
+        new Tier(2L, "실버핑", 5000L)
     );
     given(tierRepository.findAll()).willReturn(tiers);
 
@@ -77,8 +78,8 @@ public class TierApplicationTests {
 
     // then
     assertEquals(2, tierResponseList.size());
-    assertEquals("Bronze", tierResponseList.get(0).getName());
-    assertEquals("Silver", tierResponseList.get(1).getName());
+    assertEquals("애기핑", tierResponseList.get(0).getName());
+    assertEquals("실버핑", tierResponseList.get(1).getName());
     then(tierRepository).should().findAll();
   }
 
@@ -93,6 +94,42 @@ public class TierApplicationTests {
     // then
     assertTrue(tierResponseList.isEmpty());
     then(tierRepository).should().findAll();
+  }
+
+  @Test
+  void 티어_수정시_존재하는_티어면_수정성공() {
+    // given
+    Long tierId = 1L;
+    TierRequest.Update request = new TierRequest.Update("골드핑", 200000L);
+    Tier existingTier = new Tier(tierId, "실버핑", 100000L);
+
+    given(tierRepository.findById(tierId)).willReturn(Optional.of(existingTier));
+
+    // when
+    tierService.updateTier(tierId, request);
+
+    // then
+    assertEquals("골드핑", existingTier.getName()); // 업데이트된 이름 확인
+    assertEquals(200000L, existingTier.getThresholdPrice()); // 업데이트된 포인트 확인
+    then(tierRepository).should().findById(tierId);
+    then(tierRepository).shouldHaveNoMoreInteractions();
+  }
+
+  @Test
+  void 티어_수정시_존재하지_않는_티어면_예외발생() {
+    // given
+    Long tierId = 1L;
+    TierRequest.Update request = new TierRequest.Update("골드핑", 200000L);
+
+    given(tierRepository.findById(tierId)).willReturn(Optional.empty());
+
+    // when & then
+    UserException exception = assertThrows(UserException.class,
+        () -> tierService.updateTier(tierId, request));
+
+    assertEquals(UserErrorCode.TIER_NOT_FOUND.getMessage(), exception.getMessage());
+    then(tierRepository).should().findById(tierId);
+    then(tierRepository).should(never()).save(any(Tier.class));
   }
 
 }

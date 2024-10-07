@@ -16,4 +16,14 @@ public class TierRequest {
 
   }
 
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Update {
+
+    private String name;
+    private Long thresholdPrice;
+
+  }
+
 }

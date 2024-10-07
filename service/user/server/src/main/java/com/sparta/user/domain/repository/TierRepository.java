@@ -14,4 +14,6 @@ public interface TierRepository {
 
   List<Tier> findAll();
 
+  Optional<Tier> findById(Long tierId);
+
 }

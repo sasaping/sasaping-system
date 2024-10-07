@@ -40,4 +40,9 @@ public class Tier extends BaseEntity {
         .build();
   }
 
+  public void update(TierRequest.Update request) {
+    this.name = request.getName();
+    this.thresholdPrice = request.getThresholdPrice();
+  }
+
 }

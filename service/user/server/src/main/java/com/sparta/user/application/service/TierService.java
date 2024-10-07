@@ -5,6 +5,7 @@ import com.sparta.user.domain.model.Tier;
 import com.sparta.user.domain.repository.TierRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
+import com.sparta.user.presentation.request.TierRequest;
 import com.sparta.user.presentation.request.TierRequest.Create;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,14 @@ public class TierService {
 
   public List<TierResponse.Get> getTierList() {
     return tierRepository.findAll().stream().map(TierResponse.Get::of).toList();
+  }
+
+  @Transactional
+  public void updateTier(Long tierId, TierRequest.Update request) {
+    Tier tier = tierRepository
+        .findById(tierId)
+        .orElseThrow(() -> new UserException(UserErrorCode.TIER_NOT_FOUND));
+    tier.update(request);
   }
 
 }

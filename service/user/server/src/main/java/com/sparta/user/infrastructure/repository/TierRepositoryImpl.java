@@ -28,4 +28,9 @@ public class TierRepositoryImpl implements TierRepository {
     return jpaTierRepository.findAll();
   }
 
+  @Override
+  public Optional<Tier> findById(Long tierId) {
+    return jpaTierRepository.findById(tierId);
+  }
+
 }
