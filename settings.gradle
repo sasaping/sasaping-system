@@ -9,6 +9,7 @@ include(':service:product:product_server')
 include(':service:product:product_dto')
 
 include(':service:payment:server')
+include(':service:payment:payment_dto')
 
 include(':service:eureka')
 include(':service:gateway:server')
