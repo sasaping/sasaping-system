@@ -12,6 +12,8 @@ import com.sparta.payment.domain.repository.PaymentHistoryRepository;
 import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
+import com.sparta.payment.infrastructure.client.MessageClient;
+import com.sparta.slack_dto.infrastructure.MessageInternalDto;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -40,13 +42,15 @@ public class PaymentService {
   private final PaymentRepository paymentRepository;
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
+  private final MessageClient messageClient;
 
   public PaymentService(PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
-      RestTemplateBuilder restTemplateBuilder) {
+      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient) {
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
+    this.messageClient = messageClient;
   }
 
 
@@ -67,10 +71,10 @@ public class PaymentService {
           tossPaymentsUrl, HttpMethod.POST, entity, PaymentResponse.Create.class
       );
 
-      sendPaymentUrltoUser(request.getOrderId(), request.getOrderName(), response.getBody());
-
       Payment payment = Payment.create(request);
       payment.setPaymentKey(Objects.requireNonNull(response.getBody()).getPaymentKey());
+
+      sendMessage(response.getBody().getCheckout(), request.getEmail());
 
       paymentRepository.save(payment);
 
@@ -81,9 +85,19 @@ public class PaymentService {
     }
   }
 
-  // TODO : 슬랙 전송 feign 연결
-  private void sendPaymentUrltoUser(Long orderId, String orderName, Object checkout) {
-    log.info("orderId={}, orderName={}, checkout={}", orderId, orderName, checkout);
+  private void sendMessage(Object checkout, String usermail) {
+    try {
+      String checkoutUrl = checkout.toString().replace("{url=", "").replace("}", "");
+
+      MessageInternalDto.Create messageRequest = new MessageInternalDto.Create();
+      messageRequest.setReceiverEmail(usermail);
+      messageRequest.setMessage(checkoutUrl);
+
+      messageClient.sendMessage(messageRequest);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
   }
 
 
