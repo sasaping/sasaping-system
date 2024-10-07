@@ -10,7 +10,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +48,9 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private UserRole role;
 
+  @OneToMany(mappedBy = "user")
+  private List<PointHistory> pointHistories;
+
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
         .username(request.getUsername())
@@ -55,4 +60,5 @@ public class User extends BaseEntity {
         .role(request.getRole())
         .build();
   }
+
 }
