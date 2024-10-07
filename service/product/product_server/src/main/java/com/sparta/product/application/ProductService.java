@@ -49,6 +49,10 @@ public class ProductService {
     return ProductResponse.fromEntity(product);
   }
 
+  public ProductResponse getProduct(UUID productId) {
+    return ProductResponse.fromEntity(getSavedProduct(productId));
+  }
+
   private Product getSavedProduct(UUID productId) {
     return productRepository
         .findByProductIdAndIsDeletedFalse(productId)
