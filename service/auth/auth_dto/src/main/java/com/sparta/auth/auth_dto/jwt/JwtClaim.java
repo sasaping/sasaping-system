@@ -16,5 +16,4 @@ public class JwtClaim {
   public static JwtClaim create(Long userId, String username, String role) {
     return new JwtClaim(userId, username, role);
   }
-
 }

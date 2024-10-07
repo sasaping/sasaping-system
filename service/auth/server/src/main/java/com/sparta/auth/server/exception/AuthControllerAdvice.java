@@ -26,5 +26,4 @@ public class AuthControllerAdvice {
             ApiResponse.error(
                 AuthErrorCode.INTERNAL_SERVER_ERROR.getStatus().name(), e.getMessage()));
   }
-
 }

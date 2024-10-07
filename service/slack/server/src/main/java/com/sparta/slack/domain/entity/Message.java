@@ -43,5 +43,4 @@ public class Message {
         .sendAt(LocalDateTime.now())
         .build();
   }
-
 }

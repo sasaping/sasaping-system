@@ -35,11 +35,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @SpringBootTest
 class AuthApplicationTests {
 
-  @MockBean
-  private UserService userService;
+  @MockBean private UserService userService;
 
-  @Autowired
-  private AuthService authService;
+  @Autowired private AuthService authService;
 
   @Value("${jwt.secret-key}")
   private String secretKeyString;
@@ -49,16 +47,22 @@ class AuthApplicationTests {
   @BeforeEach
   void setUp() {
     // SecretKey 초기화
-    secretKey = new SecretKeySpec(secretKeyString.getBytes(StandardCharsets.UTF_8),
-        SignatureAlgorithm.HS256.getJcaName());
+    secretKey =
+        new SecretKeySpec(
+            secretKeyString.getBytes(StandardCharsets.UTF_8),
+            SignatureAlgorithm.HS256.getJcaName());
   }
 
   @Test
   void test_로그인_성공() {
     // Arrange
     AuthRequest.SignIn request = new AuthRequest.SignIn("testuser", "password123");
-    UserDto userDto = new UserDto(1L, "testuser",
-        "$2a$10$YZ2cP0PF11iqNqNrwk4pUOKQnAGxqLtGxO1F6XZomixg73EYQoduC", "ROLE_ADMIN");
+    UserDto userDto =
+        new UserDto(
+            1L,
+            "testuser",
+            "$2a$10$YZ2cP0PF11iqNqNrwk4pUOKQnAGxqLtGxO1F6XZomixg73EYQoduC",
+            "ROLE_ADMIN");
 
     // Mock the user service to return the userDto when called
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
@@ -78,8 +82,7 @@ class AuthApplicationTests {
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
 
     // Act & Assert
-    AuthException exception = assertThrows(AuthException.class,
-        () -> authService.signIn(request));
+    AuthException exception = assertThrows(AuthException.class, () -> authService.signIn(request));
     assertEquals("로그인 실패", exception.getMessage());
 
     verify(userService, times(1)).getUserByUsername("testuser");
@@ -92,8 +95,7 @@ class AuthApplicationTests {
     when(userService.getUserByUsername("nonexistentuser")).thenReturn(null);
 
     // Act & Assert
-    AuthException exception = assertThrows(AuthException.class,
-        () -> authService.signIn(request));
+    AuthException exception = assertThrows(AuthException.class, () -> authService.signIn(request));
     assertEquals("로그인 실패", exception.getMessage());
 
     verify(userService, times(1)).getUserByUsername("nonexistentuser");
@@ -101,15 +103,16 @@ class AuthApplicationTests {
 
   @Test
   void test_정상_토큰() {
-    String token = Jwts.builder()
-        .setSubject("test")
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + 60000)) // 1분 후 만료
-        .claim(USER_ID, 1L)
-        .claim(USER_NAME, "testUser")
-        .claim(USER_ROLE, "ROLE_ADMIN")
-        .signWith(secretKey)
-        .compact();
+    String token =
+        Jwts.builder()
+            .setSubject("test")
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 60000)) // 1분 후 만료
+            .claim(USER_ID, 1L)
+            .claim(USER_NAME, "testUser")
+            .claim(USER_ROLE, "ROLE_ADMIN")
+            .signWith(secretKey)
+            .compact();
 
     JwtClaim result = authService.verifyToken(token);
 
@@ -120,41 +123,41 @@ class AuthApplicationTests {
 
   @Test
   void test_만료된_토큰() {
-    String expiredToken = Jwts.builder()
-        .setSubject("test")
-        .setIssuedAt(new Date(System.currentTimeMillis() - 2000)) // 2초 전 발급
-        .setExpiration(new Date(System.currentTimeMillis() - 1000)) // 1초 전에 만료
-        .claim(USER_ID, 1L)
-        .claim(USER_NAME, "testUser")
-        .claim(USER_ROLE, "ROLE_USER")
-        .signWith(secretKey)
-        .compact();
+    String expiredToken =
+        Jwts.builder()
+            .setSubject("test")
+            .setIssuedAt(new Date(System.currentTimeMillis() - 2000)) // 2초 전 발급
+            .setExpiration(new Date(System.currentTimeMillis() - 1000)) // 1초 전에 만료
+            .claim(USER_ID, 1L)
+            .claim(USER_NAME, "testUser")
+            .claim(USER_ROLE, "ROLE_USER")
+            .signWith(secretKey)
+            .compact();
 
-    AuthException thrownException = assertThrows(AuthException.class,
-        () -> authService.verifyToken(expiredToken));
+    AuthException thrownException =
+        assertThrows(AuthException.class, () -> authService.verifyToken(expiredToken));
 
     assertEquals(
-        AuthErrorCode.TOEKN_EXPIRED.getMessage(),
-        thrownException.getErrorCode().getMessage());
+        AuthErrorCode.TOEKN_EXPIRED.getMessage(), thrownException.getErrorCode().getMessage());
   }
 
   @Test
   void test_잘못된_토큰() {
-    String invalidToken = Jwts.builder()
-        .setSubject("test")
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + 10000)) // 10초 후 만료
-        .claim(USER_ID, 1L)
-        .claim(USER_NAME, "testUser")
-        .claim(USER_ROLE, "ROLE_USER")
-        .signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256)) // 다른 키로 서명
-        .compact();
+    String invalidToken =
+        Jwts.builder()
+            .setSubject("test")
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 10000)) // 10초 후 만료
+            .claim(USER_ID, 1L)
+            .claim(USER_NAME, "testUser")
+            .claim(USER_ROLE, "ROLE_USER")
+            .signWith(Keys.secretKeyFor(SignatureAlgorithm.HS256)) // 다른 키로 서명
+            .compact();
 
-    AuthException thrownException = assertThrows(AuthException.class,
-        () -> authService.verifyToken(invalidToken));
+    AuthException thrownException =
+        assertThrows(AuthException.class, () -> authService.verifyToken(invalidToken));
 
-    assertEquals(AuthErrorCode.INVALID_TOKEN.getMessage(),
-        thrownException.getErrorCode().getMessage());
+    assertEquals(
+        AuthErrorCode.INVALID_TOKEN.getMessage(), thrownException.getErrorCode().getMessage());
   }
-
 }

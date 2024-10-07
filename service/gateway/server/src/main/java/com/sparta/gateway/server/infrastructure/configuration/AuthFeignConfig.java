@@ -19,5 +19,4 @@ public class AuthFeignConfig {
   public Logger.Level feignLoggerLevel() {
     return Logger.Level.FULL;
   }
-
 }

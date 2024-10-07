@@ -25,21 +25,24 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain httpSecurity(HttpSecurity http, ObjectMapper objectMapper)
       throws Exception {
-    http
-        .csrf(AbstractHttpConfigurer::disable)
+    http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
-        .sessionManagement((s) -> s.sessionCreationPolicy(
-            SessionCreationPolicy.STATELESS))
+        .sessionManagement((s) -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .rememberMe(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
         .requestCache(RequestCacheConfigurer::disable)
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/users/sign-up").permitAll()
-            .requestMatchers("/internal/users/**").permitAll()
-            .anyRequest().authenticated())
-        .addFilterAfter(new SecurityContextFilter(objectMapper),
-            UsernamePasswordAuthenticationFilter.class);
+        .authorizeHttpRequests(
+            authorize ->
+                authorize
+                    .requestMatchers("/api/users/sign-up")
+                    .permitAll()
+                    .requestMatchers("/internal/users/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .addFilterAfter(
+            new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
@@ -48,5 +51,4 @@ public class SecurityConfig {
   public PasswordEncoder getPasswordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
 }

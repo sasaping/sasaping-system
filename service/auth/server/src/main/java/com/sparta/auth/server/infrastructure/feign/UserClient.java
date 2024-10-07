@@ -12,5 +12,4 @@ public interface UserClient extends UserService {
 
   @GetMapping("/internal/users")
   UserDto getUserByUsername(@RequestParam(value = "username") String username);
-
 }

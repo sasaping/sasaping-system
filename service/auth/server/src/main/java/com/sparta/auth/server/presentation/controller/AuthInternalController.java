@@ -19,5 +19,4 @@ public class AuthInternalController {
   public JwtClaim verifyToken(@RequestHeader("Authorization") String token) {
     return authService.verifyToken(token);
   }
-
 }
