@@ -3,8 +3,8 @@ spring:
     name: payment
   datasource:
     url: jdbc:mysql://localhost:3306/{LOCAL_DB_NAME}
-    username: {LOCAL_DB_USERNAME}
-    password: {LOCAL_DB_PASSWORD}
+    username: { LOCAL_DB_USERNAME }
+    password: { LOCAL_DB_PASSWORD }
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -19,3 +19,5 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+TOSS_SECRET_KEY: { TOSS_SECRET_KEY }
