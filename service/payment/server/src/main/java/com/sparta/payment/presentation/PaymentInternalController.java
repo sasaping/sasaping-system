@@ -1,8 +1,8 @@
 package com.sparta.payment.presentation;
 
-import com.sparta.payment.application.dto.PaymentRequest;
-import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.application.service.PaymentService;
+import com.sparta.payment.presentation.dto.PaymentRequest;
+import com.sparta.payment.presentation.dto.PaymentResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/internal/payment")
+@RequestMapping("/internal/payments")
 @RequiredArgsConstructor
 public class PaymentInternalController {
 

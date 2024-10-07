@@ -1,9 +1,9 @@
 package com.sparta.payment.presentation;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.payment.application.dto.PaymentHistoryResponse;
-import com.sparta.payment.application.dto.PaymentResponse;
 import com.sparta.payment.application.service.PaymentService;
+import com.sparta.payment.presentation.dto.PaymentHistoryResponse;
+import com.sparta.payment.presentation.dto.PaymentResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class PaymentController {
   private final PaymentService paymentService;
 
 
-  @GetMapping("/payments/success")
+  @GetMapping("/api/payments/success")
   public void paymentSuccess(@RequestParam String paymentKey) {
     paymentService.paymentSuccess(paymentKey);
   }

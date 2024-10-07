@@ -1,4 +1,4 @@
-package com.sparta.payment.application.dto;
+package com.sparta.payment.presentation.dto;
 
 import lombok.Getter;
 import lombok.Setter;
