@@ -1,4 +1,5 @@
 @Port=19091
+@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX1JPTEUiOiJST0xFX0FETUlOIiwiVVNFUl9JRCI6NywiVVNFUl9OQU1FIjoibmV3VXNlciIsImlhdCI6MTcyODI5MjM2NywiZXhwIjoxNzMxODkyMzY3fQ.Kvp1JJLpjxjRX4N8Nt46QP-_1jAnSzVvSISordEMHN8
 
 ### 회원가입
 POST http://localhost:{{Port}}/api/users/sign-up
@@ -14,4 +15,4 @@ Content-Type: application/json
 
 ### 인증/인가 테스트 API
 GET http://localhost:{{Port}}/api/users/hello
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX05BTUUiOiJuZXdVc2VyIiwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfSUQiOjcsImlhdCI6MTcyODI3ODEzOSwiZXhwIjoxNzMxODc4MTM5fQ.V9G1wEgl9xRGgG_0wbobjVNggATGvZekewfoUMb0RNs
+Authorization: {{Token}}
