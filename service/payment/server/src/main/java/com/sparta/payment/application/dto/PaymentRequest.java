@@ -12,6 +12,7 @@ public class PaymentRequest {
     private Long userId;
     private Long orderId;
     private String orderName;
+    private String email;
     private Long amount;
 
   }
@@ -55,7 +56,7 @@ public class PaymentRequest {
     private Long userId;
     private String startDate;
     private String endDate;
-    
+
 
   }
 
