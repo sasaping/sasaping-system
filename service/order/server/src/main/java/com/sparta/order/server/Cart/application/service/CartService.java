@@ -37,11 +37,9 @@ public class CartService {
 
     if (existingProductInfo != null) {
       existingProductInfo.addQuantity(request.getProductInfoDto().getQuantity());
-      cartOps.put(redisKey, request.getProductId(),
-          existingProductInfo);
+      cartOps.put(redisKey, request.getProductId(), existingProductInfo);
     } else {
-      cartOps.put(redisKey, request.getProductId(),
-          request.getProductInfoDto().toEntity());
+      cartOps.put(redisKey, request.getProductId(), request.getProductInfoDto().toEntity());
     }
     cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
   }
@@ -50,11 +48,12 @@ public class CartService {
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
     Map<String, ProductInfo> cartProductInfos = cartOps.entries(redisKey);
-    Map<String, CartDto.ProductInfoDto> response = cartProductInfos.entrySet().stream()
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> CartDto.ProductInfoDto.fromModel(entry.getValue())
-        ));
+    Map<String, CartDto.ProductInfoDto> response =
+        cartProductInfos.entrySet().stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> CartDto.ProductInfoDto.fromModel(entry.getValue())));
     return response;
   }
 
@@ -102,5 +101,4 @@ public class CartService {
       throw new CartException(CartErrorCode.CART_NOT_FOUND);
     }
   }
-
 }

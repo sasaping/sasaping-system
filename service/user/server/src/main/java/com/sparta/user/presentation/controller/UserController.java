@@ -28,13 +28,10 @@ public class UserController {
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/hello")
-  public String hello(
-      @AuthenticationPrincipal JwtClaim claim
-  ) {
+  public String hello(@AuthenticationPrincipal JwtClaim claim) {
     System.out.println("claim.getUserId() = " + claim.getUserId());
     System.out.println("claim.getUsername() = " + claim.getUsername());
     System.out.println("claim.getRole() = " + claim.getRole());
     return "Hello World!";
   }
-
 }

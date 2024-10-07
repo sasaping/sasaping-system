@@ -16,11 +16,7 @@ public class AuthResponse {
     private String token;
 
     public static SignIn of(String token) {
-      return SignIn.builder()
-          .token(token)
-          .build();
+      return SignIn.builder().token(token).build();
     }
-
   }
-
 }

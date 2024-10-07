@@ -16,7 +16,5 @@ public class MessageResponse {
       this.receiverEmail = messageRequest.getReceiverEmail();
       this.message = messageRequest.getMessage();
     }
-
   }
-
 }

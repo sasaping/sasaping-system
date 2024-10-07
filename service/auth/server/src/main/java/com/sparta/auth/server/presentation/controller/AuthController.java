@@ -21,5 +21,4 @@ public class AuthController {
   public ApiResponse<AuthResponse.SignIn> signIn(@RequestBody AuthRequest.SignIn request) {
     return ApiResponse.ok(authService.signIn(request));
   }
-
 }

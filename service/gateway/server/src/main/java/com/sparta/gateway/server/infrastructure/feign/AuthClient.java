@@ -12,5 +12,4 @@ public interface AuthClient extends AuthService {
 
   @GetMapping("/internal/auth/verify")
   JwtClaim verifyToken(@RequestHeader("Authorization") String token);
-
 }

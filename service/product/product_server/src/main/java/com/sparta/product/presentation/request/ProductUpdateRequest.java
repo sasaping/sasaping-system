@@ -17,6 +17,4 @@ public record ProductUpdateRequest(
     @NotBlank(message = "상세이미지주소는 필수입니다") String detailImgUrl,
     @NotNull(message = "상품이름은 필수입니다") Integer limitCountPerUser,
     @NotNull(message = "공개여부는 필수입니다") Boolean isPublic,
-    @NotNull(message = "쿠폰적용여부는 필수입니다") Boolean isCoupon) {
-
-}
+    @NotNull(message = "쿠폰적용여부는 필수입니다") Boolean isCoupon) {}

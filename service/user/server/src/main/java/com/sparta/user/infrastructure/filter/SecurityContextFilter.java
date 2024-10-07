@@ -43,5 +43,4 @@ public class SecurityContextFilter extends OncePerRequestFilter {
 
     filterChain.doFilter(request, response);
   }
-
 }

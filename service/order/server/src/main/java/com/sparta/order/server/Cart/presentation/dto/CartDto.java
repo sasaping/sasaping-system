@@ -1,6 +1,5 @@
 package com.sparta.order.server.Cart.presentation.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sparta.order.server.Cart.domain.model.ProductInfo;
 import jakarta.validation.Valid;
@@ -23,9 +22,7 @@ public class CartDto {
     @NotNull(message = "상품 ID는 필수 값입니다.")
     private String productId;
 
-    @Valid
-    private ProductInfoDto productInfoDto;
-
+    @Valid private ProductInfoDto productInfoDto;
   }
 
   @Getter
@@ -42,7 +39,6 @@ public class CartDto {
     @NotNull(message = "상품 수량은 필수 값입니다.")
     @Min(value = 1, message = "상품 수량 최소 값은 1 입니다.")
     private Integer quantity;
-
   }
 
   @Getter
@@ -71,7 +67,5 @@ public class CartDto {
     public static ProductInfoDto fromModel(ProductInfo model) {
       return new ProductInfoDto(model.getProductName(), model.getQuantity(), model.getPrice());
     }
-
   }
-
 }
