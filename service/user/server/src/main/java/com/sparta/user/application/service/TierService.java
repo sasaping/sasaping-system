@@ -41,4 +41,12 @@ public class TierService {
     tier.update(request);
   }
 
+  @Transactional
+  public void deleteTier(Long tierId) {
+    Tier tier = tierRepository
+        .findById(tierId)
+        .orElseThrow(() -> new UserException(UserErrorCode.TIER_NOT_FOUND));
+    tierRepository.delete(tier);
+  }
+
 }

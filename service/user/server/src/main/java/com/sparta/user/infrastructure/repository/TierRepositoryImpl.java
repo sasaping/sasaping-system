@@ -33,4 +33,9 @@ public class TierRepositoryImpl implements TierRepository {
     return jpaTierRepository.findById(tierId);
   }
 
+  @Override
+  public void delete(Tier tier) {
+    jpaTierRepository.delete(tier);
+  }
+
 }

@@ -7,6 +7,7 @@ import com.sparta.user.presentation.request.TierRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +43,12 @@ public class TierController {
       @RequestBody TierRequest.Update request
   ) {
     tierService.updateTier(tierId, request);
+    return ApiResponse.ok(null);
+  }
+
+  @DeleteMapping("/{tierId}")
+  public ApiResponse<?> deleteTier(@PathVariable(name = "tierId") Long tierId) {
+    tierService.deleteTier(tierId);
     return ApiResponse.ok(null);
   }
 

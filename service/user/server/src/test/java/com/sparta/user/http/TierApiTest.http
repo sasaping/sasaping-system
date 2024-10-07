@@ -45,3 +45,7 @@ Authorization: {{Token}}
   "name": "골드핑그르르",
   "thresholdPrice": 200000
 }
+
+### 등급 삭제
+DELETE localhost:{{Port}}/api/tier/{{tierId}}
+Authorization: {{Token}}

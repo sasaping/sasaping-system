@@ -16,4 +16,6 @@ public interface TierRepository {
 
   Optional<Tier> findById(Long tierId);
 
+  void delete(Tier tier);
+
 }

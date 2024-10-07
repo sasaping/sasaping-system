@@ -132,4 +132,36 @@ public class TierApplicationTests {
     then(tierRepository).should(never()).save(any(Tier.class));
   }
 
+  @Test
+  void 티어_삭제시_존재하는_티어면_삭제성공() {
+    // given
+    Long tierId = 1L;
+    Tier existingTier = new Tier(tierId, "골드핑", 150000L);
+
+    given(tierRepository.findById(tierId)).willReturn(Optional.of(existingTier));
+
+    // when
+    tierService.deleteTier(tierId);
+
+    // then
+    then(tierRepository).should().findById(tierId);
+    then(tierRepository).should().delete(existingTier);
+  }
+
+  @Test
+  void 티어_삭제시_존재하지_않는_티어면_예외발생() {
+    // given
+    Long tierId = 1L;
+
+    given(tierRepository.findById(tierId)).willReturn(Optional.empty());
+
+    // when & then
+    UserException exception = assertThrows(UserException.class,
+        () -> tierService.deleteTier(tierId));
+
+    assertEquals(UserErrorCode.TIER_NOT_FOUND.getMessage(), exception.getMessage());
+    then(tierRepository).should().findById(tierId);
+    then(tierRepository).should(never()).delete(any(Tier.class)); // 삭제 호출이 없어야 함
+  }
+
 }
