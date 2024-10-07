@@ -40,13 +40,10 @@ public class PaymentController {
     paymentService.cancelPayment(cancelRequest);
   }
 
-  // order Id로 결제 내역 조회
-  // paymentId로 결제 내역 조회 - history 있으면 같이 조회
-  // manager 가 조회하는 결제내역
 
   @GetMapping("/internal/payments/{orderId}")
   public PaymentResponse.Get getPaymentByOrderId(@PathVariable Long orderId) {
-    return paymentService.getPaymentHistories(orderId);
+    return paymentService.getPaymentByOrderId(orderId);
   }
 
 

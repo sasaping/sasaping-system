@@ -33,18 +33,17 @@ public class PaymentResponse {
     private LocalDateTime createdAt;
     private List<PaymentHistoryDto> histories;
 
-    @Getter
-    @Setter
-    public static class PaymentHistoryDto {
-
-      private Long amount;
-      private PaymentState type;
-      private String cancelReason;
-      private LocalDateTime createdAt;
-
-    }
-
   }
 
+  @Getter
+  @Setter
+  public static class PaymentHistoryDto {
+
+    private Long amount;
+    private PaymentState type;
+    private String cancelReason;
+    private LocalDateTime createdAt;
+
+  }
 
 }

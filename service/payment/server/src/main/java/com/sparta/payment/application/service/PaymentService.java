@@ -161,7 +161,7 @@ public class PaymentService {
   }
 
 
-  public PaymentResponse.Get getPaymentHistories(Long orderId) {
+  public PaymentResponse.Get getPaymentByOrderId(Long orderId) {
     Payment payment = paymentRepository.findByOrderId(orderId);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
@@ -183,8 +183,8 @@ public class PaymentService {
     return response;
   }
 
-  private PaymentResponse.Get.PaymentHistoryDto convertToHistoryDto(PaymentHistory history) {
-    PaymentResponse.Get.PaymentHistoryDto dto = new PaymentResponse.Get.PaymentHistoryDto();
+  private PaymentResponse.PaymentHistoryDto convertToHistoryDto(PaymentHistory history) {
+    PaymentResponse.PaymentHistoryDto dto = new PaymentResponse.PaymentHistoryDto();
     dto.setAmount(history.getAmount());
     dto.setType(history.getType());
     dto.setCancelReason(history.getCancelReason());
