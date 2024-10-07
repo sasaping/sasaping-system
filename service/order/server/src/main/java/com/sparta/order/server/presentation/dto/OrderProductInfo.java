@@ -1,6 +1,5 @@
-package com.sparta.order.server.presentation.request;
+package com.sparta.order.server.presentation.dto;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderProductInfo {
 
-  private UUID productId;
+  private String productId;
   private int quantity;
-  private int price;
-  private Long couponId;
+  private Long userCouponId;
 
 }

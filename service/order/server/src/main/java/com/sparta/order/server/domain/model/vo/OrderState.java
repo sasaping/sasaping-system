@@ -1,5 +1,8 @@
-package com.sparta.order.server.domain.model;
+package com.sparta.order.server.domain.model.vo;
 
+import lombok.Getter;
+
+@Getter
 public enum OrderState {
 
   COMPLETED("주문 완료"),

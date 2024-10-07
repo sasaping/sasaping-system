@@ -1,4 +1,4 @@
-package exception;
+package com.sparta.order.server.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

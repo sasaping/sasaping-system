@@ -1,4 +1,4 @@
-package exception;
+package com.sparta.order.server.exception;
 
 import com.sparta.common.domain.exception.BusinessException;
 

@@ -1,4 +1,4 @@
-package com.sparta.order.server.domain.model;
+package com.sparta.order.server.domain.model.vo;
 
 import lombok.Getter;
 
