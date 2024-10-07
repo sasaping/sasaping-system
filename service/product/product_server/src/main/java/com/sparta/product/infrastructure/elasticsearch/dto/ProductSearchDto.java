@@ -2,6 +2,7 @@ package com.sparta.product.infrastructure.elasticsearch.dto;
 
 import com.sparta.product.presentation.response.ProductResponse;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,9 @@ public class ProductSearchDto {
   @Id private String productId;
   private Long categoryId;
   private String productName;
+  private String brandName;
+  private String mainColor;
+  private String size;
   private BigDecimal originalPrice;
   private BigDecimal discountedPrice;
   private Double discountPercent;
@@ -24,14 +28,17 @@ public class ProductSearchDto {
   private double averageRating;
   private boolean isPublic;
   private boolean soldout;
+  private List<String> tags;
   private boolean isDeleted;
-  private boolean isCoupon;
 
   @Builder
   private ProductSearchDto(
       String productId,
       Long categoryId,
       String productName,
+      String brandName,
+      String mainColor,
+      String size,
       BigDecimal originalPrice,
       BigDecimal discountedPrice,
       Double discountPercent,
@@ -42,10 +49,13 @@ public class ProductSearchDto {
       boolean isPublic,
       boolean soldout,
       boolean isDeleted,
-      boolean isCoupon) {
+      List<String> tags) {
     this.productId = productId;
     this.categoryId = categoryId;
     this.productName = productName;
+    this.brandName = brandName;
+    this.mainColor = mainColor;
+    this.size = size;
     this.originalPrice = originalPrice;
     this.discountedPrice = discountedPrice;
     this.discountPercent = discountPercent;
@@ -56,7 +66,7 @@ public class ProductSearchDto {
     this.isPublic = isPublic;
     this.soldout = soldout;
     this.isDeleted = isDeleted;
-    this.isCoupon = isCoupon;
+    this.tags = tags;
   }
 
   public static ProductSearchDto toDto(ProductResponse product) {
@@ -64,6 +74,9 @@ public class ProductSearchDto {
         .productId(product.getProductId())
         .categoryId(product.getCategoryId())
         .productName(product.getProductName())
+        .brandName(product.getBrandName())
+        .mainColor(product.getMainColor())
+        .size(product.getSize())
         .originalPrice(product.getOriginalPrice())
         .discountedPrice(product.getDiscountedPrice())
         .discountPercent(product.getDiscountPercent())
@@ -73,7 +86,6 @@ public class ProductSearchDto {
         .averageRating(product.getAverageRating())
         .isPublic(product.isPublic())
         .isDeleted(product.isDeleted())
-        .isCoupon(product.isCoupon())
         .soldout(product.isSoldout())
         .build();
   }

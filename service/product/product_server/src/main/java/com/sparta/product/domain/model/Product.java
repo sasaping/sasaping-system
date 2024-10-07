@@ -2,6 +2,7 @@ package com.sparta.product.domain.model;
 
 import com.sparta.common.domain.entity.BaseEntity;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,31 +16,30 @@ import org.springframework.data.domain.Persistable;
 @Getter
 public class Product extends BaseEntity implements Persistable {
   @PrimaryKey private UUID productId = UUID.randomUUID();
-
   @Column public Long categoryId;
-
   @Column public String productName;
-
-  @Column public BigDecimal originalPrice;
-
-  @Column public BigDecimal discountedPrice;
-
-  @Column public Double discountPercent;
-
-  @Column public int stock;
-
+  @Column public String brandName;
+  @Column public String mainColor;
+  @Column public String size;
   @Column public String description;
 
-  @Column public String thumbnailImgUrl;
+  @Column public BigDecimal originalPrice;
+  @Column public BigDecimal discountedPrice;
+  @Column public Double discountPercent;
+  @Column public int stock;
 
+  @Column public String thumbnailImgUrl;
   @Column public String detailImgUrl;
 
   @Column public int limitCountPerUser = 0;
-  @Column public double averageRating = 0.0; // TODO :: 리뷰가 등록될떄마다 평균평점 계산
+  @Column public double averageRating = 0.0;
+  @Column public long reviewCount = 0;
+  @Column public long salesCount = 0;
+
   @Column public boolean isPublic = true;
   @Column public boolean soldout = false;
   @Column public boolean isDeleted = false;
-  @Column public boolean isCoupon;
+  @Column public List<String> tags;
   @Transient private boolean isNew = false;
 
   @Override
@@ -57,6 +57,9 @@ public class Product extends BaseEntity implements Persistable {
   private Product(
       Long categoryId,
       String productName,
+      String brandName,
+      String mainColor,
+      String size,
       BigDecimal originalPrice,
       Double discountPercent,
       int stock,
@@ -64,9 +67,12 @@ public class Product extends BaseEntity implements Persistable {
       String thumbnailImgUrl,
       String detailImgUrl,
       int limitCountPerUser,
-      boolean isCoupon) {
+      List<String> tags) {
     this.categoryId = categoryId;
     this.productName = productName;
+    this.brandName = brandName;
+    this.mainColor = mainColor;
+    this.size = size;
     this.originalPrice = originalPrice;
     this.discountPercent = discountPercent;
     applyDiscount(discountPercent);
@@ -75,12 +81,15 @@ public class Product extends BaseEntity implements Persistable {
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.detailImgUrl = detailImgUrl;
     this.limitCountPerUser = limitCountPerUser;
-    this.isCoupon = isCoupon;
+    this.tags = tags;
   }
 
   public void updateProduct(
       Long categoryId,
       String productName,
+      String brandName,
+      String mainColor,
+      String size,
       BigDecimal originalPrice,
       Double discountPercent,
       Integer stock,
@@ -88,10 +97,13 @@ public class Product extends BaseEntity implements Persistable {
       String thumbnailImgUrl,
       String detailImgUrl,
       Integer limitCountPerUser,
-      boolean isPublic,
-      boolean isCoupon) {
+      List<String> tags,
+      boolean isPublic) {
     this.categoryId = categoryId;
     this.productName = productName;
+    this.brandName = brandName;
+    this.mainColor = mainColor;
+    this.size = size;
     this.originalPrice = originalPrice;
     this.discountPercent = discountPercent;
     applyDiscount(discountPercent);
@@ -99,9 +111,9 @@ public class Product extends BaseEntity implements Persistable {
     this.description = description;
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.detailImgUrl = detailImgUrl;
+    this.tags = tags;
     this.limitCountPerUser = limitCountPerUser;
     this.isPublic = isPublic;
-    this.isCoupon = isCoupon;
   }
 
   public UUID getProductId() {
