@@ -21,5 +21,4 @@ public class MessageController {
   public void sendMessage(@RequestBody MessageRequest.Create messageRequest) {
     messageService.sendMessage(messageRequest);
   }
-
 }

@@ -30,5 +30,4 @@ public class CartExceptionHandler {
     ex.printStackTrace();
     return ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.name(), ex.getMessage());
   }
-
 }

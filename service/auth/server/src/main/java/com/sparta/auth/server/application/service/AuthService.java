@@ -32,8 +32,8 @@ public class AuthService {
   private final SecretKey secretKey;
   private final PasswordEncoder passwordEncoder;
 
-  public AuthService(UserService userService, JwtProperties jwtProperties,
-      PasswordEncoder passwordEncoder) {
+  public AuthService(
+      UserService userService, JwtProperties jwtProperties, PasswordEncoder passwordEncoder) {
     this.userService = userService;
     this.jwtProperties = jwtProperties;
     this.secretKey = createSecretKey();
@@ -43,30 +43,20 @@ public class AuthService {
   public AuthResponse.SignIn signIn(AuthRequest.SignIn request) {
     UserDto userData = userService.getUserByUsername(request.getUsername());
 
-    if (userData == null ||
-        !passwordEncoder.matches(request.getPassword(), userData.getPassword())
-    ) {
+    if (userData == null
+        || !passwordEncoder.matches(request.getPassword(), userData.getPassword())) {
       throw new AuthException(AuthErrorCode.SIGN_IN_FAIL);
     }
 
     return AuthResponse.SignIn.of(
         this.createToken(
-            JwtClaim.create(
-                userData.getUserId(),
-                userData.getUsername(),
-                userData.getRole()
-            )
-        )
-    );
+            JwtClaim.create(userData.getUserId(), userData.getUsername(), userData.getRole())));
   }
 
   public JwtClaim verifyToken(String token) {
     try {
-      Claims claims = Jwts.parser()
-          .verifyWith(secretKey)
-          .build()
-          .parseSignedClaims(token)
-          .getPayload();
+      Claims claims =
+          Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
 
       return this.convert(claims);
     } catch (ExpiredJwtException e) {
@@ -108,5 +98,4 @@ public class AuthService {
         claims.get(USER_NAME, String.class),
         claims.get(USER_ROLE, String.class));
   }
-
 }

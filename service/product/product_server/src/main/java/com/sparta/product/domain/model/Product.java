@@ -13,7 +13,6 @@ import org.springframework.data.domain.Persistable;
 
 @Table("P_PRODUCT")
 @Getter
-
 public class Product extends BaseEntity implements Persistable {
   @PrimaryKey private UUID productId = UUID.randomUUID();
 

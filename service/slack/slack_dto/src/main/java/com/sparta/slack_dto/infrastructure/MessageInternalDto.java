@@ -11,7 +11,5 @@ public class MessageInternalDto {
 
     private String receiverEmail;
     private String message;
-
   }
-
 }
