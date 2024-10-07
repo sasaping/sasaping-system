@@ -1,7 +1,6 @@
 package com.sparta.order.server.Cart.exception;
 
 import com.sparta.common.domain.exception.BusinessException;
-import lombok.Getter;
 
 public class CartException extends BusinessException {
 

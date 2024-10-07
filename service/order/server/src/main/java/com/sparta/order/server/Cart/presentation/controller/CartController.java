@@ -44,7 +44,8 @@ public class CartController {
   }
 
   @DeleteMapping("/products/{productId}")
-  public ApiResponse<?> deleteCart(@PathVariable(name = "productId") String productId,
+  public ApiResponse<?> deleteCart(
+      @PathVariable(name = "productId") String productId,
       @RequestParam(name = "userId") Long userId) {
     cartService.deleteCart(userId, productId);
     return ApiResponse.ok(null);
@@ -55,5 +56,4 @@ public class CartController {
     cartService.clearCart(userId);
     return ApiResponse.ok(null);
   }
-
 }

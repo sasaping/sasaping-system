@@ -16,5 +16,4 @@ public class UserFeignConfig {
   public Logger.Level feignLoggerLevel() {
     return Logger.Level.FULL;
   }
-
 }

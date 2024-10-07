@@ -19,5 +19,4 @@ public class OrderProductDto {
   private UUID productId;
   private Integer quantity;
   private int purchasePrice;
-
 }

@@ -7,5 +7,4 @@ public class UserException extends BusinessException {
   public UserException(UserErrorCode errorCode) {
     super(errorCode.getStatus().name(), errorCode.getMessage());
   }
-
 }

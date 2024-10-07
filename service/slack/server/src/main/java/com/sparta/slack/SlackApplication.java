@@ -11,5 +11,4 @@ public class SlackApplication {
   public static void main(String[] args) {
     SpringApplication.run(SlackApplication.class, args);
   }
-
 }

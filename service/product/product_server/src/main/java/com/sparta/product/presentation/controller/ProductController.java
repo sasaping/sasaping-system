@@ -2,6 +2,7 @@ package com.sparta.product.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.product.application.ProductFacadeService;
+import com.sparta.product.application.ProductService;
 import com.sparta.product.presentation.request.ProductCreateRequest;
 import com.sparta.product.presentation.request.ProductUpdateRequest;
 import com.sparta.product.presentation.response.ProductResponse;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class ProductController {
   private final ProductFacadeService facadeService;
+  private final ProductService productService;
 
   @PostMapping
   public ApiResponse<String> createProduct(@RequestBody ProductCreateRequest request) {
@@ -44,5 +47,11 @@ public class ProductController {
   @DeleteMapping("/{productId}")
   public ApiResponse<Boolean> deleteProduct(@PathVariable("productId") @NotNull UUID productId) {
     return ApiResponse.ok(facadeService.deleteProduct(productId));
+  }
+
+  @GetMapping("/{productId}")
+  public ApiResponse<ProductResponse> getProduct(
+      @PathVariable("productId") @NotNull UUID productId) {
+    return ApiResponse.ok(productService.getProduct(productId));
   }
 }

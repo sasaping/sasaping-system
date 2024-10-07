@@ -3,17 +3,19 @@ rootProject.name = 'sasaping'
 include(':common:domain')
 
 include(':service:user:server')
-include(':service:user:dto')
+include(':service:user:user_dto')
 
 include(':service:product:product_server')
 include(':service:product:product_dto')
 
 include(':service:payment:server')
+include(':service:payment:payment_dto')
 
 include(':service:eureka')
 include(':service:gateway:server')
 
 include(':service:auth:server')
+include(':service:auth:auth_dto')
 
 include(':service:order:server')
 include(':service:order:dto')
@@ -21,3 +23,4 @@ include(':service:order:dto')
 include(':service:notification:server')
 
 include(':service:slack:server')
+include(':service:slack:slack_dto')
