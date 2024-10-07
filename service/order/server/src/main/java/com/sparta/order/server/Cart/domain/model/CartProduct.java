@@ -12,5 +12,4 @@ public class CartProduct {
 
   private UUID productId;
   private ProductInfo productInfo;
-
 }

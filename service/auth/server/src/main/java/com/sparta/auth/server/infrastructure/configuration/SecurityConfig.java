@@ -16,18 +16,22 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(AbstractHttpConfigurer::disable)
+    http.csrf(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement((s) -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .rememberMe(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
         .requestCache(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/internal/auth/**").permitAll()
-            .anyRequest().authenticated());
+        .authorizeHttpRequests(
+            authorize ->
+                authorize
+                    .requestMatchers("/api/auth/**")
+                    .permitAll()
+                    .requestMatchers("/internal/auth/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated());
 
     return http.build();
   }
@@ -36,5 +40,4 @@ public class SecurityConfig {
   public PasswordEncoder getPasswordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
 }

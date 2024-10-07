@@ -12,5 +12,4 @@ public class AuthException extends BusinessException {
     super(errorCode.getStatus().name(), errorCode.getMessage());
     this.errorCode = errorCode;
   }
-
 }

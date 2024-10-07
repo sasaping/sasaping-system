@@ -9,5 +9,4 @@ public class SlackDtoApplication {
   public static void main(String[] args) {
     SpringApplication.run(SlackDtoApplication.class, args);
   }
-
 }

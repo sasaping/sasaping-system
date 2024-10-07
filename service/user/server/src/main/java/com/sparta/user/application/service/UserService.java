@@ -32,14 +32,10 @@ public class UserService {
   }
 
   public UserDto getUserByUsername(String username) {
-    User user = userRepository.findByUsername(username).orElseThrow(
-        () -> new UserException(USER_NOT_FOUND));
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getPassword(),
-        user.getRole().name()
-    );
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getRole().name());
   }
-
 }

@@ -6,6 +6,4 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties(JwtProperties.class)
-public class JwtConfig {
-
-}
+public class JwtConfig {}
