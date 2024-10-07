@@ -1,7 +1,7 @@
 package com.sparta.user.presentation.controller;
 
 import com.sparta.user.application.service.UserService;
-import com.sparta.user.dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,5 +19,4 @@ public class UserInternalController {
   public UserDto getUserByUsername(@RequestParam(value = "username") String username) {
     return userService.getUserByUsername(username);
   }
-
 }

@@ -28,5 +28,4 @@ public class OrderDto {
   private String phoneNumber;
   private String zipcode;
   private String shippingAddress;
-
 }

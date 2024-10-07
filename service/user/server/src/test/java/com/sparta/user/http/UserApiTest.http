@@ -11,3 +11,7 @@ Content-Type: application/json
   "point": 0,
   "role": "관리자"
 }
+
+### 인증/인가 테스트 API
+GET http://localhost:{{Port}}/api/users/hello
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX05BTUUiOiJuZXdVc2VyIiwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfSUQiOjcsImlhdCI6MTcyODI3ODEzOSwiZXhwIjoxNzMxODc4MTM5fQ.V9G1wEgl9xRGgG_0wbobjVNggATGvZekewfoUMb0RNs

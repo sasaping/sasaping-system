@@ -12,9 +12,9 @@ import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
-import com.sparta.user.dto.infrastructure.UserDto;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -25,28 +25,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @SpringBootTest
 class UserApplicationTests {
 
-  @MockBean
-  private UserRepository userRepository;
+  @MockBean private UserRepository userRepository;
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   @Test
   void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
-    UserRequest.Create request = new UserRequest.Create(
-        "existinguser",
-        "password123",
-        "nickname",
-        0,
-        UserRole.ROLE_ADMIN
-    );
+    UserRequest.Create request =
+        new UserRequest.Create("existinguser", "password123", "nickname", 0, UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
 
     // Act & Assert
-    UserException exception = assertThrows(UserException.class,
-        () -> userService.createUser(request));
+    UserException exception =
+        assertThrows(UserException.class, () -> userService.createUser(request));
     assertEquals("이미 존재하는 사용자입니다.", exception.getMessage());
 
     verify(userRepository, times(1)).findByUsername("existinguser");
@@ -56,13 +49,8 @@ class UserApplicationTests {
   @Test
   void test_회원가입() {
     // Arrange
-    UserRequest.Create request = new UserRequest.Create(
-        "newuser",
-        "password123",
-        "nickname",
-        0,
-        UserRole.ROLE_ADMIN
-    );
+    UserRequest.Create request =
+        new UserRequest.Create("newuser", "password123", "nickname", 0, UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
 
@@ -95,8 +83,8 @@ class UserApplicationTests {
     when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
     // Act & Assert
-    UserException exception = assertThrows(UserException.class,
-        () -> userService.getUserByUsername(username));
+    UserException exception =
+        assertThrows(UserException.class, () -> userService.getUserByUsername(username));
     assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
 
     verify(userRepository, times(1)).findByUsername(username);
@@ -106,13 +94,8 @@ class UserApplicationTests {
   void test_유저_조회_성공() {
     // Arrange
     String username = "existinguser";
-    UserRequest.Create request = new UserRequest.Create(
-        username,
-        "password123",
-        "nickname",
-        0,
-        UserRole.ROLE_ADMIN
-    );
+    UserRequest.Create request =
+        new UserRequest.Create(username, "password123", "nickname", 0, UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");
 
@@ -128,5 +111,4 @@ class UserApplicationTests {
 
     verify(userRepository, times(1)).findByUsername(username);
   }
-
 }

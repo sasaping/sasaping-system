@@ -55,5 +55,4 @@ public class User extends BaseEntity {
         .role(request.getRole())
         .build();
   }
-
 }
