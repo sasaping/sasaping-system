@@ -56,8 +56,9 @@ class AuthApplicationTests {
   @Test
   void test_로그인_성공() {
     // Arrange
-    AuthRequest.SignIn request = new AuthRequest.SignIn("testuser", "correctpassword");
-    UserDto userDto = new UserDto(1L, "testuser", "correctpassword", "ROLE_ADMIN");
+    AuthRequest.SignIn request = new AuthRequest.SignIn("testuser", "password123");
+    UserDto userDto = new UserDto(1L, "testuser",
+        "$2a$10$YZ2cP0PF11iqNqNrwk4pUOKQnAGxqLtGxO1F6XZomixg73EYQoduC", "ROLE_ADMIN");
 
     // Mock the user service to return the userDto when called
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
