@@ -11,7 +11,9 @@ import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -85,7 +87,7 @@ public class PaymentService {
   public void paymentSuccess(String paymentKey) {
     Payment payment = paymentRepository.findByPaymentKey(paymentKey);
     if (payment == null) {
-      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+      throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
     }
 
     HttpHeaders headers = new HttpHeaders();
@@ -116,7 +118,7 @@ public class PaymentService {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
-    // TODO : 결제 실패 처리 -> 주문 상태 변경 feign API 호출
+    // TODO : 주문 상태 변경 feign API 호출
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);
@@ -125,7 +127,7 @@ public class PaymentService {
   public void cancelPayment(PaymentRequest.Cancel cancelRequest) {
     Payment payment = paymentRepository.findByOrderId(cancelRequest.getOrderId());
     if (payment == null) {
-      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+      throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
     }
 
     try {
@@ -156,6 +158,39 @@ public class PaymentService {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
+  }
+
+
+  public PaymentResponse.Get getPaymentHistories(Long orderId) {
+    Payment payment = paymentRepository.findByOrderId(orderId);
+    if (payment == null) {
+      throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
+    }
+    List<PaymentHistory> histories = paymentHistoryRepository.findByPayment_PaymentId(
+        payment.getPaymentId());
+
+    PaymentResponse.Get response = new PaymentResponse.Get();
+    response.setPaymentId(payment.getPaymentId());
+    response.setOrderId(payment.getOrderId());
+    response.setState(payment.getState());
+    response.setAmount(payment.getAmount());
+    response.setCreatedAt(payment.getCreatedAt());
+
+    response.setHistories(histories.stream()
+        .map(this::convertToHistoryDto)
+        .collect(Collectors.toList()));
+
+    return response;
+  }
+
+  private PaymentResponse.Get.PaymentHistoryDto convertToHistoryDto(PaymentHistory history) {
+    PaymentResponse.Get.PaymentHistoryDto dto = new PaymentResponse.Get.PaymentHistoryDto();
+    dto.setAmount(history.getAmount());
+    dto.setType(history.getType());
+    dto.setCancelReason(history.getCancelReason());
+    dto.setCreatedAt(history.getCreatedAt());
+
+    return dto;
   }
 
 }

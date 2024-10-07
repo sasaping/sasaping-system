@@ -1,5 +1,8 @@
 package com.sparta.payment.application.dto;
 
+import com.sparta.payment.domain.entity.PaymentState;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,5 +21,30 @@ public class PaymentResponse {
     private Object checkout;
 
   }
+
+  @Getter
+  @Setter
+  public static class Get {
+
+    private Long paymentId;
+    private Long orderId;
+    private PaymentState state;
+    private Long amount;
+    private LocalDateTime createdAt;
+    private List<PaymentHistoryDto> histories;
+
+    @Getter
+    @Setter
+    public static class PaymentHistoryDto {
+
+      private Long amount;
+      private PaymentState type;
+      private String cancelReason;
+      private LocalDateTime createdAt;
+
+    }
+
+  }
+
 
 }
