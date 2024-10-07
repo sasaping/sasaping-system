@@ -29,7 +29,7 @@ ext {
 
 dependencies {
     implementation project(':common:domain')
-    implementation project(':service:user:dto')
+    implementation project(':service:user:user_dto')
 
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.springframework.boot:spring-boot-starter-web'

@@ -8,11 +8,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
-import com.sparta.user.dto.infrastructure.UserDto;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import java.util.Optional;
