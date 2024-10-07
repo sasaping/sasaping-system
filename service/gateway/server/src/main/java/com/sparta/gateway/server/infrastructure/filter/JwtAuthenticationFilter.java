@@ -6,7 +6,7 @@ import static com.sparta.common.domain.jwt.JwtGlobalConstant.X_USER_CLAIMS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.auth.dto.jwt.JwtClaim;
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.gateway.server.application.AuthService;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

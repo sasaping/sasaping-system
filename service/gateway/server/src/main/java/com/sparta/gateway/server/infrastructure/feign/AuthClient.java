@@ -1,6 +1,6 @@
 package com.sparta.gateway.server.infrastructure.feign;
 
-import com.sparta.auth.dto.jwt.JwtClaim;
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.gateway.server.application.AuthService;
 import com.sparta.gateway.server.infrastructure.configuration.AuthFeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
