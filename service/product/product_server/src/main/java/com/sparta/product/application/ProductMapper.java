@@ -13,8 +13,8 @@ public class ProductMapper {
         .productName(product.getProductName())
         .discountPercent(product.getDiscountPercent())
         .discountedPrice(product.getDiscountedPrice())
-        .soldout(product.isSoldout())
-        .isCoupon(product.isCoupon())
+        .stock(product.getStock())
+        .tags(product.getTags())
         .build();
   }
 
@@ -22,6 +22,9 @@ public class ProductMapper {
     return Product.builder()
         .categoryId(request.categoryId())
         .productName(request.productName())
+        .brandName(request.brandName())
+        .mainColor(request.mainColor())
+        .size(request.size())
         .description(request.description())
         .originalPrice(request.originalPrice())
         .discountPercent(request.discountPercent())
@@ -29,7 +32,7 @@ public class ProductMapper {
         .detailImgUrl(request.detailImgUrl())
         .stock(request.stock())
         .limitCountPerUser(request.limitCountPerUser())
-        .isCoupon(request.isCoupon())
+        .tags(request.tags())
         .build();
   }
 
@@ -37,6 +40,9 @@ public class ProductMapper {
     existingProduct.updateProduct(
         request.categoryId(),
         request.productName(),
+        request.brandName(),
+        request.mainColor(),
+        request.size(),
         request.originalPrice(),
         request.discountPercent(),
         request.stock(),
@@ -44,7 +50,7 @@ public class ProductMapper {
         request.thumbnailImgUrl(),
         request.detailImgUrl(),
         request.limitCountPerUser(),
-        request.isPublic(),
-        request.isCoupon());
+        request.tags(),
+        request.isPublic());
   }
 }

@@ -1,6 +1,7 @@
 package com.sparta.product_dto;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,8 +16,7 @@ public class ProductDto {
   private BigDecimal discountedPrice;
   private Double discountPercent;
   private int stock;
-  private boolean soldout;
-  private boolean isCoupon;
+  private List<String> tags;
 
   @Builder
   private ProductDto(
@@ -26,7 +26,7 @@ public class ProductDto {
       BigDecimal discountedPrice,
       Double discountPercent,
       int stock,
-      boolean soldout,
+      List<String> tags,
       boolean isCoupon) {
     this.productId = productId;
     this.productName = productName;
@@ -34,7 +34,6 @@ public class ProductDto {
     this.discountedPrice = discountedPrice;
     this.discountPercent = discountPercent;
     this.stock = stock;
-    this.soldout = soldout;
-    this.isCoupon = isCoupon;
+    this.tags = tags;
   }
 }
