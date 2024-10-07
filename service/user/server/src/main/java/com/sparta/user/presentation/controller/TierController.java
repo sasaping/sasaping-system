@@ -29,8 +29,8 @@ public class TierController {
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping
-  public ApiResponse<List<TierResponse.Get>> getTier() {
-    return ApiResponse.ok(tierService.getTier());
+  public ApiResponse<List<TierResponse.Get>> getTierList() {
+    return ApiResponse.ok(tierService.getTierList());
   }
 
 }

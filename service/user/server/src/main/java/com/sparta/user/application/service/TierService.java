@@ -28,7 +28,7 @@ public class TierService {
     tierRepository.save(Tier.create(request));
   }
 
-  public List<TierResponse.Get> getTier() {
+  public List<TierResponse.Get> getTierList() {
     return tierRepository.findAll().stream().map(TierResponse.Get::of).toList();
   }
 

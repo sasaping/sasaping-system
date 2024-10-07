@@ -73,7 +73,7 @@ public class TierApplicationTests {
     given(tierRepository.findAll()).willReturn(tiers);
 
     // when
-    List<TierResponse.Get> tierResponseList = tierService.getTier();
+    List<TierResponse.Get> tierResponseList = tierService.getTierList();
 
     // then
     assertEquals(2, tierResponseList.size());
@@ -88,7 +88,7 @@ public class TierApplicationTests {
     given(tierRepository.findAll()).willReturn(Collections.emptyList());
 
     // when
-    List<TierResponse.Get> tierResponseList = tierService.getTier();
+    List<TierResponse.Get> tierResponseList = tierService.getTierList();
 
     // then
     assertTrue(tierResponseList.isEmpty());
