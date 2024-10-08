@@ -1,10 +1,10 @@
-package com.sparta.order.server.Cart.application.service;
+package com.sparta.order.server.application.service;
 
-import com.sparta.order.server.Cart.exception.CartErrorCode;
-import com.sparta.order.server.Cart.exception.CartException;
-import com.sparta.order.server.Cart.infrastructure.client.ProductClient;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductRequest;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
+import com.sparta.order.server.exception.CartErrorCode;
+import com.sparta.order.server.exception.CartException;
+import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.product_dto.ProductDto;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,7 +81,8 @@ public class CartService {
           cartProductRequest.getQuantity());
       cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
     } else {
-      throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
+      throw new CartException(
+          CartErrorCode.PRODUCT_NOT_IN_CART);
     }
   }
 
