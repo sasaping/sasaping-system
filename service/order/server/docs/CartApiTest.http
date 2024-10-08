@@ -6,12 +6,8 @@ Content-Type: application/json
 
 {
   "userId": 123456,
-  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
-  "productInfoDto": {
-    "productName": "붕어빵",
-    "price": 3000,
-    "quantity": 3
-  }
+  "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
+  "quantity": 3
 }
 
 ### 장바구니 상품 조회
@@ -23,8 +19,8 @@ Content-Type: application/json
 
 {
   "userId": 123456,
-  "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
-  "quantity": 7
+  "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
+  "quantity": 1
 }
 
 ### 장바구니 상품 삭제
@@ -33,3 +29,29 @@ DELETE http://localhost:{{Port}}/api/carts/products/9b1deb4d-3b7d-4bad-9bdd-2b0d
 
 ### 장바구니 전체 삭제
 DELETE http://localhost:{{Port}}/api/carts/clear?userId=123456
+
+### 상품 생성
+POST http://localhost:19081/api/products
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "productName": "Product 1",
+  "brandName": "brandName",
+  "mainColor": "pink",
+  "size": "S",
+  "originalPrice": 10000,
+  "discountPercent": 50,
+  "stock": 100,
+  "description": "This is an example product description.",
+  "thumbnailImgUrl": "http://example.com/thumbnail.jpg",
+  "detailImgUrl": "http://example.com/detail.jpg",
+  "limitCountPerUser": 0,
+  "tags": [
+    "COUPON",
+    "EXPRESS_DELIVERY",
+    "FREE_SHIPPING",
+    "DISCOUNT",
+    "NEW"
+  ]
+}
