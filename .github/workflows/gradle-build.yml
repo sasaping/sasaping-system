@@ -17,7 +17,7 @@ jobs:
         service: [
           user/server, auth/server, gateway/server,
           notification/server, order/server, payment/server,
-          product/product_server, slack/server ]
+          product/product_server, product/server, slack/server ]
 
     steps:
       - name: Checkout repository
