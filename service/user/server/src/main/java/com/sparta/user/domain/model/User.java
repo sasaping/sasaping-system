@@ -3,13 +3,16 @@ package com.sparta.user.domain.model;
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.presentation.request.UserRequest;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,6 +49,9 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private UserRole role;
 
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private UserTier userTier;
+
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
         .username(request.getUsername())
@@ -55,4 +61,5 @@ public class User extends BaseEntity {
         .role(request.getRole())
         .build();
   }
+
 }
