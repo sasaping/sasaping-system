@@ -1,4 +1,4 @@
-package com.sparta.user;
+package com.sparta.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,11 +23,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
-class UserApplicationTests {
+class UserServiceTests {
 
-  @MockBean private UserRepository userRepository;
+  @MockBean
+  private UserRepository userRepository;
 
-  @Autowired private UserService userService;
+  @Autowired
+  private UserService userService;
 
   @Test
   void test_회원가입_시_존재하는_유저인지_확인() {
@@ -111,4 +113,5 @@ class UserApplicationTests {
 
     verify(userRepository, times(1)).findByUsername(username);
   }
+
 }
