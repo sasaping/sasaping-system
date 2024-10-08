@@ -11,5 +11,4 @@ public class UserErrorDecoder implements ErrorDecoder {
   public Exception decode(String methodKey, Response response) {
     return new AuthException(AuthErrorCode.INTERNAL_SERVER_ERROR);
   }
-
 }

@@ -1,10 +1,11 @@
-package com.sparta.order.server.presentation.controller;
+package com.sparta.order.server.Cart.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.order.server.application.service.CartService;
-import com.sparta.order.server.presentation.dto.CartDto;
+import com.sparta.order.server.Cart.application.service.CartService;
+import com.sparta.order.server.Cart.presentation.dto.CartDto;
+import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
 import jakarta.validation.Valid;
-import java.util.Map;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,25 +27,28 @@ public class CartController {
   // TODO userId 인증 객체로 변경 필요
 
   @GetMapping
-  public ApiResponse<Map<String, CartDto.ProductInfoDto>> getCartList(
+  public ApiResponse<List<CartProductResponse>> getCartList(
       @RequestParam(name = "userId") Long userId) {
     return ApiResponse.ok(cartService.getCart(userId));
   }
 
   @PostMapping("/products")
-  public ApiResponse<?> addCart(@RequestBody @Valid CartDto.AddRequest request) {
-    cartService.addCart(request);
+  public ApiResponse<?> addCart(
+      @RequestBody @Valid CartDto.CartProductRequest cartProductRequest) {
+    cartService.addCart(cartProductRequest);
     return ApiResponse.created(null);
   }
 
   @PatchMapping("/products")
-  public ApiResponse<?> updateCart(@RequestBody @Valid CartDto.UpdateRequest request) {
-    cartService.updateCart(request);
+  public ApiResponse<?> updateCart(
+      @RequestBody @Valid CartDto.CartProductRequest cartProductRequest) {
+    cartService.updateCart(cartProductRequest);
     return ApiResponse.ok(null);
   }
 
   @DeleteMapping("/products/{productId}")
-  public ApiResponse<?> deleteCart(@PathVariable(name = "productId") String productId,
+  public ApiResponse<?> deleteCart(
+      @PathVariable(name = "productId") String productId,
       @RequestParam(name = "userId") Long userId) {
     cartService.deleteCart(userId, productId);
     return ApiResponse.ok(null);

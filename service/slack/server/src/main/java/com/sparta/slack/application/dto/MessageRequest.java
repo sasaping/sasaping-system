@@ -11,7 +11,5 @@ public class MessageRequest {
 
     private String receiverEmail;
     private String message;
-
   }
-
 }

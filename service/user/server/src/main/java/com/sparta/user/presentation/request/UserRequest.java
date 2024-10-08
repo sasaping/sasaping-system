@@ -19,7 +19,9 @@ public class UserRequest {
     @NotBlank(message = "아이디는 비어 있을 수 없습니다.")
     private String username;
 
-    @Pattern(regexp = "^[a-zA-Z0-9_#$%^!-]{8,15}$", message = "비밀번호는 8자 이상, 15자 이하의 알파벳 대소문자, 숫자 및 특수문자(_#$%^!-)만 허용됩니다.")
+    @Pattern(
+        regexp = "^[a-zA-Z0-9_#$%^!-]{8,15}$",
+        message = "비밀번호는 8자 이상, 15자 이하의 알파벳 대소문자, 숫자 및 특수문자(_#$%^!-)만 허용됩니다.")
     @NotBlank(message = "비밀번호는 비어 있을 수 없습니다.")
     private String password;
 
@@ -31,7 +33,5 @@ public class UserRequest {
 
     @NotBlank(message = "사용자 타입은 비어 있을 수 없습니다.")
     private UserRole role;
-
   }
-
 }

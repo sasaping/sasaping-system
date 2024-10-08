@@ -23,5 +23,4 @@ public abstract class BusinessException extends RuntimeException {
   private static String formattingErrorMessage(String message, Object... objects) {
     return message.formatted(objects);
   }
-
 }

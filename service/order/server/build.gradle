@@ -31,6 +31,7 @@ ext {
 dependencies {
     implementation project(':common:domain')
     implementation project(':service:user:user_dto')
+    implementation project(':service:product:product_dto')
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'mysql:mysql-connector-java:8.0.33'

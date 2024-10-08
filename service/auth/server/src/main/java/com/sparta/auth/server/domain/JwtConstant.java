@@ -7,7 +7,6 @@ public interface JwtConstant {
   String USER_NAME = "USER_NAME";
 
   String USER_ROLE = "USER_ROLE";
-  
-  Long MILLI_SECOND = 1000L;
 
+  Long MILLI_SECOND = 1000L;
 }

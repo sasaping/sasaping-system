@@ -1,16 +1,16 @@
-package com.sparta.order.server.application.service;
+package com.sparta.order.server.Cart.application.service;
 
-import com.sparta.order.server.domain.model.CartProduct;
-import com.sparta.order.server.domain.model.ProductInfo;
-import com.sparta.order.server.exception.CartErrorCode;
-import com.sparta.order.server.exception.CartException;
-import com.sparta.order.server.presentation.dto.CartDto;
-import com.sparta.order.server.presentation.dto.CartDto.AddRequest;
+import com.sparta.order.server.Cart.exception.CartErrorCode;
+import com.sparta.order.server.Cart.exception.CartException;
+import com.sparta.order.server.Cart.infrastructure.client.ProductClient;
+import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductRequest;
+import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
+import com.sparta.product_dto.ProductDto;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,66 +20,65 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CartService {
 
-  // TODO 상품 단건조회 API 구현 이후 상품 존재여부 검증 로직 추가
-  // TODO Redis 트랜잭션 추가
-
-  private final RedisTemplate<String, CartProduct> cartTemplate;
-  private final HashOperations<String, String, ProductInfo> cartOps;
+  private final RedisTemplate<String, Map<String, Integer>> cartTemplate;
+  private final HashOperations<String, String, Integer> cartOps;
+  private final ProductClient productClient;
   private static final long CART_EXPIRE_TIME = 30 * 24 * 60 * 60;
 
-  public CartService(RedisTemplate<String, CartProduct> cartTemplate) {
+  public CartService(RedisTemplate<String, Map<String, Integer>> cartTemplate,
+      ProductClient productClient) {
     this.cartTemplate = cartTemplate;
     this.cartOps = cartTemplate.opsForHash();
+    this.productClient = productClient;
   }
 
   @Transactional
-  public void addCart(AddRequest request) {
-    String redisKey = createRedisKey(request.getUserId());
-    ProductInfo existingProductInfo = cartOps.get(redisKey, request.getProductId());
+  public void addCart(CartProductRequest cartProductRequest) {
+    validateProductExists(cartProductRequest.getProductId());
 
-    if (existingProductInfo != null) {
-      existingProductInfo.addQuantity(request.getProductInfoDto().getQuantity());
-      cartOps.put(redisKey, request.getProductId(),
-          existingProductInfo);
+    String redisKey = createRedisKey(cartProductRequest.getUserId());
+    Integer existingProductQuantity = cartOps.get(redisKey,
+        cartProductRequest.getProductId());
+
+    if (existingProductQuantity != null) {
+      existingProductQuantity += cartProductRequest.getQuantity();
+      cartOps.put(redisKey, cartProductRequest.getProductId(), existingProductQuantity);
     } else {
-      cartOps.put(redisKey, request.getProductId(),
-          request.getProductInfoDto().toEntity());
+      cartOps.put(redisKey, cartProductRequest.getProductId(),
+          cartProductRequest.getQuantity());
     }
     cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
   }
 
-  public Map<String, CartDto.ProductInfoDto> getCart(Long userId) {
+  public List<CartProductResponse> getCart(Long userId) {
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
-    Map<String, ProductInfo> cartProductInfos = cartOps.entries(redisKey);
-    Map<String, CartDto.ProductInfoDto> response = cartProductInfos.entrySet().stream()
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> CartDto.ProductInfoDto.fromModel(entry.getValue())
-        ));
+    Map<String, Integer> productQuantities = cartOps.entries(redisKey);
+
+    List<ProductDto> products = productClient.getProductList(
+        productQuantities.keySet().stream().toList());
+
+    List<CartProductResponse> response = products.stream()
+        .map(product -> CartProductResponse.from(product,
+            productQuantities.get(product.getProductId().toString())))
+        .toList();
+
     return response;
   }
 
-  public void validateProductsInCart(Long userId, List<String> productIds) {
-    String redisKey = createRedisKey(userId);
-    validateUserCartExists(redisKey);
-    Set<String> cartProductIds = cartOps.keys(userId.toString());
-    productIds.forEach(productId -> {
-      if (!cartProductIds.contains(productId)) {
-        throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
-      }
-    });
-  }
-
   @Transactional
-  public void updateCart(CartDto.UpdateRequest request) {
-    String redisKey = createRedisKey(request.getUserId());
-    validateUserCartExists(redisKey);
-    ProductInfo existingProductInfo = cartOps.get(redisKey, request.getProductId());
+  public void updateCart(CartProductRequest cartProductRequest) {
+    validateProductExists(cartProductRequest.getProductId());
 
-    if (existingProductInfo != null) {
-      existingProductInfo.updateQuantity(request.getQuantity());
-      cartOps.put(redisKey, request.getProductId(), existingProductInfo);
+    String redisKey = createRedisKey(cartProductRequest.getUserId());
+    validateUserCartExists(redisKey);
+
+    Integer existingProductQuantity = cartOps.get(redisKey,
+        cartProductRequest.getProductId());
+
+    if (existingProductQuantity != null) {
+      cartOps.put(redisKey, cartProductRequest.getProductId(),
+          cartProductRequest.getQuantity());
       cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
     } else {
       throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
@@ -90,9 +89,9 @@ public class CartService {
   public void deleteCart(Long userId, String productId) {
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
-    ProductInfo existingProductInfo = cartOps.get(redisKey, productId);
+    Integer existingProductQuantity = cartOps.get(redisKey, productId);
 
-    if (existingProductInfo != null) {
+    if (existingProductQuantity != null) {
       cartOps.delete(redisKey, productId);
     } else {
       throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
@@ -114,6 +113,10 @@ public class CartService {
     if (cartOps.entries(redisKey).isEmpty()) {
       throw new CartException(CartErrorCode.CART_NOT_FOUND);
     }
+  }
+
+  private void validateProductExists(String productId) {
+    productClient.getProductList(new ArrayList<>(Arrays.asList(productId)));
   }
 
 }

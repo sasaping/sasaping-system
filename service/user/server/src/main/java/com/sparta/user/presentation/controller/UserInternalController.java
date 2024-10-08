@@ -19,5 +19,4 @@ public class UserInternalController {
   public UserDto getUserByUsername(@RequestParam(value = "username") String username) {
     return userService.getUserByUsername(username);
   }
-
 }

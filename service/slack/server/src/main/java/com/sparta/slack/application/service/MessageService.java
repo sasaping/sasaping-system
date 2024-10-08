@@ -26,8 +26,10 @@ public class MessageService {
 
   private final MessageRepository messageRepository;
   private final RestTemplate restTemplate = new RestTemplate();
+
   @Value("${SLACK_TOKEN}")
   private String slackToken;
+
   private static final String SLACK_API_URL = "https://slack.com/api/chat.postMessage";
 
   public void sendMessage(MessageRequest.Create messageRequest) {
@@ -40,8 +42,9 @@ public class MessageService {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setBearerAuth(slackToken);
 
-    String requestBody = String.format("{\"channel\":\"%s\", \"text\":\"%s\"}", slackUserId,
-        messageRequest.getMessage());
+    String requestBody =
+        String.format(
+            "{\"channel\":\"%s\", \"text\":\"%s\"}", slackUserId, messageRequest.getMessage());
 
     HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
     restTemplate.postForEntity(SLACK_API_URL, entity, String.class);
@@ -59,8 +62,8 @@ public class MessageService {
 
     try {
       String apiUrlWithParams = url + "?email=" + email;
-      ResponseEntity<String> response = restTemplate.exchange(apiUrlWithParams, HttpMethod.GET,
-          request, String.class);
+      ResponseEntity<String> response =
+          restTemplate.exchange(apiUrlWithParams, HttpMethod.GET, request, String.class);
 
       if (response.getStatusCode() == HttpStatus.OK) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -74,7 +77,5 @@ public class MessageService {
       throw new MessageException(MessageErrorCode.INVALID_PARAMETER);
     }
     throw new MessageException(MessageErrorCode.USER_NOT_FOUND);
-
   }
-
 }

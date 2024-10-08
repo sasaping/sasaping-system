@@ -1,8 +1,6 @@
 name: CI with Gradle
 
 on:
-  push:
-    branches: [ dev ]
   pull_request:
     branches: [ dev ]
 
@@ -30,15 +28,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Install GNU Parallel
-        run: sudo apt-get install -y parallel
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Execute Gradle build for all modules in parallel
+      - name: Execute Gradle build for all modules
         run: |
-          set -e
+          set -e  # 오류 발생 시 스크립트 종료
           
           # 모든 모듈을 찾습니다. (build.gradle 파일이 있는 디렉토리)
           MODULES=$(find ./service -type f \( -name "build.gradle" \) -exec dirname {} \; | sort -u)
@@ -46,9 +41,8 @@ jobs:
           echo "Modules to build:"
           echo "$MODULES"
           
-          # GNU Parallel을 사용하여 병렬로 빌드
-          echo "$MODULES" | parallel -j 4 '
-            folder={}
+          # 각 모듈에 대해 순차적으로 빌드
+          for folder in $MODULES; do
             echo "----------------------------"
             echo "Building in $folder..."
           
@@ -58,4 +52,4 @@ jobs:
             else
               echo "Skipping $folder: build.gradle not found."
             fi
-          '
+          done
