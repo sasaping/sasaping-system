@@ -11,6 +11,7 @@ public class ProductMapper {
     return ProductDto.builder()
         .productId(product.getProductId())
         .productName(product.getProductName())
+        .originalPrice(product.getOriginalPrice())
         .discountPercent(product.getDiscountPercent())
         .discountedPrice(product.getDiscountedPrice())
         .stock(product.getStock())
@@ -53,4 +54,5 @@ public class ProductMapper {
         request.tags(),
         request.isPublic());
   }
+
 }
