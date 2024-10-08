@@ -6,6 +6,7 @@ import com.sparta.product.application.ProductService;
 import com.sparta.product.presentation.request.ProductCreateRequest;
 import com.sparta.product.presentation.request.ProductUpdateRequest;
 import com.sparta.product.presentation.response.ProductResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,13 @@ public class ProductController {
   private final ProductService productService;
 
   @PostMapping
-  public ApiResponse<String> createProduct(@RequestBody ProductCreateRequest request) {
+  public ApiResponse<String> createProduct(@RequestBody @Valid ProductCreateRequest request) {
     return ApiResponse.created(facadeService.createProduct(request));
   }
 
   @PatchMapping
-  public ApiResponse<ProductResponse> updateProduct(@RequestBody ProductUpdateRequest request) {
+  public ApiResponse<ProductResponse> updateProduct(
+      @RequestBody @Valid ProductUpdateRequest request) {
     return ApiResponse.ok(facadeService.updateProduct(request));
   }
 
