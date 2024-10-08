@@ -3,6 +3,7 @@ package com.sparta.user.domain.model;
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.presentation.request.UserRequest;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -48,7 +49,7 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private UserRole role;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<PointHistory> pointHistories;
 
   public static User create(UserRequest.Create request, String encodedPassword) {
@@ -59,6 +60,10 @@ public class User extends BaseEntity {
         .point(request.getPoint())
         .role(request.getRole())
         .build();
+  }
+
+  public void updatePoint(Integer point) {
+    this.point = point;
   }
 
 }

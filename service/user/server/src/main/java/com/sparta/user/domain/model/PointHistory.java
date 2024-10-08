@@ -2,6 +2,7 @@ package com.sparta.user.domain.model;
 
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.user.domain.model.vo.PointHistoryType;
+import com.sparta.user.presentation.request.PointHistoryRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,10 +40,19 @@ public class PointHistory extends BaseEntity {
   private Long orderId;
 
   @Column(nullable = false)
-  private Long point;
+  private Integer point;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private PointHistoryType type;
+
+  public static PointHistory create(User user, PointHistoryRequest.Create request) {
+    return PointHistory.builder()
+        .user(user)
+        .orderId(request.getOrderId())
+        .point(request.getPoint())
+        .type(request.getType())
+        .build();
+  }
 
 }
