@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,7 @@ public class PointHistory extends BaseEntity {
   private Long orderId;
 
   @Column(nullable = false)
-  private Integer point;
+  private BigDecimal point;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

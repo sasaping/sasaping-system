@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -43,7 +44,7 @@ public class User extends BaseEntity {
   private String nickname;
 
   @Column(nullable = false)
-  private Integer point;
+  private BigDecimal point;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -62,7 +63,7 @@ public class User extends BaseEntity {
         .build();
   }
 
-  public void updatePoint(Integer point) {
+  public void updatePoint(BigDecimal point) {
     this.point = point;
   }
 

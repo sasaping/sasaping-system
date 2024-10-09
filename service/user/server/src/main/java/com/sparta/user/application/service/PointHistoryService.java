@@ -7,6 +7,7 @@ import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.PointHistoryRequest.Create;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,16 +40,16 @@ public class PointHistoryService {
     pointHistoryRepository.save(PointHistory.create(user, request));
   }
 
-  private void handlePointAdd(User user, Integer point) {
-    user.updatePoint(user.getPoint() + point);
+  private void handlePointAdd(User user, BigDecimal point) {
+    user.updatePoint(user.getPoint().add(point));
     userRepository.save(user);
   }
 
-  private void handlePointUse(User user, Integer point) {
-    if (user.getPoint() < point) {
+  private void handlePointUse(User user, BigDecimal point) {
+    if (user.getPoint().compareTo(point) < 0) {
       throw new UserException(UserErrorCode.INSUFFICIENT_POINTS);
     }
-    user.updatePoint(user.getPoint() - point);
+    user.updatePoint(user.getPoint().subtract(point));
     userRepository.save(user);
   }
 

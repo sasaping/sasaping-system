@@ -18,6 +18,7 @@ import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.PointHistoryRequest;
 import com.sparta.user.presentation.request.UserRequest;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +41,13 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_성공() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", 0, UserRole.ROLE_CUSTOMER
+        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_CUSTOMER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryRequest.Create request = new PointHistoryRequest.Create(
         user.getId(),
         10L,
-        50,
+        new BigDecimal("50.0"),
         PointHistoryType.EARN,
         "포인트 적립"
     );
@@ -68,7 +69,7 @@ public class PointHistoryServiceTests {
     PointHistoryRequest.Create request = new PointHistoryRequest.Create(
         nonExistentUserId,
         10L,
-        50,
+        new BigDecimal("50.0"),
         PointHistoryType.EARN,
         "포인트 적립"
     );
@@ -88,13 +89,13 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_시_유저의_포인트_부족() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", 100, UserRole.ROLE_CUSTOMER
+        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_CUSTOMER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryRequest.Create request = new PointHistoryRequest.Create(
         user.getId(),
         10L,
-        200, // 사용하려는 포인트가 유저 포인트보다 큼
+        new BigDecimal("200"), // 사용하려는 포인트가 유저 포인트보다 큼
         PointHistoryType.USE,
         "포인트 사용"
     );

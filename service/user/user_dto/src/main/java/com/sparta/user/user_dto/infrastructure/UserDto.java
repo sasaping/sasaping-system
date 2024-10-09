@@ -1,5 +1,6 @@
 package com.sparta.user.user_dto.infrastructure;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,6 @@ public class UserDto {
   private String username;
   private String password;
   private String role;
-  private Integer point;
+  private BigDecimal point;
 
 }

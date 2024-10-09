@@ -15,6 +15,7 @@ import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +36,8 @@ class UserServiceTests {
   void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("existinguser", "password123", "nickname", 0, UserRole.ROLE_ADMIN);
+        new UserRequest.Create("existinguser", "password123", "nickname", BigDecimal.ZERO,
+            UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
 
@@ -52,7 +54,8 @@ class UserServiceTests {
   void test_회원가입() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("newuser", "password123", "nickname", 0, UserRole.ROLE_ADMIN);
+        new UserRequest.Create("newuser", "password123", "nickname", BigDecimal.ZERO,
+            UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
 
@@ -74,7 +77,7 @@ class UserServiceTests {
     User savedUser = userCaptor.getValue();
     assertEquals("newuser", savedUser.getUsername());
     assertEquals("nickname", savedUser.getNickname());
-    assertEquals(0, savedUser.getPoint());
+    assertEquals(BigDecimal.ZERO, savedUser.getPoint());
     assertEquals(UserRole.ROLE_ADMIN, savedUser.getRole());
   }
 
@@ -97,7 +100,8 @@ class UserServiceTests {
     // Arrange
     String username = "existinguser";
     UserRequest.Create request =
-        new UserRequest.Create(username, "password123", "nickname", 0, UserRole.ROLE_ADMIN);
+        new UserRequest.Create(username, "password123", "nickname", BigDecimal.ZERO,
+            UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");
 
