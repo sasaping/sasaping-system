@@ -40,4 +40,12 @@ public class UserTier {
   @Column(name = "cumulative_amount", nullable = false)
   private Long cumulativeAmount;
 
+  public static UserTier create(User user, Tier defaultTier) {
+    return UserTier.builder()
+        .user(user)
+        .tier(defaultTier)
+        .cumulativeAmount(0L)
+        .build();
+  }
+
 }
