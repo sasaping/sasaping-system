@@ -1,5 +1,6 @@
 package com.sparta.order.server.presentation.dto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ public class OrderDto {
 
     private String orderType;
     private List<OrderProductInfo> orderProductInfos = new ArrayList<>();
-    private int pointPrice;
+    private BigDecimal pointPrice;
     private Long addressId;
 
   }

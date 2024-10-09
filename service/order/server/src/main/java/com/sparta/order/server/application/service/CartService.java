@@ -1,9 +1,12 @@
 package com.sparta.order.server.application.service;
 
+import com.sparta.common.domain.exception.BusinessException;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductRequest;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
 import com.sparta.order.server.exception.CartErrorCode;
 import com.sparta.order.server.exception.CartException;
+import com.sparta.order.server.exception.OrderErrorCode;
+import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.product_dto.ProductDto;
 import java.util.ArrayList;
@@ -106,6 +109,29 @@ public class CartService {
     cartOps.keys(redisKey).forEach(key -> cartOps.delete(redisKey, key));
   }
 
+  @Transactional
+  public void orderCartProduct(Long userId, Map<String, Integer> productQuantities) {
+    String redisKey = createRedisKey(userId);
+
+    try {
+      validateUserCartExists(redisKey);
+    } catch (BusinessException e) {
+      throw new OrderException(OrderErrorCode.CART_ITEM_ONLY_ORDERABLE);
+    }
+
+    productQuantities.forEach((productId, quantity) -> {
+          Integer existingProductQuantity = cartOps.get(redisKey, productId);
+          if (existingProductQuantity == null) {
+            throw new OrderException(OrderErrorCode.CART_ITEM_ONLY_ORDERABLE);
+          }
+          if (!existingProductQuantity.equals(quantity)) {
+            throw new OrderException(OrderErrorCode.CART_ITEM_QUANTITY_MISMATCH, productId);
+          }
+          cartOps.delete(redisKey, productId);
+        }
+    );
+  }
+
   private String createRedisKey(Long userId) {
     return "cart:" + userId.toString();
   }
@@ -119,5 +145,6 @@ public class CartService {
   private void validateProductExists(String productId) {
     productClient.getProductList(new ArrayList<>(Arrays.asList(productId)));
   }
+
 
 }

@@ -3,8 +3,11 @@ package com.sparta.order.server.domain.model;
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.order.server.domain.model.vo.OrderState;
 import com.sparta.order.server.domain.model.vo.OrderType;
+import com.sparta.order.server.exception.OrderErrorCode;
+import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
+import com.sparta.product_dto.ProductDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,9 +17,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +38,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "P_ORDER",
     uniqueConstraints = @UniqueConstraint(columnNames = "order_no", name = "UK_ORDER_NO"))
 public class Order extends BaseEntity {
+
+  private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("20000");
+  private static final BigDecimal SHIPPING_AMOUNT = new BigDecimal("3000");
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,19 +67,19 @@ public class Order extends BaseEntity {
   private Integer totalQuantity;
 
   @Column(nullable = false)
-  private float totalAmount;
+  private BigDecimal totalAmount;
 
   @Column(nullable = false)
-  private float shippingAmount;
+  private BigDecimal shippingAmount;
 
   @Column(nullable = false)
-  private float totalRealAmount;
+  private BigDecimal totalRealAmount;
 
   @Column(nullable = false, columnDefinition = "int default 0")
-  private Integer pointPrice;
+  private BigDecimal pointPrice;
 
   @Column(nullable = false)
-  private Integer couponPrice;
+  private BigDecimal couponPrice;
 
   @Column(nullable = true)
   private String invoiceNumber;
@@ -87,12 +97,12 @@ public class Order extends BaseEntity {
   private String shippingAddress;
 
   // TODO AddressDto 추가
-  public static Order createOrder(Long userId, OrderCreateRequest request, int couponPrice) {
+  public static Order createOrder(Long userId, OrderCreateRequest request,
+      List<ProductDto> products, BigDecimal couponPrice) {
 
-    final PriceInfo priceInfo = calculatePrice(request, couponPrice);
+    final PriceInfo priceInfo = calculatePrice(request, products, couponPrice);
 
-    // order no 생성
-    final String orderNo = generateOrderNo();
+    final String orderNo = generateOrderNo(OrderType.valueOf(request.getOrderType()));
 
     return Order.builder()
         .userId(userId)
@@ -113,25 +123,46 @@ public class Order extends BaseEntity {
         .build();
   }
 
-  // TODO 상품 가격 제대로 변경
-  private static PriceInfo calculatePrice(OrderCreateRequest request, int couponPrice) {
+  private static PriceInfo calculatePrice(OrderCreateRequest request, List<ProductDto> products,
+      BigDecimal couponPrice) {
+    Map<String, BigDecimal> productPrices = products.stream().collect(
+        Collectors.toMap(
+            product -> product.getProductId().toString(),
+            ProductDto::getDiscountedPrice)
+    );
+
     final int totalQuantity = request.getOrderProductInfos().stream()
         .mapToInt((OrderProductInfo::getQuantity)).sum();
-    final int totalProductAmount = request.getOrderProductInfos().stream()
-        .mapToInt(orderProductInfo -> orderProductInfo.getQuantity() * 1000)
-        .sum();
-    final int shippingAmount = totalProductAmount >= 20000 ? 0 : 3000;
-    final int totalAmount = totalProductAmount + shippingAmount;
-    final int totalRealAmount = totalAmount - request.getPointPrice() - couponPrice;
+
+    final BigDecimal totalProductAmount = request.getOrderProductInfos().stream()
+        .map(orderProductInfo -> BigDecimal.valueOf(orderProductInfo.getQuantity())
+            .multiply(productPrices.get(orderProductInfo.getProductId())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    final BigDecimal shippingAmount = totalProductAmount.compareTo(FREE_SHIPPING_THRESHOLD) >= 0
+        ? BigDecimal.ZERO
+        : SHIPPING_AMOUNT;
+
+    final BigDecimal totalAmount = totalProductAmount.add(shippingAmount);
+
+    final BigDecimal totalRealAmount = totalAmount
+        .subtract(request.getPointPrice())
+        .subtract(couponPrice);
 
     return new PriceInfo(totalQuantity, totalAmount, shippingAmount, totalRealAmount);
   }
 
-  private static String generateOrderNo() {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    String currentTime = dateFormat.format(new Date());
+  private static String generateOrderNo(OrderType orderType) {
+    String orderTypePrefix = switch (orderType) {
+      case PREORDER -> OrderType.PREORDER.getPrefix();
+      case RAFFLE -> OrderType.RAFFLE.getPrefix();
+      case STANDARD -> OrderType.STANDARD.getPrefix();
+      default -> throw new OrderException(OrderErrorCode.ORDER_NO_GENERATION_FAILED);
+    };
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    String currentTime = LocalDateTime.now().format(dateFormat);
     String randomNumber = generateRandomNumber();
-    return currentTime + randomNumber;
+    return orderTypePrefix + currentTime + randomNumber;
   }
 
   private static String generateRandomNumber() {
@@ -148,9 +179,9 @@ public class Order extends BaseEntity {
   private static class PriceInfo {
 
     private final int totalQuantity;
-    private final int totalAmount;
-    private final int shippingAmount;
-    private final int totalRealAmount;
+    private final BigDecimal totalAmount;
+    private final BigDecimal shippingAmount;
+    private final BigDecimal totalRealAmount;
 
   }
 

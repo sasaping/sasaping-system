@@ -19,4 +19,8 @@ public enum OrderType {
     return description;
   }
 
+  public String getPrefix() {
+    return this.name().substring(0, 1);
+  }
+
 }

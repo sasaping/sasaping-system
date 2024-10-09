@@ -1,5 +1,6 @@
 package com.sparta.order.server.presentation.controller;
 
+import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.order.server.application.service.OrderService;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,9 @@ public class OrderController {
   private final OrderService orderService;
 
   @PostMapping("/{userId}")
-  public void createOrder(@PathVariable(name = "userId") Long userId,
+  public ApiResponse<Long> createOrder(@PathVariable(name = "userId") Long userId,
       @RequestBody OrderCreateRequest request) {
-    orderService.createOrder(userId, request);
+    return ApiResponse.created(orderService.createOrder(userId, request));
   }
 
 }

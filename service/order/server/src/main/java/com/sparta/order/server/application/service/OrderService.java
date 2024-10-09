@@ -6,11 +6,16 @@ import com.sparta.order.server.domain.repository.OrderProductRepository;
 import com.sparta.order.server.domain.repository.OrderRepository;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
+import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
+import com.sparta.product_dto.ProductDto;
 import com.sparta.user.user_dto.infrastructure.UserInternalDto.UserOrderResponse;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,50 +25,71 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class OrderService {
 
+  private static final String COUPON_TAG = "COUPON";
+
   private final UserClient userClient;
   private final CartService cartService;
   private final OrderProductRepository orderProductRepository;
   private final OrderRepository orderRepository;
+  private final ProductClient productClient;
 
   @Transactional
-  public void createOrder(Long userId, OrderCreateRequest request) {
+  public Long createOrder(Long userId, OrderCreateRequest request) {
     // 사용자 조회 API
     UserOrderResponse user = userClient.getUser(userId);
+
     // 상품 ID 리스트 생성
     List<String> productIds = request.getOrderProductInfos().stream()
         .map(OrderProductInfo::getProductId).toList();
-    // 해당 productId가 장바구니 Redis 에 존재하는지 확인
-    //cartService.validateProductsInCart(userId, productIds);
+
+    // 상품 수량 Map 생성
+    Map<String, Integer> productQuantities = createProductQuantityMap(request);
+
     // 배송지 조회 API, 사용자 배송지인지 확인
     String address = userClient.getAddress(request.getAddressId());
-    // 포인트 유효성 검사 및 사용
-    validateAndUsePoint(user.getPoint(), request.getPointPrice());
 
-    // 주문할 상품들 Product 리스트 조회 API -> 재고 확인, 쿠폰 사용 가능 여부 확인
-    // 각 상품 재고 확인하여 재고 감소 API
+    // 포인트 유효성 검사 및 사용
+    validateAndUsePoint(new BigDecimal(user.getPoint()), request.getPointPrice());
+
+    // 주문할 상품들 Product 리스트 조회 API
+    List<ProductDto> products = productClient.getProductList(productIds);
+
+    // 쿠폰 사용 가능 여부 조회
+    validateUseCoupon(request, products);
+
+    // 각 상품 재고 확인
+    validateProductStock(products, productQuantities);
+    // 재고 감소 API
+
     // 각 상품에 달린 사용자 쿠폰 API 통해 쿠폰 ID 얻어오기
     // 쿠폰 조회 API
-    // 쿠폰가 적용
-    int couponPrice = 0;
+    // 임시 쿠폰가 적용
+    BigDecimal couponPrice = BigDecimal.ZERO;
     // 사용자 쿠폰 사용 API
 
-    Order order = createUniqueOrder(userId, request, couponPrice);
-    orderRepository.save(order);
+    Order order = createUniqueOrder(userId, request, products, couponPrice);
+    Long savedOrderId = orderRepository.save(order).getOrderId();
 
     // 주문 상품 하나씩 생성 TODO couponDto
     request.getOrderProductInfos()
         .forEach(productInfo -> createAndSaveOrderProduct(productInfo, null, order));
 
-    // 결제 API 호출 ~~
+    // 결제 API 호출
+
+    // 장바구니에 상품 삭제
+    cartService.orderCartProduct(userId, productQuantities);
+
+    return savedOrderId;
   }
 
-  private Order createUniqueOrder(Long userId, OrderCreateRequest request, int couponPrice) {
+  private Order createUniqueOrder(Long userId, OrderCreateRequest request,
+      List<ProductDto> products, BigDecimal couponPrice) {
     Order order;
     int attempts = 0;
     final int maxAttempts = 10;
 
     do {
-      order = Order.createOrder(userId, request, couponPrice);
+      order = Order.createOrder(userId, request, products, couponPrice);
       attempts++;
     } while (isDuplicateOrderNo(order.getOrderNo()) && attempts < maxAttempts);
 
@@ -78,6 +104,7 @@ public class OrderService {
     return orderRepository.existsByOrderNo(orderNo);
   }
 
+
   private void createAndSaveOrderProduct(OrderProductInfo productInfo, String couponDto,
       Order order) {
     OrderProduct orderProduct = OrderProduct.createOrderProduct(
@@ -89,11 +116,49 @@ public class OrderService {
     orderProductRepository.save(orderProduct);
   }
 
-  private void validateAndUsePoint(int userPoint, int pointPrice) {
-    if (userPoint < pointPrice) {
+  private void validateAndUsePoint(BigDecimal userPoint, BigDecimal pointPrice) {
+    if (userPoint.compareTo(pointPrice) < 0) { // userPoint가 pointPrice보다 작으면
       throw new OrderException(OrderErrorCode.INSUFFICIENT_POINT);
     }
     userClient.usePoint(pointPrice);
+  }
+
+  private void validateProductStock(List<ProductDto> products,
+      Map<String, Integer> productQuantities) {
+    Map<String, ProductDto> productMap = products.stream()
+        .collect(
+            Collectors.toMap(product -> product.getProductId().toString(), product -> product));
+
+    productQuantities.forEach((productId, quantity) -> {
+      ProductDto product = productMap.get(productId);
+      if (product == null || quantity > product.getStock()) {
+        throw new OrderException(OrderErrorCode.INSUFFICIENT_STOCK, productId);
+      }
+    });
+  }
+
+  private void validateUseCoupon(OrderCreateRequest request, List<ProductDto> products) {
+    List<String> usedCouponProductIds = request.getOrderProductInfos().stream()
+        .filter(orderProductInfo -> orderProductInfo.getUserCouponId() != null)
+        .map(OrderProductInfo::getProductId).toList();
+
+    Map<String, List<String>> productTags = products.stream()
+        .collect(Collectors.toMap(
+            product -> product.getProductId().toString(), ProductDto::getTags
+        ));
+
+    usedCouponProductIds.forEach(usedCouponProductId -> {
+      if (productTags.get(usedCouponProductId) == null || !productTags.get(usedCouponProductId)
+          .contains(COUPON_TAG)) {
+        throw new OrderException(OrderErrorCode.COUPON_NOT_APPLICABLE, usedCouponProductId);
+      }
+    });
+  }
+
+  private Map<String, Integer> createProductQuantityMap(OrderCreateRequest request) {
+    return request.getOrderProductInfos().stream()
+        .collect(Collectors.toMap(OrderProductInfo::getProductId, OrderProductInfo::getQuantity
+        ));
   }
 
 }
