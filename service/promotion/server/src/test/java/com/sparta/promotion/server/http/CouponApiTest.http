@@ -1,8 +1,10 @@
-@Port=19021
+@Port=19091
+@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjo4LCJVU0VSX1JPTEUiOiJST0xFX0NVU1RPTUVSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg0ODc3MjQsImV4cCI6MTczMjA4NzcyNH0.txZBawu2pGD2rZUj-oHbCfUhf7WNatjQX3e-2v3cRXY
 
 ### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
+Authorization: {{Token}}
 
 {
   "name": "Test Coupon",
@@ -21,3 +23,4 @@ Content-Type: application/json
 ### 이벤트 쿠폰 발급
 @couponId = 1
 POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}
+Authorization: {{Token}}
