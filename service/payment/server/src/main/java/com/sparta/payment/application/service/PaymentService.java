@@ -1,10 +1,5 @@
 package com.sparta.payment.application.service;
 
-import com.sparta.payment.application.dto.PaymentHistoryResponse;
-import com.sparta.payment.application.dto.PaymentRequest;
-import com.sparta.payment.application.dto.PaymentRequest.Create;
-import com.sparta.payment.application.dto.PaymentResponse;
-import com.sparta.payment.application.dto.PaymentResponse.Get;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
 import com.sparta.payment.domain.entity.PaymentState;
@@ -13,6 +8,11 @@ import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
 import com.sparta.payment.infrastructure.client.MessageClient;
+import com.sparta.payment.presentation.dto.PaymentHistoryResponse;
+import com.sparta.payment.presentation.dto.PaymentRequest;
+import com.sparta.payment.presentation.dto.PaymentRequest.Create;
+import com.sparta.payment.presentation.dto.PaymentResponse;
+import com.sparta.payment.presentation.dto.PaymentResponse.Get;
 import com.sparta.slack_dto.infrastructure.MessageInternalDto;
 import java.util.Base64;
 import java.util.List;

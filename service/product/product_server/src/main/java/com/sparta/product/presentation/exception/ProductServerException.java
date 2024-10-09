@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class ProductServerException extends BusinessException {
-  private ProductErrorCode errorCode;
+  private final ProductErrorCode errorCode;
 
   public ProductServerException(ProductErrorCode errorCode) {
     super(errorCode.getStatus().name(), errorCode.getMessage());
@@ -14,5 +14,6 @@ public class ProductServerException extends BusinessException {
 
   public ProductServerException(ProductErrorCode errorCode, Object... args) {
     super(errorCode.getStatus().name(), errorCode.getMessage(), args);
+    this.errorCode = errorCode;
   }
 }

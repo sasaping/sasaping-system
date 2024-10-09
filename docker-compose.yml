@@ -66,7 +66,7 @@ services:
       - sasaping-network
 
   cassandra:
-    image: cassandra:latest
+    image: cassandra:5.0.0
     container_name: cassandra-node-01
     environment:
       - CASSANDRA_SEEDS=cassandra-node-01
@@ -82,6 +82,16 @@ services:
     volumes:
       - cassandra_data:/var/lib/cassandra
 
+  product-cache:
+    image: redis:7.4.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    networks:
+      - sasaping-network
+
 networks:
   sasaping-network:
     driver: bridge
@@ -90,4 +100,6 @@ volumes:
   es_data:
     driver: local
   cassandra_data:
+    driver: local
+  redis-data:
     driver: local
