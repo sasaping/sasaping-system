@@ -3,6 +3,7 @@ package com.sparta.user.domain.model;
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.presentation.request.UserRequest;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,7 +11,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,11 +44,14 @@ public class User extends BaseEntity {
   private String nickname;
 
   @Column(nullable = false)
-  private Integer point;
+  private BigDecimal point;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private UserRole role;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<PointHistory> pointHistories;
 
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
@@ -55,4 +62,9 @@ public class User extends BaseEntity {
         .role(request.getRole())
         .build();
   }
+
+  public void updatePoint(BigDecimal point) {
+    this.point = point;
+  }
+
 }
