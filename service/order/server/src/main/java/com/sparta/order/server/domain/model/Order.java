@@ -3,6 +3,8 @@ package com.sparta.order.server.domain.model;
 import com.sparta.common.domain.entity.BaseEntity;
 import com.sparta.order.server.domain.model.vo.OrderState;
 import com.sparta.order.server.domain.model.vo.OrderType;
+import com.sparta.order.server.exception.OrderErrorCode;
+import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import jakarta.persistence.Column;
@@ -14,8 +16,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -91,8 +93,7 @@ public class Order extends BaseEntity {
 
     final PriceInfo priceInfo = calculatePrice(request, couponPrice);
 
-    // order no 생성
-    final String orderNo = generateOrderNo();
+    final String orderNo = generateOrderNo(OrderType.valueOf(request.getOrderType()));
 
     return Order.builder()
         .userId(userId)
@@ -127,11 +128,17 @@ public class Order extends BaseEntity {
     return new PriceInfo(totalQuantity, totalAmount, shippingAmount, totalRealAmount);
   }
 
-  private static String generateOrderNo() {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    String currentTime = dateFormat.format(new Date());
+  private static String generateOrderNo(OrderType orderType) {
+    String orderTypePrefix = switch (orderType) {
+      case PREORDER -> "P";
+      case RAFFLE -> "R";
+      case STANDARD -> "S";
+      default -> throw new OrderException(OrderErrorCode.ORDER_NO_GENERATION_FAILED);
+    };
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    String currentTime = LocalDateTime.now().format(dateFormat);
     String randomNumber = generateRandomNumber();
-    return currentTime + randomNumber;
+    return orderTypePrefix + currentTime + randomNumber;
   }
 
   private static String generateRandomNumber() {

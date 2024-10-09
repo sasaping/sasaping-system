@@ -106,6 +106,11 @@ public class CartService {
     cartOps.keys(redisKey).forEach(key -> cartOps.delete(redisKey, key));
   }
 
+//  public void validateProductsInCart(Long userId, Map<String, Integer> productInfo) {
+//    String redisKey = createRedisKey(userId);
+//    validateUserCartExists(redisKey);
+//  }
+
   private String createRedisKey(Long userId) {
     return "cart:" + userId.toString();
   }
@@ -119,5 +124,6 @@ public class CartService {
   private void validateProductExists(String productId) {
     productClient.getProductList(new ArrayList<>(Arrays.asList(productId)));
   }
+
 
 }
