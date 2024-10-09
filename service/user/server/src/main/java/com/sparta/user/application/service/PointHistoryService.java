@@ -2,11 +2,12 @@ package com.sparta.user.application.service;
 
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
+import com.sparta.user.domain.model.vo.PointHistoryType;
 import com.sparta.user.domain.repository.PointHistoryRepository;
 import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
-import com.sparta.user.presentation.request.PointHistoryRequest.Create;
+import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,12 @@ public class PointHistoryService {
   private final PointHistoryRepository pointHistoryRepository;
 
   @Transactional
-  public void createPointHistory(Create request) {
+  public void createPointHistory(PointHistoryDto request) {
     User user = userRepository
         .findById(request.getUserId())
         .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-    switch (request.getType()) {
+    switch (PointHistoryType.from(request.getType())) {
       case EARN:
       case REFUND:
         handlePointAdd(user, request.getPoint());
