@@ -1,0 +1,51 @@
+@Port=19091
+@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX1JPTEUiOiJST0xFX0FETUlOIiwiVVNFUl9JRCI6NywiVVNFUl9OQU1FIjoibmV3VXNlciIsImlhdCI6MTcyODI5MjM2NywiZXhwIjoxNzMxODkyMzY3fQ.Kvp1JJLpjxjRX4N8Nt46QP-_1jAnSzVvSISordEMHN8
+
+### 등급 생성1
+POST http://localhost:{{Port}}/api/tier
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "name": "골드핑",
+  "thresholdPrice": 150000
+}
+
+### 등급 생성2
+POST http://localhost:{{Port}}/api/tier
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "name": "실버핑",
+  "thresholdPrice": 100000
+}
+
+### 등급 생성3
+POST http://localhost:{{Port}}/api/tier
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "name": "애기핑",
+  "thresholdPrice": 50000
+}
+
+### 등급 조회
+GET http://localhost:{{Port}}/api/tier
+Authorization: {{Token}}
+
+### 등급 수정
+@tierId = 1
+PATCH localhost:{{Port}}/api/tier/{{tierId}}
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "name": "골드핑그르르",
+  "thresholdPrice": 200000
+}
+
+### 등급 삭제
+DELETE localhost:{{Port}}/api/tier/{{tierId}}
+Authorization: {{Token}}

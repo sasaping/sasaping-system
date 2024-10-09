@@ -1,4 +1,4 @@
-package com.sparta.payment.application.dto;
+package com.sparta.payment.presentation.dto;
 
 import com.sparta.payment.domain.entity.PaymentState;
 import java.time.LocalDateTime;
