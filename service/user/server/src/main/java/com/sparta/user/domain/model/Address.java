@@ -1,6 +1,7 @@
 package com.sparta.user.domain.model;
 
 import com.sparta.common.domain.entity.BaseEntity;
+import com.sparta.user.presentation.request.AddressRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,5 +51,17 @@ public class Address extends BaseEntity {
 
   @Column(nullable = false)
   private Boolean isDefault;
+
+  public static Address create(User user, AddressRequest.Create request) {
+    return Address.builder()
+        .user(user)
+        .alias(request.getAlias())
+        .recipient(request.getRecipient())
+        .phoneNumber(request.getPhoneNumber())
+        .zipcode(request.getZipcode())
+        .address(request.getAddress())
+        .isDefault(request.getIsDefault())
+        .build();
+  }
 
 }
