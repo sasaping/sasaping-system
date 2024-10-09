@@ -1,17 +1,27 @@
 package com.sparta.promotion.server.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sparta.promotion.server.application.service.CouponService;
 import com.sparta.promotion.server.domain.model.Coupon;
+import com.sparta.promotion.server.domain.model.UserCoupon;
 import com.sparta.promotion.server.domain.model.vo.CouponType;
 import com.sparta.promotion.server.domain.model.vo.DiscountType;
 import com.sparta.promotion.server.domain.repository.CouponRepository;
+import com.sparta.promotion.server.domain.repository.UserCouponRepository;
+import com.sparta.promotion.server.exception.PromotionErrorCode;
+import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +34,9 @@ class CouponServiceTests {
 
   @MockBean
   private CouponRepository couponRepository;
+
+  @MockBean
+  private UserCouponRepository userCouponRepository;
 
   /*
   @MockBean
@@ -83,6 +96,71 @@ class CouponServiceTests {
 
     // PromotionException exception = assertThrows(PromotionException.class, () -> couponService.createEventCoupon(request));
     // assertEquals(PromotionErrorCode.EVENT_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void test_이벤트_쿠폰_제공_성공() {
+    // given
+    Long userId = 1L;
+    Long couponId = 100L;
+
+    Coupon coupon = mock(Coupon.class);
+    when(coupon.getQuantity()).thenReturn(10);
+
+    UserCoupon userCoupon = UserCoupon.create(userId, couponId);
+
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+    when(userCouponRepository.save(any(UserCoupon.class))).thenReturn(userCoupon);
+
+    // then
+    couponService.provideEventCoupon(userId, couponId);
+
+    verify(couponRepository).findById(couponId);
+    verify(coupon).updateQuantity(anyInt());
+    verify(userCouponRepository).save(any(UserCoupon.class));
+  }
+
+  @Test
+  void test_이벤트_쿠폰_실패_수량부족() {
+    // given
+    Long userId = 1L;
+    Long couponId = 100L;
+
+    Coupon coupon = mock(Coupon.class);
+    when(coupon.getQuantity()).thenReturn(0); // 수량이 0일 경우
+
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.provideEventCoupon(userId, couponId);
+    });
+
+    assertEquals(PromotionErrorCode.INSUFFICIENT_COUPON.getMessage(), exception.getMessage());
+    verify(couponRepository).findById(couponId);
+    verify(coupon, never()).updateQuantity(anyInt());
+    verify(userCouponRepository, never()).save(any(UserCoupon.class));
+  }
+
+  @Test
+  void test_이벤트_쿠폰_실패_쿠폰없음() {
+    // given
+    Long userId = 1L;
+    Long couponId = 100L;
+
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.empty());
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.provideEventCoupon(userId, couponId);
+    });
+
+    assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+    verify(couponRepository).findById(couponId);
+    verify(userCouponRepository, never()).save(any(UserCoupon.class)); // 저장이 일어나지 않음
   }
 
 }

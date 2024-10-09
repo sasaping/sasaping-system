@@ -34,4 +34,12 @@ public class UserCoupon {
   @Column(nullable = false)
   private Boolean isUsed;
 
+  public static UserCoupon create(Long userId, Long couponId) {
+    return UserCoupon.builder()
+        .userId(userId)
+        .couponId(couponId)
+        .isUsed(false)
+        .build();
+  }
+
 }

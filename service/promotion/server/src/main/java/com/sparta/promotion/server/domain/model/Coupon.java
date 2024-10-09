@@ -76,4 +76,8 @@ public class Coupon {
         .build();
   }
 
+  public void updateQuantity(Integer quantity) {
+    this.quantity = quantity;
+  }
+
 }

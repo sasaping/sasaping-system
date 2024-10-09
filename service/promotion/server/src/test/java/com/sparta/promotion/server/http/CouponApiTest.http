@@ -1,6 +1,6 @@
 @Port=19021
 
-### GET request to example server
+### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
 
@@ -17,3 +17,7 @@ Content-Type: application/json
   "userTier": null,
   "eventId": 1
 }
+
+### 이벤트 쿠폰 발급
+@couponId = 1
+POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}

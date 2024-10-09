@@ -2,6 +2,7 @@ package com.sparta.promotion.server.infrastructure.repository;
 
 import com.sparta.promotion.server.domain.model.Coupon;
 import com.sparta.promotion.server.domain.repository.CouponRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,11 @@ public class CouponRepositoryImpl implements CouponRepository {
   @Override
   public Coupon save(Coupon coupon) {
     return jpaCouponRepository.save(coupon);
+  }
+
+  @Override
+  public Optional<Coupon> findById(Long couponId) {
+    return jpaCouponRepository.findById(couponId);
   }
 
 }
