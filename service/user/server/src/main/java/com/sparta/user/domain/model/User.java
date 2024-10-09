@@ -51,6 +51,9 @@ public class User extends BaseEntity {
   private UserRole role;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<Address> addresses;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<PointHistory> pointHistories;
 
   public static User create(UserRequest.Create request, String encodedPassword) {
