@@ -1,0 +1,19 @@
+@Port=19021
+
+### GET request to example server
+POST http://localhost:{{Port}}/api/coupons/event
+Content-Type: application/json
+
+{
+  "name": "Test Coupon",
+  "type": "EVENT",
+  "discountType": "PRICE",
+  "discountValue": 1000.00,
+  "minBuyPrice": null,
+  "maxDiscountPrice": null,
+  "quantity": 100,
+  "startDate": "2024-01-01T00:00:00",
+  "endDate": "2024-12-31T23:59:59",
+  "userTier": null,
+  "eventId": 1
+}

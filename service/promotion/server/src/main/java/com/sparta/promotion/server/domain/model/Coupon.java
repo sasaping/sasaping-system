@@ -2,6 +2,7 @@ package com.sparta.promotion.server.domain.model;
 
 import com.sparta.promotion.server.domain.model.vo.CouponType;
 import com.sparta.promotion.server.domain.model.vo.DiscountType;
+import com.sparta.promotion.server.presentation.request.CouponRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,6 +47,9 @@ public class Coupon {
   private BigDecimal maxDiscountPrice;
 
   @Column(nullable = false)
+  private Integer quantity;
+
+  @Column(nullable = false)
   private Timestamp startDate;
 
   @Column(nullable = false)
@@ -55,5 +59,21 @@ public class Coupon {
   private String userTier;
 
   private Long eventId;
+
+  public static Coupon create(CouponRequest.Create request) {
+    return Coupon.builder()
+        .name(request.getName())
+        .type(request.getType())
+        .discountType(request.getDiscountType())
+        .discountValue(request.getDiscountValue())
+        .minBuyPrice(request.getMinBuyPrice())
+        .maxDiscountPrice(request.getMaxDiscountPrice())
+        .quantity(request.getQuantity())
+        .startDate(request.getStartDate())
+        .endDate(request.getEndDate())
+        .userTier(request.getUserTier())
+        .eventId(request.getEventId())
+        .build();
+  }
 
 }
