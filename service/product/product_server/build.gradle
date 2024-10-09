@@ -32,13 +32,16 @@ dependencies {
     implementation project(':service:product:product_dto')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
+    implementation 'org.springframework.data:spring-data-elasticsearch:5.3.0'
+    implementation 'co.elastic.clients:elasticsearch-java:8.6.0'
+    implementation 'org.springframework.boot:spring-boot-starter-json:3.3.4'
+    implementation 'jakarta.json:jakarta.json-api:2.0.1'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'mysql:mysql-connector-java:8.0.33'
-    implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
-    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
