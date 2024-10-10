@@ -1,0 +1,27 @@
+@Port=19091
+@InternalPort=19092
+
+## 내부 API
+### 포인트 적립
+POST http://localhost:{{InternalPort}}/internal/users/point
+Content-Type: application/json
+
+{
+  "userId": 7,
+  "orderId": 10,
+  "point": 50,
+  "type": "적립",
+  "description": "포인트 적립입니다."
+}
+
+### 포인트 사용
+POST http://localhost:{{InternalPort}}/internal/users/point
+Content-Type: application/json
+
+{
+  "userId": 7,
+  "orderId": 11,
+  "point": 30,
+  "type": "사용",
+  "description": "포인트 사용입니다."
+}

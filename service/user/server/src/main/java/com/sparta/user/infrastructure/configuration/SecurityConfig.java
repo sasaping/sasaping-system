@@ -37,7 +37,7 @@ public class SecurityConfig {
                 authorize
                     .requestMatchers("/api/users/sign-up")
                     .permitAll()
-                    .requestMatchers("/internal/users/**")
+                    .requestMatchers("/internal/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -51,4 +51,5 @@ public class SecurityConfig {
   public PasswordEncoder getPasswordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
 }
