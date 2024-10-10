@@ -1,0 +1,25 @@
+@Port=19091
+
+### 회원가입
+POST http://localhost:{{Port}}/api/users/sign-up
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123",
+  "nickname": "nickname",
+  "point": 0,
+  "role": "관리자"
+}
+
+### 로그인
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token", response.body.data.token);
+%}

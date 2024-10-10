@@ -27,6 +27,11 @@ public class UserInternalController {
     return userService.getUserByUsername(username);
   }
 
+  @GetMapping("/user-id")
+  public UserDto getUserByUserId(@RequestParam(value = "userId") Long userId) {
+    return userService.getUserByUserId(userId);
+  }
+
   @PostMapping("/point")
   public ApiResponse<?> createPointHistory(@RequestBody @Valid PointHistoryRequest.Create request) {
     pointHistoryService.createPointHistory(request);
