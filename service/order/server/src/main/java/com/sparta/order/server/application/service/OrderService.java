@@ -11,7 +11,7 @@ import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import com.sparta.product_dto.ProductDto;
-import com.sparta.user.user_dto.infrastructure.UserInternalDto.UserOrderResponse;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -35,30 +35,25 @@ public class OrderService {
 
   @Transactional
   public Long createOrder(Long userId, OrderCreateRequest request) {
-    // 사용자 조회 API
-    UserOrderResponse user = userClient.getUser(userId);
+    UserDto user = userClient.getUser(userId);
 
-    // 상품 ID 리스트 생성
-    List<String> productIds = request.getOrderProductInfos().stream()
-        .map(OrderProductInfo::getProductId).toList();
-
-    // 상품 수량 Map 생성
+    List<String> productIds = createProductIdList(request);
     Map<String, Integer> productQuantities = createProductQuantityMap(request);
 
     // 배송지 조회 API, 사용자 배송지인지 확인
-    String address = userClient.getAddress(request.getAddressId());
+    //String address = userClient.getAddress(request.getAddressId());
 
     // 포인트 유효성 검사 및 사용
-    validateAndUsePoint(new BigDecimal(user.getPoint()), request.getPointPrice());
+    validateAndUsePoint(user.getPoint(), request.getPointPrice());
 
     // 주문할 상품들 Product 리스트 조회 API
-    List<ProductDto> products = productClient.getProductList(productIds);
+    //List<ProductDto> products = productClient.getProductList(productIds);
 
     // 쿠폰 사용 가능 여부 조회
-    validateUseCoupon(request, products);
+    //validateUseCoupon(request, products);
 
     // 각 상품 재고 확인
-    validateProductStock(products, productQuantities);
+    //validateProductStock(products, productQuantities);
     // 재고 감소 API
 
     // 각 상품에 달린 사용자 쿠폰 API 통해 쿠폰 ID 얻어오기
@@ -67,19 +62,20 @@ public class OrderService {
     BigDecimal couponPrice = BigDecimal.ZERO;
     // 사용자 쿠폰 사용 API
 
-    Order order = createUniqueOrder(userId, request, products, couponPrice);
-    Long savedOrderId = orderRepository.save(order).getOrderId();
+    //Order order = createUniqueOrder(userClaim.getUserId(), request, products, couponPrice);
+    //Long savedOrderId = orderRepository.save(order).getOrderId();
 
     // 주문 상품 하나씩 생성 TODO couponDto
-    request.getOrderProductInfos()
-        .forEach(productInfo -> createAndSaveOrderProduct(productInfo, null, order));
+    //request.getOrderProductInfos()
+    //.forEach(productInfo -> createAndSaveOrderProduct(productInfo, null, order));
 
     // 결제 API 호출
 
     // 장바구니에 상품 삭제
     cartService.orderCartProduct(userId, productQuantities);
 
-    return savedOrderId;
+    //return savedOrderId;
+    return 1L;
   }
 
   private Order createUniqueOrder(Long userId, OrderCreateRequest request,
@@ -117,10 +113,10 @@ public class OrderService {
   }
 
   private void validateAndUsePoint(BigDecimal userPoint, BigDecimal pointPrice) {
-    if (userPoint.compareTo(pointPrice) < 0) { // userPoint가 pointPrice보다 작으면
+    if (userPoint.compareTo(pointPrice) < 0) {
       throw new OrderException(OrderErrorCode.INSUFFICIENT_POINT);
     }
-    userClient.usePoint(pointPrice);
+    //userClient.usePoint(pointPrice);
   }
 
   private void validateProductStock(List<ProductDto> products,
@@ -159,6 +155,11 @@ public class OrderService {
     return request.getOrderProductInfos().stream()
         .collect(Collectors.toMap(OrderProductInfo::getProductId, OrderProductInfo::getQuantity
         ));
+  }
+
+  private List<String> createProductIdList(OrderCreateRequest request) {
+    return request.getOrderProductInfos().stream()
+        .map(OrderProductInfo::getProductId).toList();
   }
 
 }

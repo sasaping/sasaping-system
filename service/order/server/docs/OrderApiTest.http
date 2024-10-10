@@ -1,21 +1,17 @@
-@Port=19071
+@Port=19091
 
 ### 주문 생성
-POST http://localhost:{{Port}}/api/orders/123456
+POST http://localhost:{{Port}}/api/orders
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
   "orderType": "STANDARD",
   "orderProductInfos": [
     {
-      "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6g",
-      "quantity": 3,
+      "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
+      "quantity": 6,
       "userCouponId": 132
-    },
-    {
-      "productId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb1g",
-      "quantity": 2,
-      "userCouponId": 5
     }
   ],
   "pointPrice": 0,

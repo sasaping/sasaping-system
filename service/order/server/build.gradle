@@ -32,6 +32,7 @@ dependencies {
     implementation project(':common:domain')
     implementation project(':service:user:user_dto')
     implementation project(':service:product:product_dto')
+    implementation project(':service:auth:auth_dto')
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'mysql:mysql-connector-java:8.0.33'
@@ -46,6 +47,10 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 dependencyManagement {
     imports {

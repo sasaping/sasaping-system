@@ -1,4 +1,4 @@
-package com.sparta.order.server.Cart.infrastructure.configuration;
+package com.sparta.order.server.infrastructure.configuration;
 
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
@@ -26,4 +26,5 @@ public class RedisConfig {
 
     return template;
   }
+
 }
