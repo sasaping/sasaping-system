@@ -1,13 +1,11 @@
 package com.sparta.user.presentation.request;
 
-import com.sparta.user.domain.model.vo.PointHistoryType;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class PointHistoryRequest {
+public class AddressRequest {
 
   @Getter
   @NoArgsConstructor
@@ -15,14 +13,17 @@ public class PointHistoryRequest {
   public static class Create {
 
     @NotNull
-    private Long userId;
-    private Long orderId;
+    private String alias;
     @NotNull
-    private BigDecimal point;
+    private String recipient;
     @NotNull
-    private PointHistoryType type;
+    private String phoneNumber;
     @NotNull
-    private String description;
+    private String zipcode;
+    @NotNull
+    private String address;
+    @NotNull
+    private Boolean isDefault;
 
   }
 

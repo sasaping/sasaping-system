@@ -1,11 +1,9 @@
 package com.sparta.user.presentation.controller;
 
-import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.application.service.UserService;
-import com.sparta.user.presentation.request.PointHistoryRequest;
+import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,9 +31,8 @@ public class UserInternalController {
   }
 
   @PostMapping("/point")
-  public ApiResponse<?> createPointHistory(@RequestBody @Valid PointHistoryRequest.Create request) {
+  public void createPointHistory(@RequestBody PointHistoryDto request) {
     pointHistoryService.createPointHistory(request);
-    return ApiResponse.ok(null);
   }
 
 }
