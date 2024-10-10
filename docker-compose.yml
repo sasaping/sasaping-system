@@ -4,7 +4,7 @@ services:
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     user: "0"
-    command: >인
+    command: >
       bash -c '
         if [ x${ELASTIC_PASSWORD} == x ]; then
           echo "Set the ELASTIC_PASSWORD environment variable in the .env file";

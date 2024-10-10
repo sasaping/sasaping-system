@@ -33,6 +33,7 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.data:spring-data-elasticsearch:5.3.0'
     implementation 'co.elastic.clients:elasticsearch-java:8.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.4'
