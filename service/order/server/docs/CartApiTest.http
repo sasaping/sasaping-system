@@ -6,7 +6,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
+  "productId": "19646241-55d8-40f7-8f3e-d7242dedff49",
   "quantity": 3
 }
 

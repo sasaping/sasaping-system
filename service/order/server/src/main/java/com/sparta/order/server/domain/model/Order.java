@@ -8,6 +8,7 @@ import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import com.sparta.product_dto.ProductDto;
+import com.sparta.user.user_dto.infrastructure.AddressDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -98,7 +99,7 @@ public class Order extends BaseEntity {
 
   // TODO AddressDto 추가
   public static Order createOrder(Long userId, OrderCreateRequest request,
-      List<ProductDto> products, BigDecimal couponPrice) {
+      List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
 
     final PriceInfo priceInfo = calculatePrice(request, products, couponPrice);
 
@@ -116,10 +117,10 @@ public class Order extends BaseEntity {
         .totalRealAmount(priceInfo.totalRealAmount)
         .pointPrice(request.getPointPrice())
         .couponPrice(couponPrice)
-        .recipient("수령인")
-        .phoneNumber("전화번호")
-        .zipcode("우편번호")
-        .shippingAddress("배송지")
+        .recipient(address.getRecipient())
+        .phoneNumber(address.getPhoneNumber())
+        .zipcode(address.getZipcode())
+        .shippingAddress(address.getAddress())
         .build();
   }
 

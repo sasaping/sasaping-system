@@ -9,11 +9,11 @@ Content-Type: application/json
   "orderType": "STANDARD",
   "orderProductInfos": [
     {
-      "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
-      "quantity": 6,
+      "productId": "19646241-55d8-40f7-8f3e-d7242dedff49",
+      "quantity": 3,
       "userCouponId": 132
     }
   ],
   "pointPrice": 0,
-  "addressId": 1123
+  "addressId": 1
 }

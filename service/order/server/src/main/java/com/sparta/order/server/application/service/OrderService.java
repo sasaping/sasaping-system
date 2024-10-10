@@ -11,6 +11,8 @@ import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import com.sparta.product_dto.ProductDto;
+import com.sparta.user.user_dto.infrastructure.AddressDto;
+import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
 
   private static final String COUPON_TAG = "COUPON";
+  private static final String POINT_HISTORY_TYPE_USE = "사용";
+  private static final String POINT_DESCRIPTION_ORDER_PAYMENT = "주문 결제";
 
   private final UserClient userClient;
   private final CartService cartService;
@@ -41,19 +45,17 @@ public class OrderService {
     Map<String, Integer> productQuantities = createProductQuantityMap(request);
 
     // 배송지 조회 API, 사용자 배송지인지 확인
-    //String address = userClient.getAddress(request.getAddressId());
-
-    // 포인트 유효성 검사 및 사용
-    validateAndUsePoint(user.getPoint(), request.getPointPrice());
+    AddressDto address = userClient.getAddress(request.getAddressId());
+    validateAddress(address, userId);
 
     // 주문할 상품들 Product 리스트 조회 API
-    //List<ProductDto> products = productClient.getProductList(productIds);
+    List<ProductDto> products = productClient.getProductList(productIds);
 
     // 쿠폰 사용 가능 여부 조회
-    //validateUseCoupon(request, products);
+    validateUseCoupon(request, products);
 
     // 각 상품 재고 확인
-    //validateProductStock(products, productQuantities);
+    validateProductStock(products, productQuantities);
     // 재고 감소 API
 
     // 각 상품에 달린 사용자 쿠폰 API 통해 쿠폰 ID 얻어오기
@@ -62,30 +64,42 @@ public class OrderService {
     BigDecimal couponPrice = BigDecimal.ZERO;
     // 사용자 쿠폰 사용 API
 
-    //Order order = createUniqueOrder(userClaim.getUserId(), request, products, couponPrice);
-    //Long savedOrderId = orderRepository.save(order).getOrderId();
+    Order order = createUniqueOrder(userId, request, products, couponPrice, address);
+    Long savedOrderId = orderRepository.save(order).getOrderId();
+
+    // 포인트 유효성 검사 및 사용
+    if (request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
+      PointHistoryDto pointUserRequest = new PointHistoryDto(userId, savedOrderId,
+          request.getPointPrice(), POINT_HISTORY_TYPE_USE, POINT_DESCRIPTION_ORDER_PAYMENT);
+      validateAndUsePoint(user.getPoint(), request.getPointPrice(), pointUserRequest);
+    }
 
     // 주문 상품 하나씩 생성 TODO couponDto
-    //request.getOrderProductInfos()
-    //.forEach(productInfo -> createAndSaveOrderProduct(productInfo, null, order));
+    request.getOrderProductInfos()
+        .forEach(productInfo -> createAndSaveOrderProduct(productInfo, null, order));
 
     // 결제 API 호출
 
     // 장바구니에 상품 삭제
-    cartService.orderCartProduct(userId, productQuantities);
+    //cartService.orderCartProduct(userId, productQuantities);
 
-    //return savedOrderId;
-    return 1L;
+    return savedOrderId;
+  }
+
+  private void validateAddress(AddressDto address, Long userId) {
+    if (!address.getUserId().equals(userId)) {
+      throw new OrderException(OrderErrorCode.ADDRESS_MISMATCH, address.getAddressId());
+    }
   }
 
   private Order createUniqueOrder(Long userId, OrderCreateRequest request,
-      List<ProductDto> products, BigDecimal couponPrice) {
+      List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
     Order order;
     int attempts = 0;
     final int maxAttempts = 10;
 
     do {
-      order = Order.createOrder(userId, request, products, couponPrice);
+      order = Order.createOrder(userId, request, products, couponPrice, address);
       attempts++;
     } while (isDuplicateOrderNo(order.getOrderNo()) && attempts < maxAttempts);
 
@@ -112,11 +126,12 @@ public class OrderService {
     orderProductRepository.save(orderProduct);
   }
 
-  private void validateAndUsePoint(BigDecimal userPoint, BigDecimal pointPrice) {
+  private void validateAndUsePoint(BigDecimal userPoint, BigDecimal pointPrice,
+      PointHistoryDto pointUserRequest) {
     if (userPoint.compareTo(pointPrice) < 0) {
       throw new OrderException(OrderErrorCode.INSUFFICIENT_POINT);
     }
-    //userClient.usePoint(pointPrice);
+    userClient.usePoint(pointUserRequest);
   }
 
   private void validateProductStock(List<ProductDto> products,
