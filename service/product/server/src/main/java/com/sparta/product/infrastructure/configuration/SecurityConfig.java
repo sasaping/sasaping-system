@@ -1,7 +1,7 @@
-package com.sparta.user.infrastructure.configuration;
+package com.sparta.product.infrastructure.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.user.infrastructure.filter.SecurityContextFilter;
+import com.sparta.product.infrastructure.filter.SecurityContextFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,8 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -34,22 +32,10 @@ public class SecurityConfig {
         .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
-                authorize
-                    .requestMatchers("/api/users/sign-up")
-                    .permitAll()
-                    .requestMatchers("/internal/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
+                authorize.requestMatchers("/internal/**").permitAll().anyRequest().authenticated())
         .addFilterAfter(
             new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
-
-  @Bean
-  public PasswordEncoder getPasswordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
 }

@@ -10,14 +10,13 @@ import static org.mockito.Mockito.when;
 import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
-import com.sparta.user.domain.model.vo.PointHistoryType;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.PointHistoryRepository;
 import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
-import com.sparta.user.presentation.request.PointHistoryRequest;
 import com.sparta.user.presentation.request.UserRequest;
+import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,11 @@ public class PointHistoryServiceTests {
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_CUSTOMER
     );
     User user = User.create(userRequest, "encodedPassword");
-    PointHistoryRequest.Create request = new PointHistoryRequest.Create(
+    PointHistoryDto request = new PointHistoryDto(
         user.getId(),
         10L,
         new BigDecimal("50.0"),
-        PointHistoryType.EARN,
+        "적립",
         "포인트 적립"
     );
 
@@ -66,11 +65,11 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_시_존재하지_않는_유저() {
     // Given
     Long nonExistentUserId = 999L; // 존재하지 않는 유저 ID
-    PointHistoryRequest.Create request = new PointHistoryRequest.Create(
+    PointHistoryDto request = new PointHistoryDto(
         nonExistentUserId,
         10L,
         new BigDecimal("50.0"),
-        PointHistoryType.EARN,
+        "적립",
         "포인트 적립"
     );
 
@@ -92,11 +91,11 @@ public class PointHistoryServiceTests {
         "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_CUSTOMER
     );
     User user = User.create(userRequest, "encodedPassword");
-    PointHistoryRequest.Create request = new PointHistoryRequest.Create(
+    PointHistoryDto request = new PointHistoryDto(
         user.getId(),
         10L,
         new BigDecimal("200"), // 사용하려는 포인트가 유저 포인트보다 큼
-        PointHistoryType.USE,
+        "사용",
         "포인트 사용"
     );
 

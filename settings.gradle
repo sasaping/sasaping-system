@@ -5,7 +5,7 @@ include(':common:domain')
 include(':service:user:server')
 include(':service:user:user_dto')
 
-include(':service:product:product_server')
+include(':service:product:server')
 include(':service:product:product_dto')
 
 include(':service:payment:server')

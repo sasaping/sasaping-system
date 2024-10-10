@@ -9,18 +9,22 @@ permissions:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     permissions: write-all
+    strategy:
+      matrix:
+        service: [user, auth, gateway, notification, order, payment, product, slack, promotion]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -31,25 +35,5 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Execute Gradle build for all modules
-        run: |
-          set -e  # 오류 발생 시 스크립트 종료
-          
-          # 모든 모듈을 찾습니다. (build.gradle 파일이 있는 디렉토리)
-          MODULES=$(find ./service -type f \( -name "build.gradle" \) -exec dirname {} \; | sort -u)
-          
-          echo "Modules to build:"
-          echo "$MODULES"
-          
-          # 각 모듈에 대해 순차적으로 빌드
-          for folder in $MODULES; do
-            echo "----------------------------"
-            echo "Building in $folder..."
-          
-            if [ -f "$folder/build.gradle" ]; then
-              echo "Building Gradle project in $folder..."
-              ./gradlew -p "$folder" build -x test
-            else
-              echo "Skipping $folder: build.gradle not found."
-            fi
-          done
+      - name: Build with Gradle
+        run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -x test
