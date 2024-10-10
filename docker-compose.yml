@@ -277,12 +277,24 @@ services:
     volumes:
       - cassandra_data:/var/lib/cassandra
 
+  product-cache:
+    image: redis:7.4.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    networks:
+      - sasaping-network
+
 networks:
   sasaping-network:
     driver: bridge
 
 volumes:
   cassandra_data:
+    driver: local
+  redis-data:
     driver: local
   certs:
     driver: local
