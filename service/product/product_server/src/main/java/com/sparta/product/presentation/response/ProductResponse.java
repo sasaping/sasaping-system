@@ -2,6 +2,7 @@ package com.sparta.product.presentation.response;
 
 import com.sparta.product.domain.model.Product;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -32,6 +33,7 @@ public class ProductResponse {
   private boolean soldout;
   private boolean isDeleted;
   private List<String> tags;
+  private LocalDateTime createdAt;
 
   @Builder
   private ProductResponse(
@@ -55,7 +57,8 @@ public class ProductResponse {
       boolean isPublic,
       boolean soldout,
       boolean isDeleted,
-      List<String> tags) {
+      List<String> tags,
+      LocalDateTime createdAt) {
     this.productId = productId.toString();
     this.categoryId = categoryId;
     this.productName = productName;
@@ -77,6 +80,7 @@ public class ProductResponse {
     this.soldout = soldout;
     this.isDeleted = isDeleted;
     this.tags = tags;
+    this.createdAt = createdAt;
   }
 
   public static ProductResponse fromEntity(Product product) {
@@ -102,6 +106,7 @@ public class ProductResponse {
         .isPublic(product.isPublic())
         .soldout(product.isSoldout())
         .tags(product.getTags())
+        .createdAt(product.getCreatedAt())
         .build();
   }
 }

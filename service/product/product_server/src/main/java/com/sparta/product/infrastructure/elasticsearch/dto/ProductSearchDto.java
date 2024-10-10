@@ -1,5 +1,6 @@
 package com.sparta.product.infrastructure.elasticsearch.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sparta.product.presentation.response.ProductResponse;
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,7 +12,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 @Getter
 @NoArgsConstructor
-@Document(indexName = "products")
+@Document(indexName = "sasaping-ecommerce-products")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductSearchDto {
   @Id private String productId;
   private Long categoryId;
@@ -29,7 +31,10 @@ public class ProductSearchDto {
   private boolean isPublic;
   private boolean soldout;
   private List<String> tags;
+  private Long reviewCount;
+  private Long salesCount;
   private boolean isDeleted;
+  private String createdAt;
 
   @Builder
   private ProductSearchDto(
@@ -49,7 +54,10 @@ public class ProductSearchDto {
       boolean isPublic,
       boolean soldout,
       boolean isDeleted,
-      List<String> tags) {
+      List<String> tags,
+      Long reviewCount,
+      Long salesCount,
+      String createdAt) {
     this.productId = productId;
     this.categoryId = categoryId;
     this.productName = productName;
@@ -66,7 +74,10 @@ public class ProductSearchDto {
     this.isPublic = isPublic;
     this.soldout = soldout;
     this.isDeleted = isDeleted;
+    this.reviewCount = reviewCount;
+    this.salesCount = salesCount;
     this.tags = tags;
+    this.createdAt = createdAt;
   }
 
   public static ProductSearchDto toDto(ProductResponse product) {
@@ -87,6 +98,10 @@ public class ProductSearchDto {
         .isPublic(product.isPublic())
         .isDeleted(product.isDeleted())
         .soldout(product.isSoldout())
+        .tags(product.getTags())
+        .reviewCount(product.getReviewCount())
+        .salesCount(product.getSalesCount())
+        .createdAt(product.getCreatedAt().toString())
         .build();
   }
 }

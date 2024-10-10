@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProductFacadeService {
   private final ProductService productService;
-  private final ElasticSearchService elasticSearchService;
+  private final ElasticsearchService elasticSearchService;
 
   public String createProduct(ProductCreateRequest request) {
     ProductResponse product = productService.createProduct(request);

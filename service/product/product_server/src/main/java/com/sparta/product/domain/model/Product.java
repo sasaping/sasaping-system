@@ -138,6 +138,8 @@ public class Product extends BaseEntity implements Persistable {
       this.discountedPrice =
           this.originalPrice.multiply(
               BigDecimal.valueOf(1).subtract(discountPercentBD.divide(BigDecimal.valueOf(100))));
+    } else {
+      this.discountedPrice = this.originalPrice;
     }
   }
 }
