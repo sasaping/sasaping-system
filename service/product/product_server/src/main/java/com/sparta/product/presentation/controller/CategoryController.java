@@ -1,7 +1,6 @@
 package com.sparta.product.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.product.application.CategoryCache;
 import com.sparta.product.application.CategoryService;
 import com.sparta.product.presentation.request.CategoryCreateRequest;
 import com.sparta.product.presentation.request.CategoryUpdateRequest;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class CategoryController {
   private final CategoryService categoryService;
-  private final CategoryCache categoryCacheService;
 
   @PostMapping
   public ApiResponse<Long> createCategory(@RequestBody @Validated CategoryCreateRequest request) {
@@ -49,6 +47,6 @@ public class CategoryController {
 
   @GetMapping
   public ApiResponse<List<CategoryResponse>> getCategories() {
-    return ApiResponse.ok(categoryCacheService.fetchAndCacheCategories());
+    return ApiResponse.ok(categoryService.fetchAndCacheCategories());
   }
 }
