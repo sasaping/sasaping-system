@@ -24,6 +24,11 @@ spring:
           predicates:
             - Path=/api/products/**, /api/preproducts/**, /api/categories/**,
 
+        - id: promotion
+          uri: lb://promotion
+          predicates:
+            - Path=/api/coupons/**
+
       discovery:
         locator:
           enabled: true
