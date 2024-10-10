@@ -37,7 +37,7 @@ public class CouponService {
   public void provideEventCoupon(Long userId, Long couponId) {
     // UserDto userData = userService.getUser(userId);
     Coupon coupon = couponRepository
-        .findById(couponId)
+        .findByIdWithPessimisticLock(couponId)
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
     if (coupon.getQuantity() - 1 < 0) {
       throw new PromotionException(PromotionErrorCode.INSUFFICIENT_COUPON);
