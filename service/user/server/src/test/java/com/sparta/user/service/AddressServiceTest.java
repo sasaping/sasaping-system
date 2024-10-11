@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,7 +43,8 @@ public class AddressServiceTest {
   private AddressService addressService;
 
   @Test
-  void 배송지_생성() {
+  @DisplayName("배송지 생성")
+  void use_1() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
@@ -67,7 +69,8 @@ public class AddressServiceTest {
   }
 
   @Test
-  void 배송지_생성_사용자없음_예외발생() {
+  @DisplayName("배송지 생성 사용자 없을 시 예외 발생")
+  void use_2() {
     // given
     Long userId = 1L;
     AddressRequest.Create addressRequest = new AddressRequest.Create(
@@ -92,7 +95,8 @@ public class AddressServiceTest {
   }
 
   @Test
-  void 배송지_단일조회_성공() {
+  @DisplayName("배송지 단일 조회 성공")
+  void use_3() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
@@ -125,7 +129,8 @@ public class AddressServiceTest {
   }
 
   @Test
-  void 배송지_단일조회_실패() {
+  @DisplayName("배송지 단일 조회 실패")
+  void use_4() {
     // given
     Long addressId = 1L;
 
@@ -140,7 +145,8 @@ public class AddressServiceTest {
   }
 
   @Test
-  void 현재_사용자_배송지_조회() {
+  @DisplayName("현재 사용자 배송지 조회")
+  void use_5() {
     // given
     Long userId = 1L;
     UserRequest.Create userRequest = new UserRequest.Create(
@@ -176,6 +182,43 @@ public class AddressServiceTest {
     assertEquals(2, result.size());
     verify(userRepository, times(1)).findById(userId);
     verify(addressRepository, times(1)).findAllByUserId(user.getId());
+  }
+
+  @Test
+  @DisplayName("전체 배송지 조회")
+  void use_6() {
+    // given
+    UserRequest.Create userRequest = new UserRequest.Create(
+        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
+    );
+    User user = User.create(userRequest, "encodedPassword");
+
+    List<Address> addressList = Arrays.asList(
+        Address.create(user, new AddressRequest.Create(
+            "집",
+            "홍길동",
+            "010-1234-5678",
+            "12345",
+            "서울시 강남구 테헤란로 123",
+            true
+        )),
+        Address.create(user, new AddressRequest.Create(
+            "집2",
+            "홍길동2",
+            "010-1234-4321",
+            "12347",
+            "서울시 강남구 테헤란로 456",
+            false
+        ))
+    );
+
+    // when
+    when(addressRepository.findAll()).thenReturn(addressList);
+
+    // then
+    List<AddressResponse.Get> result = addressService.getAddressList();
+    assertEquals(2, result.size());
+    verify(addressRepository, times(1)).findAll();
   }
 
 }

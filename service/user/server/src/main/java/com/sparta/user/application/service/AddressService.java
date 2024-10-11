@@ -3,6 +3,7 @@ package com.sparta.user.application.service;
 import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
 
 import com.sparta.user.application.dto.AddressResponse;
+import com.sparta.user.application.dto.AddressResponse.Get;
 import com.sparta.user.domain.model.Address;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.AddressRepository;
@@ -52,6 +53,14 @@ public class AddressService {
         .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     return addressRepository
         .findAllByUserId(user.getId())
+        .stream()
+        .map(AddressResponse.Get::of)
+        .collect(Collectors.toList());
+  }
+
+  public List<Get> getAddressList() {
+    return addressRepository
+        .findAll()
         .stream()
         .map(AddressResponse.Get::of)
         .collect(Collectors.toList());

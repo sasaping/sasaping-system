@@ -39,4 +39,11 @@ public class AddressController {
     return ApiResponse.ok(addressService.getAddressByUserId(claim.getUserId()));
   }
 
+  @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+  @GetMapping
+  public ApiResponse<List<AddressResponse.Get>> getAddressList() {
+    return ApiResponse.ok(addressService.getAddressList());
+
+  }
+
 }

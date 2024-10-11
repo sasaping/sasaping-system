@@ -28,4 +28,9 @@ public class AddressRepositoryImpl implements AddressRepository {
     return jpaAddressRepository.findAllByUserId(userId);
   }
 
+  @Override
+  public List<Address> findAll() {
+    return jpaAddressRepository.findAll();
+  }
+
 }

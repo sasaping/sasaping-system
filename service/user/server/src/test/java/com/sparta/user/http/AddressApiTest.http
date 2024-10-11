@@ -1,11 +1,12 @@
 @Port=19091
 @InternalPort=19092
-@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMCwiVVNFUl9ST0xFIjoiUk9MRV9VU0VSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg2NTUxOTgsImV4cCI6MTczMjI1NTE5OH0.o6VKKVIrBV1SNtlPCbVOWygPhcNGvmLKJsrXMvp8rgI
+@TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMCwiVVNFUl9ST0xFIjoiUk9MRV9VU0VSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg2NTUxOTgsImV4cCI6MTczMjI1NTE5OH0.o6VKKVIrBV1SNtlPCbVOWygPhcNGvmLKJsrXMvp8rgI
+@TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
 
 ### (외부)배송지 등록
 POST http://localhost:{{Port}}/api/address
 Content-Type: application/json
-Authorization: {{Token}}
+Authorization: {{TokenUser}}
 
 {
   "alias": "집2",
@@ -18,8 +19,11 @@ Authorization: {{Token}}
 
 ### 내 배송지 조회
 GET http://localhost:{{Port}}/api/address/me
-Authorization: {{Token}}
+Authorization: {{TokenUser}}
 
+### 배송지 전체 조회(관리자)
+GET http://localhost:{{Port}}/api/address
+Authorization: {{TokenAdmin}}
 
 ### (내부)배송지 단일 조회
 @addressId = 1

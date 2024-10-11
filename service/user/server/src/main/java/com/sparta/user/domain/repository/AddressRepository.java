@@ -14,4 +14,6 @@ public interface AddressRepository {
 
   List<Address> findAllByUserId(Long userId);
 
+  List<Address> findAll();
+
 }
