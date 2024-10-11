@@ -40,7 +40,7 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_성공() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_CUSTOMER
+        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryDto request = new PointHistoryDto(
@@ -88,7 +88,7 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_시_유저의_포인트_부족() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_CUSTOMER
+        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryDto request = new PointHistoryDto(
