@@ -40,5 +40,9 @@ Authorization: {{TokenUser}}
   "isDefault": true
 }
 
+### 배송지 삭제
+DELETE http://localhost:{{Port}}/api/address/{{addressId}}
+Authorization: {{TokenUser}}
+
 ### (내부)배송지 단일 조회
 GET http://localhost:{{InternalPort}}/internal/address/{{addressId}}

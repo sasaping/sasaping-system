@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,8 +43,7 @@ public class AddressServiceTest {
   private AddressService addressService;
 
   @Test
-  @DisplayName("배송지 생성")
-  void use_1() {
+  void test_배송지_생성() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
@@ -70,8 +68,7 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("배송지 생성 사용자 없을 시 예외 발생")
-  void use_2() {
+  void test_배송지_생성_사용자_없을_시_예외_발생() {
     // given
     Long userId = 1L;
     AddressRequest.Create addressRequest = new AddressRequest.Create(
@@ -96,8 +93,7 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("배송지 단일 조회 성공")
-  void use_3() {
+  void test_배송지_단일_조회_성공() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
@@ -130,8 +126,7 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("배송지 단일 조회 실패")
-  void use_4() {
+  void test_배송지_단일_조회_실패() {
     // given
     Long addressId = 1L;
 
@@ -146,8 +141,7 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("현재 사용자 배송지 조회")
-  void use_5() {
+  void test_현재_사용자_배송지_조회() {
     // given
     Long userId = 1L;
     UserRequest.Create userRequest = new UserRequest.Create(
@@ -186,8 +180,7 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("전체 배송지 조회")
-  void use_6() {
+  void test_전체_배송지_조회() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
@@ -223,15 +216,14 @@ public class AddressServiceTest {
   }
 
   @Test
-  @DisplayName("배송지 수정")
-  void use_7() {
+  void test_배송지_수정() {
     // given
     Long userId = 1L;
+    Long addressId = 1L;
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
-    Long addressId = 1L;
     Address address = Address.create(user, new AddressRequest.Create(
         "집",
         "홍길동",
@@ -240,7 +232,6 @@ public class AddressServiceTest {
         "서울시 강남구 테헤란로 123",
         false
     ));
-
     AddressRequest.Update addressUpdateRequest = new AddressRequest.Update(
         "회사",
         "김철수",
@@ -266,6 +257,38 @@ public class AddressServiceTest {
 
     verify(userRepository, times(1)).findById(userId);
     verify(addressRepository, times(1)).findById(addressId);
+  }
+
+  @Test
+  void test_배송지_삭제() {
+    // given
+    Long userId = 1L;
+    Long addressId = 1L;
+
+    UserRequest.Create userRequest = new UserRequest.Create(
+        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
+    );
+    User user = User.create(userRequest, "encodedPassword");
+    Address address = Address.create(user, new AddressRequest.Create(
+        "집",
+        "홍길동",
+        "010-1234-5678",
+        "12345",
+        "서울시 강남구 테헤란로 123",
+        false
+    ));
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(addressRepository.findById(addressId)).thenReturn(Optional.of(address));
+
+    // delete 주소 실행
+    addressService.deleteAddress(userId, addressId);
+
+    // then
+    verify(userRepository, times(1)).findById(userId);
+    verify(addressRepository, times(1)).findById(addressId);
+    verify(addressRepository, times(1)).delete(address);
   }
 
 }

@@ -80,4 +80,15 @@ public class AddressService {
     address.update(request);
   }
 
+  @Transactional
+  public void deleteAddress(Long userId, Long addressId) {
+    userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    Address address = addressRepository
+        .findById(addressId)
+        .orElseThrow(() -> new UserException(UserErrorCode.ADDRESS_NOT_FOUND));
+    addressRepository.delete(address);
+  }
+
 }

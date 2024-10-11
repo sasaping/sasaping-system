@@ -16,4 +16,6 @@ public interface AddressRepository {
 
   List<Address> findAll();
 
+  void delete(Address address);
+
 }

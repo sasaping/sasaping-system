@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +58,16 @@ public class AddressController {
       @AuthenticationPrincipal JwtClaim claim
   ) {
     addressService.updateAddress(claim.getUserId(), addressId, request);
+    return ApiResponse.ok();
+  }
+
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+  @DeleteMapping("/{addressId}")
+  public ApiResponse<?> deleteAddress(
+      @PathVariable Long addressId,
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    addressService.deleteAddress(claim.getUserId(), addressId);
     return ApiResponse.ok();
   }
 

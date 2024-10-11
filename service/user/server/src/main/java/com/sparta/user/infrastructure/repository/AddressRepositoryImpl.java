@@ -33,4 +33,9 @@ public class AddressRepositoryImpl implements AddressRepository {
     return jpaAddressRepository.findAll();
   }
 
+  @Override
+  public void delete(Address address) {
+    jpaAddressRepository.delete(address);
+  }
+
 }
