@@ -1,0 +1,21 @@
+@Port=19091
+@InternalPort=19092
+@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjo3LCJVU0VSX1JPTEUiOiJST0xFX0FETUlOIiwiVVNFUl9OQU1FIjoibmV3VXNlciIsImlhdCI6MTcyODQ2MjUxOSwiZXhwIjoxNzMyMDYyNTE5fQ.gbr5aA9ZocMY5g7PoLepnVuAnXqQ6djVzfDKxcT3yNM
+
+### (외부)배송지 등록
+POST http://localhost:{{Port}}/api/address
+Content-Type: application/json
+Authorization: {{Token}}
+
+{
+  "alias": "집",
+  "recipient": "홍길동",
+  "phoneNumber": "010-1234-5678",
+  "zipcode": "12345",
+  "address": "서울시 강남구 테헤란로 123",
+  "isDefault": false
+}
+
+### (내부)배송지 단일 조회
+@addressId = 1
+GET http://localhost:{{InternalPort}}/internal/address/{{addressId}}
