@@ -24,8 +24,8 @@ public class PaymentRequest {
     private String flowMode = "DIRECT";
     private String easyPay = "토스페이";
     private String method = "";
-    private String successUrl = "http://localhost:19061/api/payments/success";
-    private String failUrl = "http://localhost:19061/api/payments/fail";
+    private String successUrl;
+    private String failUrl;
 
   }
 

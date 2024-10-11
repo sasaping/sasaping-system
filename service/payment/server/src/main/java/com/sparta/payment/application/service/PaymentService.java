@@ -37,6 +37,12 @@ public class PaymentService {
 
   @Value("${TOSS_SECRET_KEY}")
   private String originalKey;
+
+  @Value("${PAYMENT.SUCCESS_URL}")
+  private String SUCCESS_URL;
+
+  @Value("${PAYMENT.FAIL_URL}")
+  private String FAIL_URL;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
 
   private final PaymentRepository paymentRepository;
@@ -67,6 +73,8 @@ public class PaymentService {
       body.setOrderId(request.getOrderId());
       body.setOrderName(request.getOrderName());
       body.setAmount(request.getAmount());
+      body.setSuccessUrl(SUCCESS_URL);
+      body.setFailUrl(FAIL_URL);
 
       HttpEntity<PaymentRequest.CreateExt> entity = new HttpEntity<>(body, headers);
 
@@ -128,13 +136,13 @@ public class PaymentService {
 
     // TODO : 주문 상태 변경 Feign API 호출
 
-    try {
-      elasticSearchService.savePayment(payment);
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
-    }
-    
+//    try {
+//      elasticSearchService.savePayment(payment);
+//    } catch (Exception e) {
+//      log.error(e.getMessage());
+//      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+//    }
+
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);

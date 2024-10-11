@@ -24,7 +24,7 @@ public class PaymentController {
   private final PaymentService paymentService;
 
 
-  @GetMapping("/api/payments/success")
+  @GetMapping("/payments/success")
   public void paymentSuccess(@RequestParam String paymentKey) {
     paymentService.paymentSuccess(paymentKey);
   }
