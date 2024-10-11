@@ -206,8 +206,11 @@ public class PaymentService {
   }
 
 
-  public Page<PaymentResponse.Get> getAllPayments(Pageable pageable) {
-    Page<Payment> payments = paymentRepository.findAll(pageable);
+  public Page<PaymentResponse.Get> getAllPayments(Pageable pageable, String userId,
+      String paymentKey,
+      String paymentId, String orderId, String state) {
+    Page<Payment> payments = paymentRepository.findBySearchOption(pageable, userId, paymentKey,
+        paymentId, orderId, state);
     return payments.map(this::convertToPaymentDto);
   }
 
