@@ -2,6 +2,7 @@ package com.sparta.user.application.service;
 
 import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
 
+import com.sparta.user.application.dto.AddressResponse;
 import com.sparta.user.domain.model.Address;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.AddressRepository;
@@ -10,6 +11,8 @@ import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.AddressRequest;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,17 @@ public class AddressService {
         address.getAddress(),
         address.getIsDefault()
     );
+  }
+
+  public List<AddressResponse.Get> getAddressByUserId(Long userId) {
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return addressRepository
+        .findAllByUserId(user.getId())
+        .stream()
+        .map(AddressResponse.Get::of)
+        .collect(Collectors.toList());
   }
 
 }
