@@ -8,6 +8,7 @@ import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
 import com.sparta.payment.infrastructure.client.MessageClient;
+import com.sparta.payment.infrastructure.event.PaymentCompletedEvent;
 import com.sparta.payment.presentation.dto.PaymentHistoryResponse;
 import com.sparta.payment.presentation.dto.PaymentRequest;
 import com.sparta.payment.presentation.dto.PaymentRequest.Create;
@@ -27,6 +28,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -45,16 +47,20 @@ public class PaymentService {
   private String FAIL_URL;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
 
+  private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
+
   private final PaymentRepository paymentRepository;
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
   private final MessageClient messageClient;
   private final ElasticSearchService elasticSearchService;
 
-  public PaymentService(PaymentRepository paymentRepository,
+  public PaymentService(KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate,
+      PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
       RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
       ElasticSearchService elasticSearchService) {
+    this.kafkaTemplate = kafkaTemplate;
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
@@ -134,7 +140,13 @@ public class PaymentService {
         Object.class
     );
 
-    // TODO : 주문 상태 변경 Feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .build();
+
+    kafkaTemplate.send("payment-completed-topic", event);
 
     elasticSearchService.savePayment(payment);
 
@@ -151,7 +163,14 @@ public class PaymentService {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
-    // TODO : 주문 상태 변경 feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .success(false)
+        .build();
+
+    kafkaTemplate.send("payment-completed-topic", event);
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);
