@@ -47,8 +47,14 @@ public class PaymentController {
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/payments/all")
-  public ApiResponse<?> getAllPayments(Pageable pageable) {
-    return ApiResponse.ok(paymentService.getAllPayments(pageable));
+  public ApiResponse<?> getAllPayments(Pageable pageable,
+      @RequestParam(required = false) String userId,
+      @RequestParam(required = false) String paymentKey,
+      @RequestParam(required = false) String paymentId,
+      @RequestParam(required = false) String orderId,
+      @RequestParam(required = false) String state) {
+    return ApiResponse.ok(paymentService.getAllPayments(pageable, userId, paymentKey, paymentId,
+        orderId, state));
   }
 
 }
