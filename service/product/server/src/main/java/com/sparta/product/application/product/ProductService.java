@@ -9,6 +9,7 @@ import com.sparta.product.presentation.request.ProductUpdateRequest;
 import com.sparta.product.presentation.response.ProductResponse;
 import com.sparta.product_dto.ProductDto;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,18 @@ public class ProductService {
     product.isDelete();
     productRepository.save(product);
     return ProductResponse.fromEntity(product);
+  }
+
+  public void reduceStock(Map<String, Integer> productQuantities) {
+    productQuantities.entrySet().stream()
+        .forEach(
+            entry -> {
+              String productId = entry.getKey();
+              int reduceCount = entry.getValue();
+              Product product = getSavedProduct(UUID.fromString(productId));
+              product.updateStock(reduceCount);
+              productRepository.save(product);
+            });
   }
 
   public ProductResponse getProduct(UUID productId) {

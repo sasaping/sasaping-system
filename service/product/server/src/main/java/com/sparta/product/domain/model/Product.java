@@ -142,4 +142,8 @@ public class Product extends BaseEntity implements Persistable {
       this.discountedPrice = this.originalPrice;
     }
   }
+
+  public void updateStock(int reduceCount) {
+    this.stock -= reduceCount;
+  }
 }
