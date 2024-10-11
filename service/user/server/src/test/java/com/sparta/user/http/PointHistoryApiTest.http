@@ -1,5 +1,12 @@
 @Port=19091
 @InternalPort=19092
+@TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMCwiVVNFUl9ST0xFIjoiUk9MRV9VU0VSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg2NTUxOTgsImV4cCI6MTczMjI1NTE5OH0.o6VKKVIrBV1SNtlPCbVOWygPhcNGvmLKJsrXMvp8rgI
+@TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
+
+## 외부 API
+### 내 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point/me
+Authorization: {{TokenUser}}
 
 ## 내부 API
 ### 포인트 적립
@@ -7,7 +14,7 @@ POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 7,
+  "userId": 10,
   "orderId": 10,
   "point": 50,
   "type": "적립",
@@ -19,7 +26,7 @@ POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 7,
+  "userId": 10,
   "orderId": 11,
   "point": 30,
   "type": "사용",

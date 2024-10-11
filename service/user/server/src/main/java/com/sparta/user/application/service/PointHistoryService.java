@@ -1,5 +1,8 @@
 package com.sparta.user.application.service;
 
+import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
+
+import com.sparta.user.application.dto.PointResponse;
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.PointHistoryType;
@@ -9,6 +12,8 @@ import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +57,17 @@ public class PointHistoryService {
     }
     user.updatePoint(user.getPoint().subtract(point));
     userRepository.save(user);
+  }
+
+  public List<PointResponse.Get> getPointHistoryByUserid(Long userId) {
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return pointHistoryRepository
+        .findAllByUserId(user.getId())
+        .stream()
+        .map(PointResponse.Get::of)
+        .collect(Collectors.toList());
   }
 
 }

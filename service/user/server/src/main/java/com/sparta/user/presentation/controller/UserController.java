@@ -2,8 +2,11 @@ package com.sparta.user.presentation.controller;
 
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
+import com.sparta.user.application.dto.PointResponse;
+import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.presentation.request.UserRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
+  private final PointHistoryService pointHistoryService;
 
   @PostMapping("/sign-up")
   public ApiResponse<Void> createUser(@RequestBody UserRequest.Create request) {
@@ -26,6 +30,15 @@ public class UserController {
     return ApiResponse.created(null);
   }
 
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @GetMapping("/point/me")
+  public ApiResponse<List<PointResponse.Get>> getPointHistoryByUserid(
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    return ApiResponse.ok(pointHistoryService.getPointHistoryByUserid(claim.getUserId()));
+  }
+
+  // TODO(경민): 인증/인가 테스트 코드 리펙토링 시 삭제 필요
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/hello")
   public String hello(@AuthenticationPrincipal JwtClaim claim) {
@@ -34,4 +47,5 @@ public class UserController {
     System.out.println("claim.getRole() = " + claim.getRole());
     return "Hello World!";
   }
+
 }

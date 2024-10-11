@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.application.dto.PointResponse;
 import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
@@ -18,6 +19,8 @@ import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +111,43 @@ public class PointHistoryServiceTests {
     });
 
     assertEquals(UserErrorCode.INSUFFICIENT_POINTS.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void test_현재_사용자_포인트_내역_조회_성공() {
+    // given
+    UserRequest.Create userRequest = new UserRequest.Create(
+        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_USER
+    );
+    User user = User.create(userRequest, "encodedPassword");
+    PointHistoryDto request = new PointHistoryDto(
+        1L,
+        10L,
+        new BigDecimal("50.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory1 = PointHistory.create(user, request);
+    PointHistoryDto request2 = new PointHistoryDto(
+        1L,
+        11L,
+        new BigDecimal("100.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory2 = PointHistory.create(user, request2);
+
+    List<PointHistory> pointHistories = Arrays.asList(pointHistory1, pointHistory2);
+
+    // when
+    when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+    when(pointHistoryRepository.findAllByUserId(user.getId())).thenReturn(pointHistories);
+    List<PointResponse.Get> result = pointHistoryService.getPointHistoryByUserid(user.getId());
+
+    // then
+    assertEquals(2, result.size());
+    assertEquals(pointHistory1.getPoint(), result.get(0).getPoint());
+    assertEquals(pointHistory2.getPoint(), result.get(1).getPoint());
   }
 
 }
