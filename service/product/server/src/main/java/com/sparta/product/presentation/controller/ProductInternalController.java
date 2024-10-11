@@ -1,6 +1,6 @@
 package com.sparta.product.presentation.controller;
 
-import com.sparta.product.application.ProductService;
+import com.sparta.product.application.product.ProductService;
 import com.sparta.product_dto.ProductDto;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +21,4 @@ public class ProductInternalController {
       @RequestParam(name = "productIds") List<String> productIds) {
     return productService.getProductList(productIds);
   }
-
 }

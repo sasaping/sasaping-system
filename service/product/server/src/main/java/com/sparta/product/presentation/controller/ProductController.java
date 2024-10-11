@@ -1,8 +1,8 @@
 package com.sparta.product.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.product.application.ProductFacadeService;
-import com.sparta.product.application.ProductService;
+import com.sparta.product.application.product.ProductFacadeService;
+import com.sparta.product.application.product.ProductService;
 import com.sparta.product.presentation.request.ProductCreateRequest;
 import com.sparta.product.presentation.request.ProductUpdateRequest;
 import com.sparta.product.presentation.response.ProductResponse;

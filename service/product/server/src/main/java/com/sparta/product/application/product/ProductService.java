@@ -1,4 +1,4 @@
-package com.sparta.product.application;
+package com.sparta.product.application.product;
 
 import com.sparta.product.domain.model.Product;
 import com.sparta.product.domain.repository.cassandra.ProductRepository;
