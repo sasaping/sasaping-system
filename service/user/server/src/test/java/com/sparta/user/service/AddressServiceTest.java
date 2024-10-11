@@ -2,6 +2,7 @@ package com.sparta.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -219,6 +220,52 @@ public class AddressServiceTest {
     List<AddressResponse.Get> result = addressService.getAddressList();
     assertEquals(2, result.size());
     verify(addressRepository, times(1)).findAll();
+  }
+
+  @Test
+  @DisplayName("배송지 수정")
+  void use_7() {
+    // given
+    Long userId = 1L;
+    UserRequest.Create userRequest = new UserRequest.Create(
+        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
+    );
+    User user = User.create(userRequest, "encodedPassword");
+    Long addressId = 1L;
+    Address address = Address.create(user, new AddressRequest.Create(
+        "집",
+        "홍길동",
+        "010-1234-5678",
+        "12345",
+        "서울시 강남구 테헤란로 123",
+        false
+    ));
+
+    AddressRequest.Update addressUpdateRequest = new AddressRequest.Update(
+        "회사",
+        "김철수",
+        "010-9876-5432",
+        "54321",
+        "서울시 서초구 서초대로 456",
+        true
+    );
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(addressRepository.findById(userId)).thenReturn(Optional.of(address));
+
+    // then
+    addressService.updateAddress(userId, addressId, addressUpdateRequest);
+
+    assertEquals("회사", address.getAlias());
+    assertEquals("김철수", address.getRecipient());
+    assertEquals("010-9876-5432", address.getPhoneNumber());
+    assertEquals("54321", address.getZipcode());
+    assertEquals("서울시 서초구 서초대로 456", address.getAddress());
+    assertTrue(address.getIsDefault());
+
+    verify(userRepository, times(1)).findById(userId);
+    verify(addressRepository, times(1)).findById(addressId);
   }
 
 }

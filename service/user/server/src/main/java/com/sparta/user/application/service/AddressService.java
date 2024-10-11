@@ -11,11 +11,13 @@ import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.AddressRequest;
+import com.sparta.user.presentation.request.AddressRequest.Update;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +26,7 @@ public class AddressService {
   private final UserRepository userRepository;
   private final AddressRepository addressRepository;
 
+  @Transactional
   public void createAddress(Long userId, AddressRequest.Create request) {
     User user = userRepository
         .findById(userId)
@@ -64,6 +67,17 @@ public class AddressService {
         .stream()
         .map(AddressResponse.Get::of)
         .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public void updateAddress(Long userId, Long addressId, Update request) {
+    userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    Address address = addressRepository
+        .findById(addressId)
+        .orElseThrow(() -> new UserException(UserErrorCode.ADDRESS_NOT_FOUND));
+    address.update(request);
   }
 
 }

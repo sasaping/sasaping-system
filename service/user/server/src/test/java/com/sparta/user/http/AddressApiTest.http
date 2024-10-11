@@ -25,6 +25,20 @@ Authorization: {{TokenUser}}
 GET http://localhost:{{Port}}/api/address
 Authorization: {{TokenAdmin}}
 
+### 배송지 수정
+@addressId = 2
+PATCH http://localhost:{{Port}}/api/address/{{addressId}}
+Content-Type: application/json
+Authorization: {{TokenUser}}
+
+{
+  "alias": "회사",
+  "recipient": "김철수",
+  "phoneNumber": "010-9876-5432",
+  "zipcode": "54321",
+  "address": "서울시 서초구 서초대로 456",
+  "isDefault": true
+}
+
 ### (내부)배송지 단일 조회
-@addressId = 1
 GET http://localhost:{{InternalPort}}/internal/address/{{addressId}}

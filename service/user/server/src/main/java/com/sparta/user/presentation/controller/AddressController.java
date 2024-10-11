@@ -5,11 +5,14 @@ import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.user.application.dto.AddressResponse;
 import com.sparta.user.application.service.AddressService;
 import com.sparta.user.presentation.request.AddressRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +47,17 @@ public class AddressController {
   public ApiResponse<List<AddressResponse.Get>> getAddressList() {
     return ApiResponse.ok(addressService.getAddressList());
 
+  }
+
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+  @PatchMapping("/{addressId}")
+  public ApiResponse<?> updateAddress(
+      @PathVariable Long addressId,
+      @RequestBody @Valid AddressRequest.Update request,
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    addressService.updateAddress(claim.getUserId(), addressId, request);
+    return ApiResponse.ok();
   }
 
 }
