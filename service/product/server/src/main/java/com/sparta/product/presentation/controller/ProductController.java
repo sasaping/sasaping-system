@@ -7,9 +7,13 @@ import com.sparta.product.presentation.request.ProductCreateRequest;
 import com.sparta.product.presentation.request.ProductUpdateRequest;
 import com.sparta.product.presentation.response.ProductResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,5 +59,30 @@ public class ProductController {
   public ApiResponse<ProductResponse> getProduct(
       @PathVariable("productId") @NotNull UUID productId) {
     return ApiResponse.ok(productService.getProduct(productId));
+  }
+
+  @GetMapping
+  public ApiResponse<Page<ProductResponse>> getProductList(
+      @RequestParam(defaultValue = "0") @Min(0) int page,
+      @RequestParam(defaultValue = "30") @Min(1) @Max(100) int size,
+      @RequestParam("categoryId") Long categoryId,
+      @RequestParam(value = "brandName", required = false) String brandName,
+      @RequestParam(name = "minPrice", defaultValue = "1000") @Min(1000) Long minPrice,
+      @RequestParam(value = "maxPrice", required = false) Long maxPrice,
+      @RequestParam(value = "productSize", required = false) String productSize,
+      @RequestParam(value = "mainColor", required = false) String mainColor,
+      @RequestParam(value = "sort", defaultValue = "newest") String sortOption)
+      throws IOException {
+    return ApiResponse.ok(
+        productService.getProductList(
+            page,
+            size,
+            categoryId,
+            brandName,
+            minPrice,
+            maxPrice,
+            productSize,
+            mainColor,
+            sortOption));
   }
 }
