@@ -1,4 +1,4 @@
-package com.sparta.product.application;
+package com.sparta.product.application.category;
 
 import com.sparta.product.presentation.response.CategoryResponse;
 import java.util.List;

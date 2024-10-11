@@ -1,4 +1,4 @@
-package com.sparta.product.application;
+package com.sparta.product.application.product;
 
 import com.sparta.product.domain.model.SortOption;
 import com.sparta.product.domain.repository.ElasticSearchRepository;
@@ -52,10 +52,20 @@ public class ElasticsearchService {
       Long maxPrice,
       String productSize,
       String mainColor,
-      String sortOption) throws IOException {
+      String sortOption)
+      throws IOException {
     SortOption sort = SortOption.valueOf(sortOption.toUpperCase());
     Pageable pageable = PageRequest.of(page, size, Sort.by(sort.getField()));
     return customRepository.searchProductList(
-        categoryId, brandName, minPrice, maxPrice, productSize, mainColor, page, size, pageable, sort);
+        categoryId,
+        brandName,
+        minPrice,
+        maxPrice,
+        productSize,
+        mainColor,
+        page,
+        size,
+        pageable,
+        sort);
   }
 }

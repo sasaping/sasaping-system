@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
   Optional<Category> findByCategoryId(Long categoryId);
 
+  boolean existsByCategoryId(Long categoryId);
+
   @Query("SELECT c FROM Category c LEFT JOIN FETCH c.subCategories")
   List<Category> findAllWithSubCategories();
 }

@@ -1,4 +1,4 @@
-package com.sparta.product.application;
+package com.sparta.product.application.category;
 
 import com.sparta.product.domain.model.Category;
 import com.sparta.product.domain.repository.jpa.CategoryRepository;
@@ -60,6 +60,10 @@ public class CategoryService {
         .filter(category -> category.getParent() == null)
         .map(CategoryResponse::fromEntity)
         .collect(Collectors.toList());
+  }
+
+  public boolean existsCategory(Long categoryId) {
+    return categoryRepository.existsByCategoryId(categoryId);
   }
 
   private void syncParentCategory(Category target, Category newParent) {

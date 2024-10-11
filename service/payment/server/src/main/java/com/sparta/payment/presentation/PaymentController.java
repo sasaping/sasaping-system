@@ -27,7 +27,6 @@ import org.thymeleaf.context.Context;
 public class PaymentController {
 
   private final PaymentService paymentService;
-  // thymeleaf
   private final TemplateEngine templateEngine;
 
 
