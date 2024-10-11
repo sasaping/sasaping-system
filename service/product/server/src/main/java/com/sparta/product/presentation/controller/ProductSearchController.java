@@ -2,7 +2,7 @@ package com.sparta.product.presentation.controller;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.product.application.ElasticsearchService;
+import com.sparta.product.application.product.ElasticsearchService;
 import com.sparta.product.infrastructure.elasticsearch.dto.ProductSearchDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
