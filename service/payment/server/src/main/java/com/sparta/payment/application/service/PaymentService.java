@@ -43,14 +43,17 @@ public class PaymentService {
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
   private final MessageClient messageClient;
+  private final ElasticSearchService elasticSearchService;
 
   public PaymentService(PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
-      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient) {
+      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
+      ElasticSearchService elasticSearchService) {
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
     this.messageClient = messageClient;
+    this.elasticSearchService = elasticSearchService;
   }
 
 
@@ -125,6 +128,13 @@ public class PaymentService {
 
     // TODO : 주문 상태 변경 Feign API 호출
 
+    try {
+      elasticSearchService.savePayment(payment);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
+    
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);
@@ -196,8 +206,11 @@ public class PaymentService {
   }
 
 
-  public Page<PaymentResponse.Get> getAllPayments(Pageable pageable) {
-    Page<Payment> payments = paymentRepository.findAll(pageable);
+  public Page<PaymentResponse.Get> getAllPayments(Pageable pageable, String userId,
+      String paymentKey,
+      String paymentId, String orderId, String state) {
+    Page<Payment> payments = paymentRepository.findBySearchOption(pageable, userId, paymentKey,
+        paymentId, orderId, state);
     return payments.map(this::convertToPaymentDto);
   }
 

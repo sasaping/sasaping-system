@@ -1,8 +1,12 @@
 spring:
   application:
     name: payment
+  elasticsearch:
+    uris: { ELASTIC_URL }
+    password: { ELASTIC_PASSWORD }
+    username: { ELASTIC_USER }
   datasource:
-    url: jdbc:mysql://localhost:3306/{LOCAL_DB_NAME}
+    url: { LOCAL_DB_URL }
     username: { LOCAL_DB_USERNAME }
     password: { LOCAL_DB_PASSWORD }
     driver-class-name: com.mysql.cj.jdbc.Driver
