@@ -136,12 +136,7 @@ public class PaymentService {
 
     // TODO : 주문 상태 변경 Feign API 호출
 
-//    try {
-//      elasticSearchService.savePayment(payment);
-//    } catch (Exception e) {
-//      log.error(e.getMessage());
-//      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
-//    }
+    elasticSearchService.savePayment(payment);
 
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
