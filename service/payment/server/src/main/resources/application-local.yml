@@ -25,3 +25,7 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
 
 TOSS_SECRET_KEY: { TOSS_SECRET_KEY }
+
+PAYMENT:
+  SUCCESS_URL: http://localhost:19061/payments/success
+  FAIL_URL: http://localhost:19061/payments/fail

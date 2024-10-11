@@ -113,7 +113,7 @@ public class PaymentService {
 
 
   @Transactional
-  public void paymentSuccess(String paymentKey) {
+  public Payment paymentSuccess(String paymentKey) {
     Payment payment = paymentRepository.findByPaymentKey(paymentKey);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
@@ -141,6 +141,8 @@ public class PaymentService {
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);
+
+    return payment;
   }
 
   public void paymentFail(String paymentKey) {
