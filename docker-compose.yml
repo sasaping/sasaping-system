@@ -7,6 +7,7 @@ services:
         - FILE_DIRECTORY=./service/eureka
     networks:
       - app-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
 
   gateway:
     container_name: gateway-service
@@ -20,6 +21,7 @@ services:
       - "19091:19091"
     networks:
       - app-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
 
   user:
     container_name: user_service
@@ -31,6 +33,7 @@ services:
       - eureka-service
     networks:
       - app-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
 
   auth:
     container_name: auth-service
@@ -42,6 +45,7 @@ services:
       - eureka-service
     networks:
       - app-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/auth
 
   user_db:
     image: mysql:8.0
