@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
 
+env:
+  ECR_NAMESPACE: sasaping
+
 jobs:
   build:
     name: Build
