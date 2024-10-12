@@ -64,6 +64,9 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Grant execute permission for dockerTagAndPush
+        run: chmod +x ./dockerTagAndPush.sh
+
       # docker compose 를 이용해서 여러 이미지를 모두 빌드하고, 별도의 script를 사용해서 이미지를 push 합니다.
       - name: Build, Tag and Push docker image to AWS ECR
         run: |
