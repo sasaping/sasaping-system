@@ -3,6 +3,8 @@ package com.sparta.server.presentaion;
 import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.server.application.SearchService;
 import com.sparta.server.domain.ProductSearchDto;
+import com.sparta.server.exception.SearchErrorCode;
+import com.sparta.server.exception.SearchException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ public class SearchController {
 
   @GetMapping("/search")
   public ApiResponse<List<ProductSearchDto>> searchProducts(
-      @RequestParam String keyword,
+      @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) String brandName,
       @RequestParam(required = false) String mainColor,
@@ -30,6 +32,10 @@ public class SearchController {
       @RequestParam(required = false) Double maxPrice,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
+
+    if (keyword == null || keyword.isEmpty()) {
+      throw new SearchException(SearchErrorCode.KEYWORD_IS_EMPTY);
+    }
     SearchHits<ProductSearchDto> searchHits = searchService.searchProducts(keyword, categoryId,
         brandName, mainColor, minPrice, maxPrice, page, size);
     List<ProductSearchDto> products = searchHits.getSearchHits().stream()
