@@ -5,6 +5,7 @@ import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.presentation.request.UserRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,13 +43,10 @@ public class UserController {
     return ApiResponse.ok(userService.getUserById(userId));
   }
 
-  @PreAuthorize("hasRole('ROLE_ADMIN')")
-  @GetMapping("/hello")
-  public String hello(@AuthenticationPrincipal JwtClaim claim) {
-    System.out.println("claim.getUserId() = " + claim.getUserId());
-    System.out.println("claim.getUsername() = " + claim.getUsername());
-    System.out.println("claim.getRole() = " + claim.getRole());
-    return "Hello World!";
+  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @GetMapping
+  public ApiResponse<List<UserResponse.Info>> getUserList() {
+    return ApiResponse.ok(userService.getUserList());
   }
 
 }

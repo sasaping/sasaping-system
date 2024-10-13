@@ -2,6 +2,7 @@ package com.sparta.user.infrastructure.repository;
 
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.UserRepository;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,11 @@ public class UserRepositoryImpl implements UserRepository {
   @Override
   public Optional<User> findById(Long userId) {
     return jpaUserRepository.findById(userId);
+  }
+
+  @Override
+  public Collection<User> findAll() {
+    return jpaUserRepository.findAll();
   }
 
 }

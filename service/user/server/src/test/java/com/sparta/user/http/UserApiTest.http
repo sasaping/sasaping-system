@@ -22,6 +22,10 @@ Authorization: {{TokenUser}}
 GET http://localhost:{{Port}}/api/users/{{userId}}
 Authorization: {{TokenAdmin}}
 
+### 사용자 전체 조회
+GET http://localhost:{{Port}}/api/users
+Authorization: {{TokenAdmin}}
+
 ### 인증/인가 테스트 API
 GET http://localhost:{{Port}}/api/users/hello
 Authorization: {{TokenAdmin}}

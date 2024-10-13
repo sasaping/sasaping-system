@@ -17,6 +17,8 @@ import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -150,6 +152,30 @@ class UserServiceTests {
     assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
 
     verify(userRepository, times(1)).findById(userId);
+  }
+
+  @Test
+  void test_전체_사용자_조회() {
+    // given
+    UserRequest.Create userRequest1 = new UserRequest.Create(
+        "username1", "password", "nickname1", UserRole.ROLE_USER
+    );
+    UserRequest.Create userRequest2 = new UserRequest.Create(
+        "username2", "password", "nickname2", UserRole.ROLE_ADMIN
+    );
+
+    List<User> userList = Arrays.asList(
+        User.create(userRequest1, "password"),
+        User.create(userRequest2, "password")
+    );
+
+    // when
+    when(userRepository.findAll()).thenReturn(userList);
+
+    // then
+    List<UserResponse.Info> result = userService.getUserList();
+    assertEquals(2, result.size());
+    verify(userRepository, times(1)).findAll();
   }
 
 }

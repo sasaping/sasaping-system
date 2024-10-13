@@ -9,6 +9,8 @@ import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,14 @@ public class UserService {
             .findById(userId)
             .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     return UserResponse.Info.of(user);
+  }
+
+  public List<UserResponse.Info> getUserList() {
+    return userRepository
+        .findAll()
+        .stream()
+        .map(UserResponse.Info::of)
+        .collect(Collectors.toList());
   }
 
 }
