@@ -117,7 +117,7 @@ class UserServiceTests {
   }
 
   @Test
-  void test_유저_마이페이지_조회_성공() {
+  void test_단일_유저_조회_성공() {
     // Arrange
     Long userId = 1L;
     UserRequest.Create request =
@@ -128,7 +128,7 @@ class UserServiceTests {
     when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
 
     // Act
-    UserResponse.Info result = userService.getMyPage(userId);
+    UserResponse.Info result = userService.getUserById(userId);
 
     // Assert
     assertEquals("testuser", result.getUsername());
@@ -139,14 +139,14 @@ class UserServiceTests {
   }
 
   @Test
-  void test_유저_마이페이지_조회_실패() {
+  void test_단일_유저_조회_실패() {
     // Arrange
     Long userId = 1L;
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     // Act & Assert
     UserException exception = assertThrows(UserException.class,
-        () -> userService.getMyPage(userId));
+        () -> userService.getUserById(userId));
     assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
 
     verify(userRepository, times(1)).findById(userId);

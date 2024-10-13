@@ -46,7 +46,7 @@ public class UserService {
     );
   }
 
-  public UserResponse.Info getMyPage(Long userId) {
+  public UserResponse.Info getUserById(Long userId) {
     User user =
         userRepository
             .findById(userId)

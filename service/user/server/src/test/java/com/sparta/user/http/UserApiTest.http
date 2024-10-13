@@ -17,6 +17,11 @@ Content-Type: application/json
 GET http://localhost:{{Port}}/api/users/me
 Authorization: {{TokenUser}}
 
+### 사용자 단일 조회
+@userId=11
+GET http://localhost:{{Port}}/api/users/{{userId}}
+Authorization: {{TokenAdmin}}
+
 ### 인증/인가 테스트 API
 GET http://localhost:{{Port}}/api/users/hello
 Authorization: {{TokenAdmin}}
