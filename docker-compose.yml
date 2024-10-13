@@ -9,6 +9,8 @@ services:
     networks:
       - app-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+    ports:
+      - "19090:19090"
 
   gateway:
     container_name: gateway-service
