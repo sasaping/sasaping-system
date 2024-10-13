@@ -23,10 +23,15 @@ public class SearchController {
   @GetMapping("/search")
   public ApiResponse<List<ProductSearchDto>> searchProducts(
       @RequestParam String keyword,
+      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) String brandName,
+      @RequestParam(required = false) String mainColor,
+      @RequestParam(required = false) Double minPrice,
+      @RequestParam(required = false) Double maxPrice,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
-    SearchHits<ProductSearchDto> searchHits = searchService.searchProducts(keyword, page,
-        size);
+    SearchHits<ProductSearchDto> searchHits = searchService.searchProducts(keyword, categoryId,
+        brandName, mainColor, minPrice, maxPrice, page, size);
     List<ProductSearchDto> products = searchHits.getSearchHits().stream()
         .map(SearchHit::getContent)
         .collect(Collectors.toList());
