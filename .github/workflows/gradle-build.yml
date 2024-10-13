@@ -44,6 +44,20 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -x test
 
+      # JAR 파일의 생성 여부를 확인합니다.
+      - name: Check if JAR file exists
+        run: |
+          if [ ! -f ./service/${{ matrix.service }}/server/build/libs/*SNAPSHOT.jar ]; then
+            echo "JAR file not found!"
+            exit 1
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: '${{ matrix.service }}-artifact'
+          path: './service/${{ matrix.service }}/server/build/libs/*SNAPSHOT.jar'
+
   Docker:
     name: Build docker image and Push to registry
     needs: build
@@ -53,6 +67,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # 모든 아티팩트를 다운로드합니다.
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: './service'
 
       # AWS ECR 에 이미지 업로드 권한을 얻기 위해 인증을 진행합니다.
       - name: Configure AWS credentials
