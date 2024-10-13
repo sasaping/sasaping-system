@@ -36,8 +36,7 @@ class UserServiceTests {
   void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("existinguser", "password123", "nickname", BigDecimal.ZERO,
-            UserRole.ROLE_ADMIN);
+        new UserRequest.Create("existinguser", "password123", "nickname", UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
 
@@ -54,8 +53,7 @@ class UserServiceTests {
   void test_회원가입() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("newuser", "password123", "nickname", BigDecimal.ZERO,
-            UserRole.ROLE_ADMIN);
+        new UserRequest.Create("newuser", "password123", "nickname", UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
 
@@ -100,8 +98,7 @@ class UserServiceTests {
     // Arrange
     String username = "existinguser";
     UserRequest.Create request =
-        new UserRequest.Create(username, "password123", "nickname", BigDecimal.ZERO,
-            UserRole.ROLE_ADMIN);
+        new UserRequest.Create(username, "password123", "nickname", UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");
 

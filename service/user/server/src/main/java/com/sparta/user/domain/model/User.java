@@ -61,7 +61,7 @@ public class User extends BaseEntity {
         .username(request.getUsername())
         .password(encodedPassword)
         .nickname(request.getNickname())
-        .point(request.getPoint())
+        .point(BigDecimal.ZERO)
         .role(request.getRole())
         .build();
   }
