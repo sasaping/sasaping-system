@@ -4,8 +4,9 @@ FROM gradle:8.10.1-jdk17 AS build
 WORKDIR /app
 
 ARG FILE_DIRECTORY
+ARG ARTIFACT_DIRECTORY
 
-COPY $FILE_DIRECTORY/*SNAPSHOT.jar ./app.jar
+COPY $ARTIFACT_DIRECTORY/*SNAPSHOT.jar ./app.jar
 COPY $FILE_DIRECTORY/src/main/resources/application.yml .
 COPY $FILE_DIRECTORY/src/main/resources/application-prod.yml .
 
