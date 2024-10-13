@@ -1,4 +1,4 @@
-package com.sparta.user;
+package com.sparta.user.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
-public class TierApplicationTests {
+public class TierServiceTests {
 
   @MockBean
   private TierRepository tierRepository;
