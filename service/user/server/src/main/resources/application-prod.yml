@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://mysql_user_db:3306/user
-    username: user
-    password: password
+    url: jdbc:sasaping-database.ctem8i2eavmt.ap-northeast-2.rds.amazonaws.com:3306/user
+    username: sasaping
+    password: sparta-sasaping
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

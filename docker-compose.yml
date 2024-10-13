@@ -2,7 +2,7 @@ services:
   eureka-service:
     container_name: eureka-service
     build:
-      dockerfile: Dockerfile2
+      dockerfile: Dockerfile-prod
       args:
         - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
@@ -13,7 +13,7 @@ services:
   gateway:
     container_name: gateway-service
     build:
-      dockerfile: Dockerfile2
+      dockerfile: Dockerfile-prod
       args:
         - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
@@ -28,7 +28,7 @@ services:
   user:
     container_name: user-service
     build:
-      dockerfile: Dockerfile2
+      dockerfile: Dockerfile-prod
       args:
         - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
@@ -41,7 +41,7 @@ services:
   auth:
     container_name: auth-service
     build:
-      dockerfile: Dockerfile2
+      dockerfile: Dockerfile-prod
       args:
         - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
@@ -51,20 +51,20 @@ services:
       - app-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/auth
 
-  user_db:
-    image: mysql:8.0
-    container_name: mysql_user_db
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: user
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - app-network
+#  user_db:
+#    image: mysql:8.0
+#    container_name: mysql_user_db
+#    environment:
+#      MYSQL_ROOT_PASSWORD: root_password
+#      MYSQL_DATABASE: user
+#      MYSQL_USER: user
+#      MYSQL_PASSWORD: password
+#    ports:
+#      - "3306:3306"
+#    volumes:
+#      - db_data:/var/lib/mysql
+#    networks:
+#      - app-network
 
 volumes:
   db_data:
