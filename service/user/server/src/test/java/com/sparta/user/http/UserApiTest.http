@@ -1,5 +1,6 @@
 @Port=19091
-@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX1JPTEUiOiJST0xFX0FETUlOIiwiVVNFUl9JRCI6NywiVVNFUl9OQU1FIjoibmV3VXNlciIsImlhdCI6MTcyODI5MjM2NywiZXhwIjoxNzMxODkyMzY3fQ.Kvp1JJLpjxjRX4N8Nt46QP-_1jAnSzVvSISordEMHN8
+@TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX05BTUUiOiJuZXdVc2VyMiIsIlVTRVJfUk9MRSI6IlJPTEVfVVNFUiIsIlVTRVJfSUQiOjEwLCJpYXQiOjE3Mjg4Mjk4MjMsImV4cCI6MTczMjQyOTgyM30.E1Tzyf9TUh7sWeFKnBfz_W_1xd_MR-WgBw0VRgDCXO4
+@TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
 
 ### 회원가입
 POST http://localhost:{{Port}}/api/users/sign-up
@@ -12,6 +13,10 @@ Content-Type: application/json
   "role": "관리자"
 }
 
+### 마이페이지 조회
+GET http://localhost:{{Port}}/api/users/me
+Authorization: {{TokenUser}}
+
 ### 인증/인가 테스트 API
 GET http://localhost:{{Port}}/api/users/hello
-Authorization: {{Token}}
+Authorization: {{TokenAdmin}}

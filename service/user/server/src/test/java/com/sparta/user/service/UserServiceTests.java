@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
@@ -113,6 +114,42 @@ class UserServiceTests {
     assertEquals(UserRole.ROLE_ADMIN.name(), userDto.getRole());
 
     verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  void test_유저_마이페이지_조회_성공() {
+    // Arrange
+    Long userId = 1L;
+    UserRequest.Create request =
+        new UserRequest.Create("testuser", "password123", "nickname", UserRole.ROLE_ADMIN);
+
+    User newUser = User.create(request, "password123");
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+
+    // Act
+    UserResponse.Info result = userService.getMyPage(userId);
+
+    // Assert
+    assertEquals("testuser", result.getUsername());
+    assertEquals(UserRole.ROLE_ADMIN.name(), result.getRole());
+    assertEquals(BigDecimal.ZERO, result.getPoint());
+
+    verify(userRepository, times(1)).findById(userId);
+  }
+
+  @Test
+  void test_유저_마이페이지_조회_실패() {
+    // Arrange
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // Act & Assert
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getMyPage(userId));
+    assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
+
+    verify(userRepository, times(1)).findById(userId);
   }
 
 }

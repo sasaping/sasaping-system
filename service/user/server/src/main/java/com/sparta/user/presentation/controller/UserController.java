@@ -2,6 +2,7 @@ package com.sparta.user.presentation.controller;
 
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
+import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.presentation.request.UserRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,14 @@ public class UserController {
     return ApiResponse.created(null);
   }
 
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @GetMapping("/me")
+  public ApiResponse<UserResponse.Info> getMyPage(
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    return ApiResponse.ok(userService.getMyPage(claim.getUserId()));
+  }
+
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/hello")
   public String hello(@AuthenticationPrincipal JwtClaim claim) {
@@ -34,4 +43,5 @@ public class UserController {
     System.out.println("claim.getRole() = " + claim.getRole());
     return "Hello World!";
   }
+
 }

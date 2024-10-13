@@ -3,6 +3,7 @@ package com.sparta.user.application.service;
 import static com.sparta.user.exception.UserErrorCode.USER_CONFLICT;
 import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
 
+import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserException;
@@ -43,6 +44,14 @@ public class UserService {
         user.getRole().name(),
         user.getPoint()
     );
+  }
+
+  public UserResponse.Info getMyPage(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return UserResponse.Info.of(user);
   }
 
 }
