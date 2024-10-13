@@ -15,7 +15,7 @@ services:
     build:
       dockerfile: Dockerfile2
       args:
-        - ARTIFACT_DIRECTORY=./service/eureka-artifact
+        - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
     depends_on:
       - eureka-service
@@ -26,11 +26,11 @@ services:
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
 
   user:
-    container_name: user_service
+    container_name: user-service
     build:
       dockerfile: Dockerfile2
       args:
-        - ARTIFACT_DIRECTORY=./service/eureka-artifact
+        - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
     depends_on:
       - eureka-service
@@ -43,7 +43,7 @@ services:
     build:
       dockerfile: Dockerfile2
       args:
-        - ARTIFACT_DIRECTORY=./service/eureka-artifact
+        - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
     depends_on:
       - eureka-service

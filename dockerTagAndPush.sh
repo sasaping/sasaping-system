@@ -17,11 +17,4 @@ do
   echo "$service image is built and pushed to AWS ECR"
 done
 
-mysqlImageName="mysql"
-
-# MySQL 이미지 푸시 (ECR에서 사용 가능 여부 확인 필요)
-docker tag "$mysqlImageName:latest" "$mysqlImageName:$commit_hash"
-docker push "$mysqlImageName:latest"
-docker push "$mysqlImageName:$commit_hash"
-
 echo "Build and Push processing is done"
