@@ -24,16 +24,22 @@ public class SearchService {
       String brandName, String mainColor, Double minPrice, Double maxPrice, int page, int size) {
 
     BoolQuery.Builder boolQuery = new Builder();
+    boolQuery.must(q -> q
+        .multiMatch(m -> m
+            .query(keyword)
+            .fields("productName", "brandName", "description", "tags")
+        )
+    );
 
     if (categoryId != null) {
       boolQuery.filter(q -> q.term(t -> t.field("categoryId").value(categoryId)));
     }
 
-    if (brandName != null) {
+    if (brandName != null && !brandName.isEmpty()) {
       boolQuery.filter(q -> q.term(t -> t.field("brandName").value(brandName)));
     }
 
-    if (mainColor != null) {
+    if (mainColor != null && !mainColor.isEmpty()) {
       boolQuery.filter(q -> q.term(t -> t.field("mainColor").value(mainColor)));
     }
 
@@ -49,13 +55,7 @@ public class SearchService {
     }
 
     NativeQuery searchQuery = NativeQuery.builder()
-        .withQuery(q -> q
-            .multiMatch(m -> m
-                .query(keyword)
-                .fields("productName", "brandName", "description", "tags")
-            )
-        )
-        .withQuery(q -> q.bool(boolQuery.build()))
+        .withQuery(boolQuery.build()._toQuery())
         .withPageable(PageRequest.of(page, size))
         .build();
 
