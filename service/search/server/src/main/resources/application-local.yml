@@ -2,7 +2,17 @@ spring:
   application:
     name: search
 
-
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{LOCAL_DB_URL}
+    username: { LOCAL_DB_USER }
+    password: { LOCAL_DB_PASSWORD }
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
   elasticsearch:
     rest:
       host: localhost
