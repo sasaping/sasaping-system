@@ -2,9 +2,9 @@ services:
   eureka-service:
     container_name: eureka-service
     build:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile2
       args:
-        - FILE_DIRECTORY=./service/eureka/server
+        - FILE_DIRECTORY=./service/eureka-artifact
     networks:
       - app-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
