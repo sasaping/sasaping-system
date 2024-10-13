@@ -1,8 +1,11 @@
+x-build-args:
+  dockerfile_name: &dockerfile_name Dockerfile-prod
+
 services:
   eureka-service:
     container_name: eureka-service
     build:
-      dockerfile: Dockerfile-prod
+      dockerfile: *dockerfile_name
       args:
         - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
@@ -15,7 +18,7 @@ services:
   gateway:
     container_name: gateway-service
     build:
-      dockerfile: Dockerfile-prod
+      dockerfile: *dockerfile_name
       args:
         - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
@@ -30,7 +33,7 @@ services:
   user:
     container_name: user-service
     build:
-      dockerfile: Dockerfile-prod
+      dockerfile: *dockerfile_name
       args:
         - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
@@ -43,7 +46,7 @@ services:
   auth:
     container_name: auth-service
     build:
-      dockerfile: Dockerfile-prod
+      dockerfile: *dockerfile_name
       args:
         - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
