@@ -5,11 +5,13 @@ import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.presentation.request.UserRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +49,16 @@ public class UserController {
   @GetMapping
   public ApiResponse<List<UserResponse.Info>> getUserList() {
     return ApiResponse.ok(userService.getUserList());
+  }
+
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @PatchMapping("/reset-password")
+  public ApiResponse<?> updateUserPassword(
+      @RequestBody @Valid UserRequest.UpdatePassword request,
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    userService.updateUserPassword(claim.getUserId(), request);
+    return ApiResponse.ok();
   }
 
 }

@@ -6,6 +6,7 @@ import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
 import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.repository.UserRepository;
+import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
@@ -62,6 +63,18 @@ public class UserService {
         .stream()
         .map(UserResponse.Info::of)
         .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public void updateUserPassword(Long userId, UserRequest.UpdatePassword request) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+      throw new UserException(UserErrorCode.INVAILD_PASSWORD);
+    }
+    user.updatePassword(passwordEncoder.encode(request.getUpdatePassword()));
   }
 
 }

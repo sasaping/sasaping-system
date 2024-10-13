@@ -26,6 +26,17 @@ Authorization: {{TokenAdmin}}
 GET http://localhost:{{Port}}/api/users
 Authorization: {{TokenAdmin}}
 
+### 사용자 비밀번호 재설정
+PATCH http://localhost:{{Port}}/api/users/reset-password
+Content-Type: application/json
+Authorization: {{TokenUser}}
+
+{
+  "currentPassword": "password123",
+  "updatePassword": "password456"
+}
+
+
 ### 인증/인가 테스트 API
 GET http://localhost:{{Port}}/api/users/hello
 Authorization: {{TokenAdmin}}

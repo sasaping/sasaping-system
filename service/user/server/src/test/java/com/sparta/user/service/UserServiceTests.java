@@ -13,6 +13,7 @@ import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
+import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
@@ -25,12 +26,16 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class UserServiceTests {
 
   @MockBean
   private UserRepository userRepository;
+
+  @MockBean
+  private PasswordEncoder passwordEncoder;
 
   @Autowired
   private UserService userService;
@@ -176,6 +181,53 @@ class UserServiceTests {
     List<UserResponse.Info> result = userService.getUserList();
     assertEquals(2, result.size());
     verify(userRepository, times(1)).findAll();
+  }
+
+  @Test
+  void test_비밀번호_업데이트_성공() {
+    // given
+    Long userId = 1L;
+    UserRequest.Create request = new UserRequest.Create(
+        "username1", "password", "nickname1", UserRole.ROLE_USER
+    );
+    User newUser = User.create(request, "password123");
+    UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
+        "password123", "password"
+    );
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+    when(passwordEncoder.matches(updatePassword.getCurrentPassword(),
+        newUser.getPassword())).thenReturn(true);
+    when(passwordEncoder.encode(updatePassword.getUpdatePassword())).thenReturn("password456");
+
+    // then
+    userService.updateUserPassword(userId, updatePassword);
+
+    assertEquals("password456", newUser.getPassword());
+  }
+
+  @Test
+  void test_비밀번호_업데이트_실패_잘못된_현재_비밀번호() {
+    // given
+    Long userId = 1L;
+    UserRequest.Create request = new UserRequest.Create(
+        "username1", "password", "nickname1", UserRole.ROLE_USER
+    );
+    User newUser = User.create(request, "password123");
+    UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
+        "wrongCurrentPassword", "password"
+    );
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+    when(passwordEncoder.matches(updatePassword.getCurrentPassword(),
+        newUser.getPassword())).thenReturn(false);
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.updateUserPassword(userId, updatePassword));
+    assertEquals(UserErrorCode.INVAILD_PASSWORD.getMessage(), exception.getMessage());
   }
 
 }
