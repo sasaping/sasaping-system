@@ -11,7 +11,7 @@ include(':service:product:product_dto')
 include(':service:payment:server')
 include(':service:payment:payment_dto')
 
-include(':service:eureka')
+include(':service:eureka:server')
 include(':service:gateway:server')
 
 include(':service:auth:server')
