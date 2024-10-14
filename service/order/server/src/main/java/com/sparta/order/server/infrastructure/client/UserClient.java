@@ -4,6 +4,7 @@ import com.sparta.user.user_dto.infrastructure.AddressDto;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +18,13 @@ public interface UserClient {
   UserDto getUser(@RequestParam(value = "userId") Long userId);
 
   @PostMapping("/internal/users/point")
-  void usePoint(@RequestBody PointHistoryDto request);
+  Long usePoint(@RequestBody PointHistoryDto request);
+
+  @DeleteMapping("/internal/users/point/{pointHistoryId}")
+  void rollbackPoint(@PathVariable Long pointHistoryId);
 
   @GetMapping("/internal/address/{addressId}")
   AddressDto getAddress(@PathVariable(name = "addressId") Long addressId);
+
 
 }
