@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USERNAME}
-    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://sasaping-database.ctem8i2eavmt.ap-northeast-2.rds.amazonaws.com:3306/product
+    username: sasaping
+    password: ${DB_PASSWORD}
 
   cassandra:
     contact-points: 127.0.0.1
@@ -26,7 +26,7 @@ spring:
       uris: http://localhost:9200
     fingerprint: 2B:EA:5D:9B:EB:E8:B0:D9:70:42:CE:CC:5E:53:24:EE:60:AC:91:CB:9C:D1:C8:B1:9F:75:19:9E:A4:23:D5:DD
     account: elastic
-    password: elastic-password
+    password: ${ELASTIC_PASSWORD}
 
   data:
     redis:
@@ -39,4 +39,4 @@ product:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:19090/eureka/
+      defaultZone: http://eureka-service:19090/eureka/
