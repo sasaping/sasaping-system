@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: search
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://{LOCAL_DB_URL}
+    username: { LOCAL_DB_USER }
+    password: { LOCAL_DB_PASSWORD }
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  elasticsearch:
+    rest:
+      host: localhost
+      port: 9200
+      uris: http://localhost:9200
+    fingerprint: 20:6A:9C:EF:BE:4B:8A:CF:70:B6:F9:49:B1:CD:F8:18:0A:DC:62:43:08:01:C2:2F:EC:89:68:95:63:06:69:88
+    account: elastic
+    password: elastic-password
+
+product:
+  search-index: "sasaping-ecommerce-products"
+
+server:
+  port: 19011
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
