@@ -3,6 +3,7 @@ package com.sparta.server.presentaion;
 import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.server.application.SearchService;
 import com.sparta.server.domain.ProductSearchDto;
+import com.sparta.server.domain.SortOption;
 import com.sparta.server.exception.SearchErrorCode;
 import com.sparta.server.exception.SearchException;
 import java.util.List;
@@ -31,6 +32,7 @@ public class SearchController {
       @RequestParam(required = false) Double minPrice,
       @RequestParam(required = false) Double maxPrice,
       @RequestParam(required = false) String size,
+      @RequestParam(defaultValue = "RELEVANCE") SortOption sortOption,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int pageSize) {
 
@@ -38,7 +40,7 @@ public class SearchController {
       throw new SearchException(SearchErrorCode.KEYWORD_IS_EMPTY);
     }
     SearchHits<ProductSearchDto> searchHits = searchService.searchProducts(keyword, categoryId,
-        brandName, mainColor, minPrice, maxPrice, size, page, pageSize);
+        brandName, mainColor, minPrice, maxPrice, size, sortOption, page, pageSize);
     List<ProductSearchDto> products = searchHits.getSearchHits().stream()
         .map(SearchHit::getContent)
         .collect(Collectors.toList());

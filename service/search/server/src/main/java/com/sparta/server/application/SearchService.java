@@ -4,9 +4,11 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.json.JsonData;
 import com.sparta.server.domain.ProductSearchDto;
+import com.sparta.server.domain.SortOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -20,7 +22,8 @@ public class SearchService {
   private final ElasticsearchOperations elasticsearchOperations;
 
   public SearchHits<ProductSearchDto> searchProducts(String keyword, Long categoryId,
-      String brandName, String mainColor, Double minPrice, Double maxPrice, String size, int page,
+      String brandName, String mainColor, Double minPrice, Double maxPrice, String size,
+      SortOption sortOption, int page,
       int pageSize) {
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
 
@@ -62,6 +65,11 @@ public class SearchService {
         .withQuery(boolQuery.build()._toQuery())
         .withPageable(PageRequest.of(page, pageSize))
         .build();
+
+    if (sortOption != null && !sortOption.equals(SortOption.RELEVANCE)) {
+      Sort sort = sortOption.getSort();
+      searchQuery.setSort(sort);
+    }
 
     return elasticsearchOperations.search(searchQuery, ProductSearchDto.class);
   }
