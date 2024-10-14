@@ -15,55 +15,32 @@ import org.springframework.data.domain.Persistable;
 @Table("P_PRODUCT")
 @Getter
 public class Product extends BaseEntity implements Persistable {
+  @PrimaryKey private UUID productId = UUID.randomUUID();
+  @Column private Long categoryId;
+  @Column private String productName;
+  @Column private String brandName;
+  @Column private String mainColor;
+  @Column private String size;
+  @Column private String description;
 
-  @PrimaryKey
-  private UUID productId = UUID.randomUUID();
-  @Column
-  public Long categoryId;
-  @Column
-  public String productName;
-  @Column
-  public String brandName;
-  @Column
-  public String mainColor;
-  @Column
-  public String size;
-  @Column
-  public String description;
+  @Column private BigDecimal originalPrice;
+  @Column private BigDecimal discountedPrice;
+  @Column private Double discountPercent;
+  @Column private int stock;
 
-  @Column
-  public BigDecimal originalPrice;
-  @Column
-  public BigDecimal discountedPrice;
-  @Column
-  public Double discountPercent;
-  @Column
-  public int stock;
+  @Column private String thumbnailImgUrl;
+  @Column private String detailImgUrl;
 
-  @Column
-  public String thumbnailImgUrl;
-  @Column
-  public String detailImgUrl;
+  @Column private int limitCountPerUser = 0;
+  @Column private double averageRating = 0.0;
+  @Column private long reviewCount = 0;
+  @Column private long salesCount = 0;
 
-  @Column
-  public int limitCountPerUser = 0;
-  @Column
-  public double averageRating = 0.0;
-  @Column
-  public long reviewCount = 0;
-  @Column
-  public long salesCount = 0;
-
-  @Column
-  public boolean isPublic = true;
-  @Column
-  public boolean soldout = false;
-  @Column
-  public boolean isDeleted = false;
-  @Column
-  public List<String> tags;
-  @Transient
-  private boolean isNew = false;
+  @Column private boolean isPublic = true;
+  @Column private boolean soldout = false;
+  @Column private boolean isDeleted = false;
+  @Column private List<String> tags;
+  @Transient private boolean isNew = false;
 
   @Override
   public Object getId() {
