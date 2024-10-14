@@ -145,8 +145,5 @@ jobs:
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker compose down
-            docker image prune -a -f
-            chmod +x remove_used_ports.sh
-            remove_used_ports.sh
             docker compose pull
             docker compose up -d
