@@ -1,5 +1,5 @@
 x-build-args:
-  dockerfile_name: &dockerfile_name Dockerfile-local
+  dockerfile_name: &dockerfile_name Dockerfile-prod
 
 services:
   eureka-service:
