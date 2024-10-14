@@ -50,6 +50,7 @@ jobs:
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
           EC2_HOST: ${{secrets.EC2_HOST}}
           TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
+          SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
 
       - name: Check if JAR file exists
         run: |
