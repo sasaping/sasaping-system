@@ -14,6 +14,7 @@ public enum SortOption {
   OLDEST("createdAt", Sort.Direction.ASC),
   NAME_A_TO_Z("productName.keyword", Sort.Direction.ASC),
   NAME_Z_TO_A("productName.keyword", Sort.Direction.DESC),
+  REVIEW("reviewCount", Sort.Direction.DESC),
   BEST_SELLING("salesCount", Sort.Direction.DESC);
 
   private final String field;
