@@ -2,9 +2,9 @@ spring:
   application:
     name: payment
   datasource:
-    url: { LOCAL_DB_URL }
-    username: { LOCAL_DB_USERNAME }
-    password: { LOCAL_DB_PASSWORD }
+    url: { DATASOURCE_URL }
+    username: { DATASOURCE_USERNAME }
+    password: { DATASOURCE_PASSWORD }
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -17,8 +17,6 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-server:
-  port: 19061
 
 eureka:
   client:
@@ -28,5 +26,5 @@ eureka:
 TOSS_SECRET_KEY: { TOSS_SECRET_KEY }
 
 PAYMENT:
-  SUCCESS_URL: http://localhost:19061/payments/success
-  FAIL_URL: http://localhost:19061/payments/fail
+  SUCCESS_URL: { PAYMENT_URL }/payments/success
+  FAIL_URL: { PAYMENT_URL }/payments/fail
