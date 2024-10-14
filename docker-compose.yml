@@ -1,5 +1,5 @@
 x-build-args:
-  dockerfile_name: &dockerfile_name Dockerfile-prod
+  dockerfile_name: &dockerfile_name Dockerfile-local
 
 services:
   eureka-service:
@@ -10,7 +10,7 @@ services:
         - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
     networks:
-      - app-network
+      - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
     ports:
       - "19090:19090"
@@ -27,7 +27,7 @@ services:
     ports:
       - "19091:19091"
     networks:
-      - app-network
+      - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
 
   user:
@@ -40,7 +40,7 @@ services:
     depends_on:
       - eureka-service
     networks:
-      - app-network
+      - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
 
   auth:
@@ -53,27 +53,36 @@ services:
     depends_on:
       - eureka-service
     networks:
-      - app-network
+      - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/auth
 
-#  user_db:
-#    image: mysql:8.0
-#    container_name: mysql_user_db
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root_password
-#      MYSQL_DATABASE: user
-#      MYSQL_USER: user
-#      MYSQL_PASSWORD: password
-#    ports:
-#      - "3306:3306"
-#    volumes:
-#      - db_data:/var/lib/mysql
-#    networks:
-#      - app-network
+  order:
+    container_name: order-service
+    build:
+      dockerfile: *dockerfile_name
+      args:
+        - ARTIFACT_DIRECTORY=./service/order-artifact
+        - FILE_DIRECTORY=./service/order/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+
+  cart-cache:
+    container_name: cart-cache
+    image: redis:7.4.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: always
+    networks:
+      - sasaping-network
 
 volumes:
-  db_data:
+  redis-data:
 
 networks:
-  app-network:
+  sasaping-network:
     driver: bridge
