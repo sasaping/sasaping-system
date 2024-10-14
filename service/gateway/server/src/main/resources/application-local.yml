@@ -22,7 +22,7 @@ spring:
         - id: product
           uri: lb://product
           predicates:
-            - Path=/api/products/**, /api/preproducts/**, /api/categories/**,
+            - Path=/api/products/**, /api/preorders/**, /api/categories/**,
 
         - id: promotion
           uri: lb://promotion
