@@ -1,10 +1,6 @@
 spring:
   application:
     name: payment
-  elasticsearch:
-    uris: { ELASTIC_URL }
-    password: { ELASTIC_PASSWORD }
-    username: { ELASTIC_USER }
   datasource:
     url: { LOCAL_DB_URL }
     username: { LOCAL_DB_USERNAME }

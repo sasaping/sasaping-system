@@ -4,27 +4,11 @@ server:
 spring:
   application:
     name: user
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/user
-    username: user
-    password: password
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+  profiles:
+    active: prod
 
 management:
   endpoints:
     web:
       exposure:
         include: health, info
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:19090/eureka/

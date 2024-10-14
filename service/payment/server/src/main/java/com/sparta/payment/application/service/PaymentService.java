@@ -53,19 +53,16 @@ public class PaymentService {
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
   private final MessageClient messageClient;
-  private final ElasticSearchService elasticSearchService;
 
   public PaymentService(KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate,
       PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
-      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
-      ElasticSearchService elasticSearchService) {
+      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient) {
     this.kafkaTemplate = kafkaTemplate;
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
     this.messageClient = messageClient;
-    this.elasticSearchService = elasticSearchService;
   }
 
 
@@ -147,8 +144,6 @@ public class PaymentService {
         .build();
 
     kafkaTemplate.send("payment-completed-topic", event);
-
-    elasticSearchService.savePayment(payment);
 
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);

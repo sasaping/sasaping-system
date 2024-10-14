@@ -16,7 +16,8 @@ public enum UserErrorCode {
   TIER_CONFLICT(HttpStatus.CONFLICT, "이미 존재하는 등급입니다."),
   TIER_NOT_FOUND(HttpStatus.NOT_FOUND, "등급을 찾을 수 없습니다."),
 
-  ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "배송지를 찾을 수 없습니다.");
+  ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "배송지를 찾을 수 없습니다."),
+  POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "포인트 내역을 찾을 수 없습니다.");
 
   private final HttpStatus status;
   private final String message;

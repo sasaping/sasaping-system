@@ -25,14 +25,6 @@ spring:
 product:
   search-index: "sasaping-ecommerce-products"
 
-server:
-  port: 19011
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info
 
 eureka:
   client:
