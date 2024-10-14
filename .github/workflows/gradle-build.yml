@@ -149,6 +149,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
+          KIBANA_PASSWORD: ${{secrets.KIBANA_PASSWORD}}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -161,7 +163,7 @@ jobs:
             ECR_REGISTRY,
             ECR_NAMESPACE,
             ELASTIC_PASSWORD,
-            KIBANA_PASSWORD,
+            KIBANA_PASSWORD, 
             STACK_VERSION,
             CLUSTER_NAME,
             LICENSE,
