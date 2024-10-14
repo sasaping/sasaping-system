@@ -1,8 +1,12 @@
 spring:
   application:
     name: payment
+  elasticsearch:
+    uris: { ELASTIC_URL }
+    password: { ELASTIC_PASSWORD }
+    username: { ELASTIC_USER }
   datasource:
-    url: jdbc:mysql://localhost:3306/{LOCAL_DB_NAME}
+    url: { LOCAL_DB_URL }
     username: { LOCAL_DB_USERNAME }
     password: { LOCAL_DB_PASSWORD }
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -11,6 +15,11 @@ spring:
       ddl-auto: update
     show-sql: false
     database-platform: org.hibernate.dialect.MySQLDialect
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 server:
   port: 19061
@@ -21,3 +30,7 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
 
 TOSS_SECRET_KEY: { TOSS_SECRET_KEY }
+
+PAYMENT:
+  SUCCESS_URL: http://localhost:19061/payments/success
+  FAIL_URL: http://localhost:19061/payments/fail
