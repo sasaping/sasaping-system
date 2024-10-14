@@ -35,10 +35,10 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorize ->
                 authorize
-                    .requestMatchers("/api/users/sign-up")
-                    .permitAll()
-                    .requestMatchers("/internal/**")
-                    .permitAll()
+                    .requestMatchers("/api/users/sign-up").permitAll()
+                    .requestMatchers("/internal/**").permitAll()
+                    .requestMatchers("/payments/success").permitAll()
+                    .requestMatchers("/payments/fail").permitAll()
                     .anyRequest()
                     .authenticated())
         .addFilterAfter(

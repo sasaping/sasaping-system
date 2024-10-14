@@ -8,6 +8,7 @@ import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
 import com.sparta.payment.infrastructure.client.MessageClient;
+import com.sparta.payment.infrastructure.event.PaymentCompletedEvent;
 import com.sparta.payment.presentation.dto.PaymentHistoryResponse;
 import com.sparta.payment.presentation.dto.PaymentRequest;
 import com.sparta.payment.presentation.dto.PaymentRequest.Create;
@@ -27,6 +28,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -37,7 +39,15 @@ public class PaymentService {
 
   @Value("${TOSS_SECRET_KEY}")
   private String originalKey;
+
+  @Value("${PAYMENT.SUCCESS_URL}")
+  private String SUCCESS_URL;
+
+  @Value("${PAYMENT.FAIL_URL}")
+  private String FAIL_URL;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
+
+  private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
 
   private final PaymentRepository paymentRepository;
   private final PaymentHistoryRepository paymentHistoryRepository;
@@ -45,10 +55,12 @@ public class PaymentService {
   private final MessageClient messageClient;
   private final ElasticSearchService elasticSearchService;
 
-  public PaymentService(PaymentRepository paymentRepository,
+  public PaymentService(KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate,
+      PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
       RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
       ElasticSearchService elasticSearchService) {
+    this.kafkaTemplate = kafkaTemplate;
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
@@ -67,6 +79,8 @@ public class PaymentService {
       body.setOrderId(request.getOrderId());
       body.setOrderName(request.getOrderName());
       body.setAmount(request.getAmount());
+      body.setSuccessUrl(SUCCESS_URL);
+      body.setFailUrl(FAIL_URL);
 
       HttpEntity<PaymentRequest.CreateExt> entity = new HttpEntity<>(body, headers);
 
@@ -105,7 +119,7 @@ public class PaymentService {
 
 
   @Transactional
-  public void paymentSuccess(String paymentKey) {
+  public Payment paymentSuccess(String paymentKey) {
     Payment payment = paymentRepository.findByPaymentKey(paymentKey);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
@@ -126,18 +140,21 @@ public class PaymentService {
         Object.class
     );
 
-    // TODO : 주문 상태 변경 Feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .build();
 
-    try {
-      elasticSearchService.savePayment(payment);
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
-    }
-    
+    kafkaTemplate.send("payment-completed-topic", event);
+
+    elasticSearchService.savePayment(payment);
+
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);
+
+    return payment;
   }
 
   public void paymentFail(String paymentKey) {
@@ -146,7 +163,14 @@ public class PaymentService {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
-    // TODO : 주문 상태 변경 feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .success(false)
+        .build();
+
+    kafkaTemplate.send("payment-completed-topic", event);
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);
