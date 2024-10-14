@@ -2,9 +2,9 @@ spring:
   application:
     name: payment
   datasource:
-    url: { DATASOURCE_URL }
-    username: { DATASOURCE_USERNAME }
-    password: { DATASOURCE_PASSWORD }
+    url: jdbc:mysql://sasaping-database.ctem8i2eavmt.ap-northeast-2.rds.amazonaws.com:3306/payment
+    username: sasaping
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -12,7 +12,7 @@ spring:
     show-sql: false
     database-platform: org.hibernate.dialect.MySQLDialect
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -21,10 +21,10 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:19090/eureka/
+      defaultZone: http://eureka-service:19090/eureka/
 
-TOSS_SECRET_KEY: { TOSS_SECRET_KEY }
+TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
 
 PAYMENT:
-  SUCCESS_URL: { PAYMENT_URL }/payments/success
-  FAIL_URL: { PAYMENT_URL }/payments/fail
+  SUCCESS_URL: ${EC2_HOST}:19061/payments/success
+  FAIL_URL: ${EC2_HOST}:19061/payments/fail

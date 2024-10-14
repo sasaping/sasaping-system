@@ -48,6 +48,8 @@ jobs:
         run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -x test
         env:
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          EC2_HOST: ${{secrets.EC2_HOST}}
+          TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
 
       - name: Check if JAR file exists
         run: |
