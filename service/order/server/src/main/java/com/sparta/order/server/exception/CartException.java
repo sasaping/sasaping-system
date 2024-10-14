@@ -1,4 +1,4 @@
-package com.sparta.order.server.Cart.exception;
+package com.sparta.order.server.exception;
 
 import com.sparta.common.domain.exception.BusinessException;
 
@@ -10,4 +10,5 @@ public class CartException extends BusinessException {
     super(errorCode.getStatus().name(), errorCode.getMessage(), args);
     this.errorCode = errorCode;
   }
+
 }

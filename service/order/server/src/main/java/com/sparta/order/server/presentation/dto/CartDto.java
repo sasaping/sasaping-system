@@ -16,9 +16,6 @@ public class CartDto {
   @AllArgsConstructor
   public static class CartProductRequest {
 
-    // TODO 인증 인가 구현되면 제외 시키기
-    private Long userId;
-
     @NotNull(message = "상품 ID는 필수 값입니다.")
     private String productId;
 

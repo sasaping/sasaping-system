@@ -1,10 +1,14 @@
-package com.sparta.order.server.Cart.application.service;
+package com.sparta.order.server.application.service;
 
-import com.sparta.order.server.Cart.exception.CartErrorCode;
-import com.sparta.order.server.Cart.exception.CartException;
-import com.sparta.order.server.Cart.infrastructure.client.ProductClient;
+import com.sparta.common.domain.exception.BusinessException;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductRequest;
 import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
+import com.sparta.order.server.exception.CartErrorCode;
+import com.sparta.order.server.exception.CartException;
+import com.sparta.order.server.exception.OrderErrorCode;
+import com.sparta.order.server.exception.OrderException;
+import com.sparta.order.server.infrastructure.client.ProductClient;
+import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.product_dto.ProductDto;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,20 +27,22 @@ public class CartService {
   private final RedisTemplate<String, Map<String, Integer>> cartTemplate;
   private final HashOperations<String, String, Integer> cartOps;
   private final ProductClient productClient;
+  private final UserClient userClient;
   private static final long CART_EXPIRE_TIME = 30 * 24 * 60 * 60;
 
   public CartService(RedisTemplate<String, Map<String, Integer>> cartTemplate,
-      ProductClient productClient) {
+      ProductClient productClient, UserClient userClient) {
     this.cartTemplate = cartTemplate;
     this.cartOps = cartTemplate.opsForHash();
+    this.userClient = userClient;
     this.productClient = productClient;
   }
 
   @Transactional
-  public void addCart(CartProductRequest cartProductRequest) {
-    validateProductExists(cartProductRequest.getProductId());
-
-    String redisKey = createRedisKey(cartProductRequest.getUserId());
+  public void addCart(Long userId, CartProductRequest cartProductRequest) {
+    //validateProductExists(cartProductRequest.getProductId());
+    validateUserExists(userId);
+    String redisKey = createRedisKey(userId);
     Integer existingProductQuantity = cartOps.get(redisKey,
         cartProductRequest.getProductId());
 
@@ -67,10 +73,11 @@ public class CartService {
   }
 
   @Transactional
-  public void updateCart(CartProductRequest cartProductRequest) {
-    validateProductExists(cartProductRequest.getProductId());
+  public void updateCart(Long userId, CartProductRequest cartProductRequest) {
+    //validateProductExists(cartProductRequest.getProductId());
 
-    String redisKey = createRedisKey(cartProductRequest.getUserId());
+    validateUserExists(userId);
+    String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
 
     Integer existingProductQuantity = cartOps.get(redisKey,
@@ -81,12 +88,14 @@ public class CartService {
           cartProductRequest.getQuantity());
       cartTemplate.expire(redisKey, CART_EXPIRE_TIME, TimeUnit.SECONDS);
     } else {
-      throw new CartException(CartErrorCode.PRODUCT_NOT_IN_CART);
+      throw new CartException(
+          CartErrorCode.PRODUCT_NOT_IN_CART);
     }
   }
 
   @Transactional
   public void deleteCart(Long userId, String productId) {
+    validateUserExists(userId);
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
     Integer existingProductQuantity = cartOps.get(redisKey, productId);
@@ -100,9 +109,34 @@ public class CartService {
 
   @Transactional
   public void clearCart(Long userId) {
+    validateUserExists(userId);
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
     cartOps.keys(redisKey).forEach(key -> cartOps.delete(redisKey, key));
+  }
+
+  @Transactional
+  public void orderCartProduct(Long userId, Map<String, Integer> productQuantities) {
+    validateUserExists(userId);
+    String redisKey = createRedisKey(userId);
+
+    try {
+      validateUserCartExists(redisKey);
+    } catch (BusinessException e) {
+      throw new OrderException(OrderErrorCode.CART_ITEM_ONLY_ORDERABLE);
+    }
+
+    productQuantities.forEach((productId, quantity) -> {
+          Integer existingProductQuantity = cartOps.get(redisKey, productId);
+          if (existingProductQuantity == null) {
+            throw new OrderException(OrderErrorCode.CART_ITEM_ONLY_ORDERABLE);
+          }
+          if (!existingProductQuantity.equals(quantity)) {
+            throw new OrderException(OrderErrorCode.CART_ITEM_QUANTITY_MISMATCH, productId);
+          }
+          cartOps.delete(redisKey, productId);
+        }
+    );
   }
 
   private String createRedisKey(Long userId) {
@@ -117,6 +151,12 @@ public class CartService {
 
   private void validateProductExists(String productId) {
     productClient.getProductList(new ArrayList<>(Arrays.asList(productId)));
+  }
+
+  private void validateUserExists(Long userId) {
+    if (userClient.getUser(userId) == null) {
+      throw new CartException(CartErrorCode.USER_NOT_FOUND, userId);
+    }
   }
 
 }

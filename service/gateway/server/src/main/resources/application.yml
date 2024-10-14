@@ -31,6 +31,11 @@ spring:
           predicates:
             - Path=/api/coupons/**
 
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/api/orders/**, /api/carts/**
+
       discovery:
         locator:
           enabled: true
