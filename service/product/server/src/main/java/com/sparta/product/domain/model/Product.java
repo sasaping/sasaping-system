@@ -15,32 +15,55 @@ import org.springframework.data.domain.Persistable;
 @Table("P_PRODUCT")
 @Getter
 public class Product extends BaseEntity implements Persistable {
-  @PrimaryKey private UUID productId = UUID.randomUUID();
-  @Column public Long categoryId;
-  @Column public String productName;
-  @Column public String brandName;
-  @Column public String mainColor;
-  @Column public String size;
-  @Column public String description;
 
-  @Column public BigDecimal originalPrice;
-  @Column public BigDecimal discountedPrice;
-  @Column public Double discountPercent;
-  @Column public int stock;
+  @PrimaryKey
+  private UUID productId = UUID.randomUUID();
+  @Column
+  public Long categoryId;
+  @Column
+  public String productName;
+  @Column
+  public String brandName;
+  @Column
+  public String mainColor;
+  @Column
+  public String size;
+  @Column
+  public String description;
 
-  @Column public String thumbnailImgUrl;
-  @Column public String detailImgUrl;
+  @Column
+  public BigDecimal originalPrice;
+  @Column
+  public BigDecimal discountedPrice;
+  @Column
+  public Double discountPercent;
+  @Column
+  public int stock;
 
-  @Column public int limitCountPerUser = 0;
-  @Column public double averageRating = 0.0;
-  @Column public long reviewCount = 0;
-  @Column public long salesCount = 0;
+  @Column
+  public String thumbnailImgUrl;
+  @Column
+  public String detailImgUrl;
 
-  @Column public boolean isPublic = true;
-  @Column public boolean soldout = false;
-  @Column public boolean isDeleted = false;
-  @Column public List<String> tags;
-  @Transient private boolean isNew = false;
+  @Column
+  public int limitCountPerUser = 0;
+  @Column
+  public double averageRating = 0.0;
+  @Column
+  public long reviewCount = 0;
+  @Column
+  public long salesCount = 0;
+
+  @Column
+  public boolean isPublic = true;
+  @Column
+  public boolean soldout = false;
+  @Column
+  public boolean isDeleted = false;
+  @Column
+  public List<String> tags;
+  @Transient
+  private boolean isNew = false;
 
   @Override
   public Object getId() {
@@ -146,4 +169,9 @@ public class Product extends BaseEntity implements Persistable {
   public void updateStock(int reduceCount) {
     this.stock -= reduceCount;
   }
+
+  public void rollbackStock(int rollbackCount) {
+    this.stock += rollbackCount;
+  }
+
 }

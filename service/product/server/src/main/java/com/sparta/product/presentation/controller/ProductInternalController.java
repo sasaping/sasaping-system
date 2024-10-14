@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,14 @@ public class ProductInternalController {
     return productService.getProductList(productIds);
   }
 
-  @PatchMapping("/reduceStock")
-  public void updateStock(Map<String, Integer> productQuantities) {
+  @PostMapping("/reduce-stock")
+  public void updateStock(@RequestBody Map<String, Integer> productQuantities) {
     productService.reduceStock(productQuantities);
   }
+
+  @PostMapping("/rollback-stock")
+  public void rollbackStock(@RequestBody Map<String, Integer> productQuantities) {
+    productService.rollbackStock(productQuantities);
+  }
+
 }
