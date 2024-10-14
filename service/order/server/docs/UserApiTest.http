@@ -20,7 +20,6 @@ Content-Type: application/json
   "username": "newUser",
   "password": "password123"
 }
-
 > {%
   client.global.set("access_token", response.body.data.token);
 %}

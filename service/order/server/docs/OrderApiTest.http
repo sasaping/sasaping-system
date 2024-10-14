@@ -14,6 +14,10 @@ Content-Type: application/json
       "userCouponId": 132
     }
   ],
-  "pointPrice": 0,
+  "pointPrice": 1,
   "addressId": 1
 }
+
+### 상품 재고 조회
+GET http://localhost:{{Port}}/api/products/19646241-55d8-40f7-8f3e-d7242dedff49
+Authorization: Bearer {{access_token}}

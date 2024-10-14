@@ -10,12 +10,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
@@ -33,24 +36,27 @@ public class OrderProduct extends BaseEntity {
   @Column(nullable = false)
   private int quantity;
   @Column(nullable = false)
-  private int purchasePrice;
+  private BigDecimal purchasePrice;
   @Column
   private Long userCouponId;
   @Column
-  private int couponPrice;
+  private BigDecimal couponPrice;
 
 
-  // TODO productId -> productDto product price 설정
-  public static OrderProduct createOrderProduct(String productId,
+  // TODO productId -> productDto 설정
+  public static OrderProduct createOrderProduct(String productId, BigDecimal productPrice,
       int quantity, String couponDto, Order order) {
 
     return OrderProduct.builder()
         .order(order)
         .productId(productId)
         .quantity(quantity)
-        .purchasePrice(couponDto != null ? 1000 * quantity - 100 : 1000 * quantity)
+        .purchasePrice(
+            couponDto != null ? productPrice.multiply(BigDecimal.valueOf(quantity))
+                .subtract(BigDecimal.valueOf(100))
+                : productPrice.multiply(BigDecimal.valueOf(quantity)))
         .userCouponId(couponDto != null ? 1L : null)
-        .couponPrice(couponDto != null ? 100 : 0)
+        .couponPrice(couponDto != null ? BigDecimal.valueOf(100) : BigDecimal.ZERO)
         .build();
   }
 
