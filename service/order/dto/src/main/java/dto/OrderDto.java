@@ -4,14 +4,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@Builder
-@NoArgsConstructor
 public class OrderDto {
 
   @Getter
@@ -23,7 +18,6 @@ public class OrderDto {
     private List<OrderProductInfo> orderProductInfos = new ArrayList<>();
     private BigDecimal pointPrice;
     private Long addressId;
-
   }
 
   @Getter
@@ -34,7 +28,5 @@ public class OrderDto {
     private String productId;
     private int quantity;
     private Long userCouponId;
-
   }
-
 }
