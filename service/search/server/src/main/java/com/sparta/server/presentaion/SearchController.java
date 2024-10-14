@@ -22,7 +22,7 @@ public class SearchController {
 
   private final SearchService searchService;
 
-  @GetMapping("/search")
+  @GetMapping("/api/search")
   public ApiResponse<List<ProductSearchDto>> searchProducts(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long categoryId,
@@ -30,14 +30,15 @@ public class SearchController {
       @RequestParam(required = false) String mainColor,
       @RequestParam(required = false) Double minPrice,
       @RequestParam(required = false) Double maxPrice,
+      @RequestParam(required = false) String size,
       @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
+      @RequestParam(defaultValue = "10") int pageSize) {
 
     if (keyword == null || keyword.isEmpty()) {
       throw new SearchException(SearchErrorCode.KEYWORD_IS_EMPTY);
     }
     SearchHits<ProductSearchDto> searchHits = searchService.searchProducts(keyword, categoryId,
-        brandName, mainColor, minPrice, maxPrice, page, size);
+        brandName, mainColor, minPrice, maxPrice, size, page, pageSize);
     List<ProductSearchDto> products = searchHits.getSearchHits().stream()
         .map(SearchHit::getContent)
         .collect(Collectors.toList());
