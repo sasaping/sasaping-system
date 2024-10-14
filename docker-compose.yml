@@ -95,6 +95,19 @@ services:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
 
+  slack:
+    container_name: slack-service
+    build:
+      dockerfile: *dockerfile_name
+      args:
+        - ARTIFACT_DIRECTORY=./service/slack-artifact
+        - FILE_DIRECTORY=./service/slack/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/slack
+
   zookeeper:
     image: wurstmeister/zookeeper:latest
     platform: linux/amd64

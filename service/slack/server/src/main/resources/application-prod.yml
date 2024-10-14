@@ -2,9 +2,9 @@ spring:
   application:
     name: slack
   datasource:
-    url: { DATASOURCE_URL }
-    username: { DATASOURCE_USERNAME }
-    password: { DATASOURCE_PASSWORD }
+    url: jdbc:mysql://sasaping-database.ctem8i2eavmt.ap-northeast-2.rds.amazonaws.com:3306/payment
+    username: sasaping
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -17,6 +17,6 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:19090/eureka/
+      defaultZone: http://eureka-service:19090/eureka/
 
-SLACK_TOKEN: { SLACK_TOKEN }
+SLACK_TOKEN: ${SLACK_TOKEN}
