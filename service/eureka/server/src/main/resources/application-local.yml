@@ -1,7 +1,3 @@
-spring:
-  application:
-    name: eureka
-
 eureka:
   client:
     register-with-eureka: false
@@ -10,6 +6,3 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
   instance:
     hostname: localhost
-
-server:
-  port: 19090
