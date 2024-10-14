@@ -118,6 +118,16 @@ jobs:
           source: "docker-compose.yml"
           target: "/home/ubuntu" # target 은 디렉토리임. target directory 아래에 같은 이름의 파일로 옮겨진다.
 
+      # 사용 중인 포트를 점검하고 종료하는 script를 실행합니다.
+      - name: Upload stop-used-port script to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "stop-used-port.sh"
+          target: "/home/ubuntu"
+
       # ssh를 통해 EC2에 접속하고 docker container를 재시작합니다.
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -134,6 +144,9 @@ jobs:
           envs: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, ECR_REGISTRY, ECR_NAMESPACE
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            docker compose down --rmi all
+            docker compose down
+            docker image prune -a -f
+            chmod +x remove_used_ports.sh
+            remove_used_ports.sh
             docker compose pull
             docker compose up -d
