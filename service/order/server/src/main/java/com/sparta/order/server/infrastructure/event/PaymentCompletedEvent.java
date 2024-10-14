@@ -1,4 +1,4 @@
-package com.sparta.payment.infrastructure.event;
+package com.sparta.order.server.infrastructure.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
