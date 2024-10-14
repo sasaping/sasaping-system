@@ -2,8 +2,6 @@ package com.sparta.payment.application.service;
 
 import com.sparta.payment.domain.entity.ElasticSearchPayment;
 import com.sparta.payment.domain.entity.Payment;
-import com.sparta.payment.exception.PaymentErrorCode;
-import com.sparta.payment.exception.PaymentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -18,12 +16,8 @@ public class ElasticSearchService {
 
   public void savePayment(Payment payment) {
     ElasticSearchPayment esPayment = convertToElasticsearchPayment(payment);
-    try {
-      elasticsearchOperations.save(esPayment);
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
-    }
+    elasticsearchOperations.save(esPayment);
+
   }
 
   private ElasticSearchPayment convertToElasticsearchPayment(Payment payment) {
