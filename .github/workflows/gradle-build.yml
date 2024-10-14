@@ -51,6 +51,7 @@ jobs:
           EC2_HOST: ${{secrets.EC2_HOST}}
           TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
           SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
+          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
 
       - name: Check if JAR file exists
         run: |
@@ -147,7 +148,20 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          envs: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, ECR_REGISTRY, ECR_NAMESPACE
+          envs: |
+            AWS_ACCESS_KEY_ID,
+            AWS_SECRET_ACCESS_KEY,
+            AWS_REGION,
+            ECR_REGISTRY,
+            ECR_NAMESPACE,
+            ELASTIC_PASSWORD,
+            KIBANA_PASSWORD,
+            STACK_VERSION,
+            CLUSTER_NAME,
+            LICENSE,
+            ES_PORT,
+            KIBANA_PORT,
+            MEM_LIMIT
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker compose down
