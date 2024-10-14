@@ -90,7 +90,7 @@ services:
     depends_on:
       - eureka-service
     ports:
-      - "19091:19091"
+      - "19061:19061"
     networks:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
