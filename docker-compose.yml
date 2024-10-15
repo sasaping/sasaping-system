@@ -4,6 +4,8 @@ x-build-args:
 services:
   eureka-service:
     container_name: eureka-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -17,6 +19,8 @@ services:
 
   gateway:
     container_name: gateway-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -32,6 +36,8 @@ services:
 
   user:
     container_name: user-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -45,6 +51,8 @@ services:
 
   auth:
     container_name: auth-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -58,6 +66,8 @@ services:
 
   order:
     container_name: order-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -71,6 +81,8 @@ services:
 
   payment:
     container_name: payment-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -86,6 +98,8 @@ services:
 
   slack:
     container_name: slack-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -99,6 +113,8 @@ services:
 
   product:
     container_name: product-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
@@ -112,6 +128,8 @@ services:
 
   promotion:
     container_name: promotion-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:

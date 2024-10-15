@@ -51,15 +51,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        env:
-          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-          EC2_HOST: ${{secrets.EC2_HOST}}
-          TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
-          SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
-          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
-          ELASTIC_FINGERPRINT: ${{secrets.ELASTIC_FINGERPRINT}}
         run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -x test
-
 
       - name: Check if JAR file exists
         run: |
@@ -174,7 +166,7 @@ jobs:
             MEM_LIMIT
           script: |
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            docker compose down
+            docker ps --format "{{.ID}} {{.Image}}" | grep -vE "docker.elastic.co/elasticsearch/elasticsearch:8.6.0|wurstmeister/zookeeper:latest" | awk '{print $1}' | xargs -r docker stop
             docker container prune -f
             docker rmi $(docker images "${ECR_REGISTRY}/${ECR_NAMESPACE}/*" -q)
             sudo chmod +x /home/ubuntu/stop-used-port.sh
