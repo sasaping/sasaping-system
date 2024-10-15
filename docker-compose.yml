@@ -143,6 +143,8 @@ services:
 
   search:
     container_name: search-service
+    env_file:
+      - .env
     build:
       dockerfile: *dockerfile_name
       args:
