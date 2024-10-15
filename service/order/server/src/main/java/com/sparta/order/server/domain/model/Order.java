@@ -53,14 +53,14 @@ public class Order extends BaseEntity {
   @Column(nullable = false)
   private Long paymentId;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 50)
   private String orderNo;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 50)
   @Enumerated(value = EnumType.STRING)
   private OrderType type;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 50)
   @Enumerated(value = EnumType.STRING)
   private OrderState state;
 
@@ -82,20 +82,24 @@ public class Order extends BaseEntity {
   @Column(nullable = false)
   private BigDecimal couponPrice;
 
-  @Column(nullable = true)
+  @Column(nullable = true, length = 255)
   private String invoiceNumber;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 100)
   private String recipient;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 100)
   private String phoneNumber;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String zipcode;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 255)
   private String shippingAddress;
+
+  public void cancel() {
+    state = OrderState.CANCELED;
+  }
 
   // TODO AddressDto 추가
   public static Order createOrder(Long userId, OrderCreateRequest request,
@@ -110,7 +114,7 @@ public class Order extends BaseEntity {
         .paymentId(1L)
         .orderNo(orderNo)
         .type(OrderType.valueOf(request.getOrderType()))
-        .state(OrderState.COMPLETED)
+        .state(OrderState.PENDING_PAYMENT)
         .totalQuantity(priceInfo.totalQuantity)
         .totalAmount(priceInfo.totalAmount)
         .shippingAmount(priceInfo.shippingAmount)

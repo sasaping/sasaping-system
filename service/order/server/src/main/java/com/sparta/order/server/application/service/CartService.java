@@ -40,7 +40,7 @@ public class CartService {
 
   @Transactional
   public void addCart(Long userId, CartProductRequest cartProductRequest) {
-    //validateProductExists(cartProductRequest.getProductId());
+    validateProductExists(cartProductRequest.getProductId());
     validateUserExists(userId);
     String redisKey = createRedisKey(userId);
     Integer existingProductQuantity = cartOps.get(redisKey,
@@ -74,7 +74,7 @@ public class CartService {
 
   @Transactional
   public void updateCart(Long userId, CartProductRequest cartProductRequest) {
-    //validateProductExists(cartProductRequest.getProductId());
+    validateProductExists(cartProductRequest.getProductId());
 
     validateUserExists(userId);
     String redisKey = createRedisKey(userId);

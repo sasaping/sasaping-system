@@ -6,7 +6,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "productId": "19646241-55d8-40f7-8f3e-d7242dedff49",
+  "productId": "800504d0-be21-450e-8598-0dc3d382d7ea",
   "quantity": 3
 }
 
@@ -34,7 +34,7 @@ DELETE http://localhost:{{Port}}/api/carts/clear?userId=123456
 Authorization: Bearer {{access_token}}
 
 ### 상품 생성
-POST http://localhost:19081/api/products
+POST http://localhost:19091/api/products
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
@@ -58,4 +58,14 @@ Content-Type: application/json
     "DISCOUNT",
     "NEW"
   ]
+}
+
+### 카테고리 생성
+POST http://localhost:{{Port}}/api/categories
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "name": "CLOTHES",
+  "parentCategoryId": null
 }
