@@ -18,7 +18,7 @@ public interface UserClient {
   UserDto getUser(@RequestParam(value = "userId") Long userId);
 
   @PostMapping("/internal/users/point")
-  Long usePoint(@RequestBody PointHistoryDto request);
+  Long createPointHistory(@RequestBody PointHistoryDto request);
 
   @DeleteMapping("/internal/users/point/{pointHistoryId}")
   void rollbackPoint(@PathVariable Long pointHistoryId);
