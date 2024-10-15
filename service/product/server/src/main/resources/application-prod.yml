@@ -6,7 +6,7 @@ spring:
     password: ${DB_PASSWORD}
 
   cassandra:
-    contact-points: 127.0.0.1
+    contact-points: cassandra
     port: 9042
     keyspace-name: product
     schema-action: create_if_not_exists
