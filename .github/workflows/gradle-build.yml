@@ -174,7 +174,7 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker compose down
             docker container prune -f
-            docker image prune -a -f
+            docker rmi $(docker images "${ECR_REGISTRY}/${ECR_NAMESPACE}/*" -q)
             sudo chmod +x /home/ubuntu/stop-used-port.sh
             /home/ubuntu/stop-used-port.sh
             docker compose pull
