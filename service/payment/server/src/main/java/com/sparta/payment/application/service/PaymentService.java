@@ -67,7 +67,7 @@ public class PaymentService {
   }
 
 
-  public PaymentResponse.Create createPayment(Create request) {
+  public void createPayment(Create request) {
     String secretKey = Base64.getEncoder().encodeToString(originalKey.getBytes());
     try {
       HttpHeaders headers = new HttpHeaders();
@@ -92,8 +92,6 @@ public class PaymentService {
       sendMessage(response.getBody().getCheckout(), request.getEmail());
 
       paymentRepository.save(payment);
-
-      return response.getBody();
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
