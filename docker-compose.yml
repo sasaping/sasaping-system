@@ -110,6 +110,19 @@ services:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/product
 
+  promotion:
+    container_name: promotion-service
+    build:
+      dockerfile: *dockerfile_name
+      args:
+        - ARTIFACT_DIRECTORY=./service/promotion-artifact
+        - FILE_DIRECTORY=./service/promotion/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/promotion
+
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
