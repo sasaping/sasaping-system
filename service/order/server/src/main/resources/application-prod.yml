@@ -12,7 +12,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: ${EC2_PUBLIC_IP}:9092
     consumer:
       group-id: order-service-group
       auto-offset-reset: earliest
