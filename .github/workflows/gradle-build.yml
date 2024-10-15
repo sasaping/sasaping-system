@@ -78,7 +78,7 @@ jobs:
     name: Build docker image and Push to registry
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' # Push 이벤트일 때만 실행
+    if: github.event_name == 'pull_request' # Push 이벤트일 때만 실행
 
     steps:
       - name: Checkout
@@ -119,7 +119,7 @@ jobs:
     name: Deploy
     needs: Docker
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' # Push 이벤트일 때만 실행
+    if: github.event_name == 'pull_request' # Push 이벤트일 때만 실행
 
     steps:
       - uses: actions/checkout@v4
