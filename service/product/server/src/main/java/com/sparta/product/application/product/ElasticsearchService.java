@@ -3,7 +3,7 @@ package com.sparta.product.application.product;
 import com.sparta.product.domain.model.SortOption;
 import com.sparta.product.domain.repository.ElasticSearchRepository;
 import com.sparta.product.domain.repository.ElasticsearchCustomRepository;
-import com.sparta.product.infrastructure.elasticsearch.dto.ProductSearchDto;
+import com.sparta.product.infrastructure.utils.ProductSearchDto;
 import com.sparta.product.presentation.response.ProductResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;

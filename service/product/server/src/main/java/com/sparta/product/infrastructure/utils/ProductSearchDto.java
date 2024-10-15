@@ -1,4 +1,4 @@
-package com.sparta.product.infrastructure.elasticsearch.dto;
+package com.sparta.product.infrastructure.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sparta.product.presentation.response.ProductResponse;
