@@ -1,5 +1,6 @@
 package com.sparta.payment.application.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
 import com.sparta.payment.domain.entity.PaymentState;
@@ -47,25 +48,22 @@ public class PaymentService {
   private String FAIL_URL;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
 
-  private final KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate;
+  private final KafkaTemplate<String, Object> kafkaTemplate;
 
   private final PaymentRepository paymentRepository;
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
   private final MessageClient messageClient;
-  private final ElasticSearchService elasticSearchService;
 
-  public PaymentService(KafkaTemplate<String, PaymentCompletedEvent> kafkaTemplate,
+  public PaymentService(KafkaTemplate<String, Object> kafkaTemplate,
       PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
-      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
-      ElasticSearchService elasticSearchService) {
+      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient) {
     this.kafkaTemplate = kafkaTemplate;
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
     this.messageClient = messageClient;
-    this.elasticSearchService = elasticSearchService;
   }
 
 
@@ -144,11 +142,18 @@ public class PaymentService {
         .paymentId(payment.getPaymentId())
         .orderId(payment.getOrderId())
         .amount(payment.getAmount())
+        .success(true)
         .build();
 
-    kafkaTemplate.send("payment-completed-topic", event);
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      String jsonMessage = objectMapper.writeValueAsString(event);
+      kafkaTemplate.send("payment-completed-topic", jsonMessage);
 
-    elasticSearchService.savePayment(payment);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
 
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);

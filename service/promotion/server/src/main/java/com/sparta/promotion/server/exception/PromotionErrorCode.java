@@ -11,8 +11,8 @@ public enum PromotionErrorCode {
   INVALID_DISCOUNT_TYPE(HttpStatus.NOT_FOUND, "해당 할인 타입이 없습니다."),
   COUPON_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 쿠폰을 찾을 수 없습니다."),
   INSUFFICIENT_COUPON(HttpStatus.BAD_REQUEST, "쿠폰 수량이 부족합니다."),
-  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류");
-
+  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류"),
+  EVENT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이벤트를 찾을 수 없습니다");
   private final HttpStatus status;
   private final String message;
 }

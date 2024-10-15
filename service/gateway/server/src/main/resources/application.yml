@@ -29,7 +29,17 @@ spring:
         - id: promotion
           uri: lb://promotion
           predicates:
-            - Path=/api/coupons/**
+            - Path=/api/coupons/**, /api/events/**
+
+        - id: payment
+          uri: lb://payment
+          predicates:
+            - Path=/api/payments/**
+
+        - id: search
+          uri: lb://search
+          predicates:
+            - Path=/api/search/**
 
         - id: order
           uri: lb://order

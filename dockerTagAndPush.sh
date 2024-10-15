@@ -1,5 +1,5 @@
 # 모든 서비스 도커 이미지를 빌드합니다.
-services=("eureka" "gateway" "user" "auth" "order")
+services=("eureka" "gateway" "user" "auth" "order" "payment" "slack" "product")
 
 # 도커 이미지에 commit hash를 기반으로한 이미지 태그를 설정합니다.
 commit_hash=$(git rev-parse --short HEAD)

@@ -1,0 +1,14 @@
+server:
+  port: 19081
+
+spring:
+  application:
+    name: product
+  profiles:
+    active: prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

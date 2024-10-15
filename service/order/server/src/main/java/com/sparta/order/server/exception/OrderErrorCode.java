@@ -15,7 +15,9 @@ public enum OrderErrorCode {
   INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "상품의 재고가 부족합니다. : [%s]"),
   COUPON_NOT_APPLICABLE(HttpStatus.BAD_REQUEST, "쿠폰 적용이 불가한 상품입니다. : [%s]"),
   CART_ITEM_ONLY_ORDERABLE(HttpStatus.BAD_REQUEST, "장바구니에 있는 상품만 주문이 가능합니다."),
-  CART_ITEM_QUANTITY_MISMATCH(HttpStatus.BAD_REQUEST, "장바구니에 있는 상품과 주문 상품의 수량이 다릅니다. : [%s]");
+  CART_ITEM_QUANTITY_MISMATCH(HttpStatus.BAD_REQUEST, "장바구니에 있는 상품과 주문 상품의 수량이 다릅니다. : [%s]"),
+  EVENT_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이벤트 처리에 실패했습니다. 잠시 후 다시 시도해주세요."),
+  ;
 
 
   private final HttpStatus status;
