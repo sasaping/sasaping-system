@@ -3,10 +3,10 @@ spring:
     name: search
 
   datasource:
+    url: { DATASOURCE_URL }
+    username: { DATASOURCE_USERNAME }
+    password: { DATASOURCE_PASSWORD }
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://{LOCAL_DB_URL}
-    username: { LOCAL_DB_USER }
-    password: { LOCAL_DB_PASSWORD }
   jpa:
     database: MYSQL
     hibernate:
@@ -24,6 +24,7 @@ spring:
 
 product:
   search-index: "sasaping-ecommerce-products"
+
 
 
 eureka:

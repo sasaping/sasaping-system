@@ -1,0 +1,12 @@
+server:
+  port: 19011
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+spring:
+  profiles:
+    include: prod

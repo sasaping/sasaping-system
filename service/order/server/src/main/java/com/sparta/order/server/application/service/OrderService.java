@@ -1,5 +1,6 @@
 package com.sparta.order.server.application.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.order.server.domain.model.Order;
 import com.sparta.order.server.domain.model.OrderProduct;
 import com.sparta.order.server.domain.model.vo.OrderState;
@@ -9,6 +10,13 @@ import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
+
+import com.sparta.order.server.infrastructure.event.PaymentCompletedEvent;
+import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
+import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
+import com.sparta.product_dto.ProductDto;
+import com.sparta.user.user_dto.infrastructure.AddressDto;
+
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
@@ -16,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +76,25 @@ public class OrderService {
         orderProduct -> orderProduct.getProductId(), orderProduct -> orderProduct.getQuantity()));
 
     productClient.rollbackStock(orderProductQuantities);
+  }
+
+  @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
+  public void handlePaymentCompletedEvent(String event) {
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      PaymentCompletedEvent paymentCompletedEvent = objectMapper.readValue(event,
+          PaymentCompletedEvent.class);
+      Boolean success = paymentCompletedEvent.getSuccess();
+      if (success) {
+        // TODO : 결제 성공시 주문 완료 처리 (주문 상태 변경, 재고 차감)
+      } else {
+        // TODO :: 결제 실패시 주문 취소 처리
+      }
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new OrderException(OrderErrorCode.EVENT_PROCESSING_FAILED);
+    }
   }
 
 }
