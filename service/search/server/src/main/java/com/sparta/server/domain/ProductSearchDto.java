@@ -12,8 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 @Document(indexName = "sasaping-ecommerce-products")
 public class ProductSearchDto {
 
-  @Id
-  private String productId;
+  @Id private String productId;
   private Long categoryId;
   private String productName;
   private String brandName;
@@ -22,7 +21,6 @@ public class ProductSearchDto {
   private BigDecimal originalPrice;
   private BigDecimal discountedPrice;
   private Double discountPercent;
-  private Integer stock;
   private String description;
   private String thumbnailImgUrl;
   private double averageRating;
@@ -33,6 +31,4 @@ public class ProductSearchDto {
   private Long salesCount;
   private boolean isDeleted;
   private String createdAt;
-
-
 }
