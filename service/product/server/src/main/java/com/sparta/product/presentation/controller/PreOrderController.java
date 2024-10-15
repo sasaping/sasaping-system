@@ -1,6 +1,8 @@
 package com.sparta.product.presentation.controller;
 
+import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
+import com.sparta.product.application.preorder.PreOrderFacadeService;
 import com.sparta.product.application.preorder.PreOrderService;
 import com.sparta.product.domain.model.PreOrderState;
 import com.sparta.product.presentation.request.PreOrderCreateRequest;
@@ -10,7 +12,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +30,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/preorders")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class PreOrderController {
   private final PreOrderService preOrderService;
+  private final PreOrderFacadeService preOrderFacadeService;
+
+  @PostMapping("/{preOrderId}/order")
+  public ApiResponse<Void> preOrder(
+      @NotNull @PathVariable("preOrderId") Long preOrderId,
+      @NotNull @RequestParam("addressId") Long addressId,
+      @AuthenticationPrincipal JwtClaim jwtClaim) {
+    preOrderFacadeService.preOrder(preOrderId, addressId, jwtClaim.getUserId());
+    return ApiResponse.ok();
+  }
 
   @PostMapping
   public ApiResponse<Long> createPreOrder(@RequestBody @Valid PreOrderCreateRequest request) {

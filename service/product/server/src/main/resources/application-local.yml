@@ -37,7 +37,7 @@ spring:
       port: 6379
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
     listener:
       ack-mode: MANUAL
     producer:

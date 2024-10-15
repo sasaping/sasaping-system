@@ -75,7 +75,7 @@ public class PreOrderService {
     preOrderRepository.delete(preOrder);
   }
 
-  private PreOrder findPreOrderByPreOrderId(Long preOrderId) {
+  public PreOrder findPreOrderByPreOrderId(Long preOrderId) {
     return preOrderRepository
         .findByPreOrderIdAndIsPublicTrue(preOrderId)
         .orElseThrow(() -> new ProductServerException(ProductErrorCode.NOT_FOUND_PREORDER));
