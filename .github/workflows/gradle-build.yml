@@ -29,7 +29,7 @@ jobs:
     permissions: write-all
     strategy:
       matrix:
-        service: [ eureka, user, auth, gateway, notification, order, payment, product, slack, promotion ]
+        service: [ eureka, user, auth, gateway, notification, order, payment, product, slack, promotion, search ]
 
     steps:
       - name: Checkout repository

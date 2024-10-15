@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: search
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://{LOCAL_DB_URL}
