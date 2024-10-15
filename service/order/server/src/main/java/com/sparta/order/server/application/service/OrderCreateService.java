@@ -6,10 +6,12 @@ import com.sparta.order.server.domain.repository.OrderProductRepository;
 import com.sparta.order.server.domain.repository.OrderRepository;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
+import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
+import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
 import com.sparta.product_dto.ProductDto;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
@@ -41,6 +43,7 @@ public class OrderCreateService {
   private final OrderProductRepository orderProductRepository;
   private final OrderRepository orderRepository;
   private final ProductClient productClient;
+  private final PaymentClient paymentClient;
   private final OrderRollbackService orderRollbackService;
 
   @Transactional
@@ -96,8 +99,12 @@ public class OrderCreateService {
           .forEach(
               productInfo -> createAndSaveOrderProduct(productInfo, null,
                   productPrices.get(productInfo.getProductId()), order));
-
+      
+      PaymentInternalDto.Create payment = new PaymentInternalDto.Create(
+          userId, savedOrderId, order.getOrderNo(), request.getUserEmail(),
+          order.getTotalRealAmount().longValue());
       // 결제 API 호출
+      paymentClient.payment(payment);
 
       // 장바구니에 상품 삭제
       cartService.orderCartProduct(userId, productQuantities);
