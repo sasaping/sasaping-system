@@ -58,6 +58,7 @@ jobs:
           TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
           SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
           ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
+          ELASTIC_FINGERPRINT: ${{secrets.ELASTIC_FINGERPRINT}}
 
       - name: Check if JAR file exists
         run: |
