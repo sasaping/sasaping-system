@@ -39,6 +39,7 @@ public class SecurityConfig {
                     .requestMatchers("/internal/**").permitAll()
                     .requestMatchers("/payments/success").permitAll()
                     .requestMatchers("/payments/fail").permitAll()
+//                    .requestMatchers("/resources/templates/**").permitAll() // TODO : 계속 잘되면 나중에 삭제 예정
                     .anyRequest()
                     .authenticated())
         .addFilterAfter(

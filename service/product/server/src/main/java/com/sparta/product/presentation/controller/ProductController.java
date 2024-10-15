@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Validated
 public class ProductController {
+
   private final ProductFacadeService facadeService;
   private final ProductService productService;
 
@@ -55,7 +56,7 @@ public class ProductController {
     return ApiResponse.ok(facadeService.deleteProduct(productId));
   }
 
-  @GetMapping("/{productId}")
+  @GetMapping("/search/{productId}")
   public ApiResponse<ProductResponse> getProduct(
       @PathVariable("productId") @NotNull UUID productId) {
     return ApiResponse.ok(productService.getProduct(productId));
@@ -85,4 +86,5 @@ public class ProductController {
             mainColor,
             sortOption));
   }
+
 }
