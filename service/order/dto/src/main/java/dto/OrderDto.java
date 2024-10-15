@@ -28,5 +28,7 @@ public class OrderDto {
     private String productId;
     private int quantity;
     private Long userCouponId;
+
   }
+
 }

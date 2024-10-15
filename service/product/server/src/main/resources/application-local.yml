@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: product
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${MYSQL_URL}
@@ -56,15 +53,6 @@ spring:
 
 product:
   search-index: "sasaping-ecommerce-products"
-
-server:
-  port: 19081
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info
 
 eureka:
   client:

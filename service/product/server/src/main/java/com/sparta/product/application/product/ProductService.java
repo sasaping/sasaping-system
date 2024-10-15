@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j(topic = "ProductService")
 public class ProductService {
+
   private final ProductRepository productRepository;
 
   @Transactional
@@ -63,14 +64,30 @@ public class ProductService {
     return ProductResponse.fromEntity(product);
   }
 
+  @Transactional
   public void reduceStock(Map<String, Integer> productQuantities) {
+    log.info(productQuantities.toString());
     productQuantities.entrySet().stream()
         .forEach(
             entry -> {
+              log.info(entry.getKey(), entry.getValue());
               String productId = entry.getKey();
               int reduceCount = entry.getValue();
               Product product = getSavedProduct(UUID.fromString(productId));
               product.updateStock(reduceCount);
+              productRepository.save(product);
+            });
+  }
+
+  @Transactional
+  public void rollbackStock(Map<String, Integer> productQuantities) {
+    productQuantities.entrySet().stream()
+        .forEach(
+            entry -> {
+              String productId = entry.getKey();
+              int rollbackCount = entry.getValue();
+              Product product = getSavedProduct(UUID.fromString(productId));
+              product.rollbackStock(rollbackCount);
               productRepository.save(product);
             });
   }
@@ -121,4 +138,6 @@ public class ProductService {
         .findByProductIdAndIsDeletedFalse(productId)
         .orElseThrow(() -> new ProductServerException(ProductErrorCode.NOT_FOUND_PRODUCT));
   }
+
+
 }

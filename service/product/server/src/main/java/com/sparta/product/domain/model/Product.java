@@ -146,4 +146,9 @@ public class Product extends BaseEntity implements Persistable {
   public void updateStock(int reduceCount) {
     this.stock -= reduceCount;
   }
+
+  public void rollbackStock(int rollbackCount) {
+    this.stock += rollbackCount;
+  }
+
 }
