@@ -188,6 +188,12 @@ public class Order extends BaseEntity {
     return sb.toString();
   }
 
+  public void validateOrderPermission(Long userId) {
+    if (!this.userId.equals(userId)) {
+      throw new OrderException(OrderErrorCode.ORDER_PERMISSION_DENIED);
+    }
+  }
+
   @AllArgsConstructor
   private static class PriceInfo {
 
@@ -197,5 +203,6 @@ public class Order extends BaseEntity {
     private final BigDecimal totalRealAmount;
 
   }
+
 
 }
