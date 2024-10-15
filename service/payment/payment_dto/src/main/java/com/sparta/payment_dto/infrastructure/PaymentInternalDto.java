@@ -21,6 +21,7 @@ public class PaymentInternalDto {
 
   @Getter
   @Setter
+  @AllArgsConstructor
   public static class Cancel {
 
     private Long orderId;
