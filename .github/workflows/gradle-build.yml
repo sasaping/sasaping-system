@@ -113,6 +113,7 @@ jobs:
           ./dockerTagAndPush.sh
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
 
   Deploy:
     name: Deploy

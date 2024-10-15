@@ -9,6 +9,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
+        - DB_PASSWORD=${DB_PASSWORD}
     networks:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
@@ -22,6 +23,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     ports:
@@ -37,6 +39,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
@@ -50,6 +53,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
@@ -63,6 +67,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/order-artifact
         - FILE_DIRECTORY=./service/order/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
@@ -76,6 +81,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/payment-artifact
         - FILE_DIRECTORY=./service/payment/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     ports:
@@ -91,6 +97,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/slack-artifact
         - FILE_DIRECTORY=./service/slack/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
@@ -104,6 +111,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/product-artifact
         - FILE_DIRECTORY=./service/product/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
@@ -117,6 +125,7 @@ services:
       args:
         - ARTIFACT_DIRECTORY=./service/promotion-artifact
         - FILE_DIRECTORY=./service/promotion/server
+        - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-service
     networks:
