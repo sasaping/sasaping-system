@@ -50,9 +50,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Check DB_PASSWORD
-        run: echo ${{secrets.DB_PASSWORD}}
-
       - name: Build with Gradle
         env:
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
