@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum OrderErrorCode {
+  ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
+  CANNOT_CANCEL_WHILE_SHIPPING(HttpStatus.FORBIDDEN, "배송이 시작된 주문은 취소할 수 없습니다. : [%s]"),
   INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
   ADDRESS_MISMATCH(HttpStatus.BAD_REQUEST, "배송지 정보가 사용자가 등록한 배송지와 일치하지 않습니다. : [%s]"),
   ORDER_NO_GENERATION_FAILED(

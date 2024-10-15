@@ -16,7 +16,6 @@ public class OrderRollbackService {
   private final UserClient userClient;
   private final ProductClient productClient;
 
-  // feign 호출로 처리
   public void rollbackTransaction(
       Map<String, Integer> deductedProductsQuantities,
       List<Long> usedCoupons,

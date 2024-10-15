@@ -38,7 +38,7 @@ public class UserInternalController {
   }
 
   @DeleteMapping("/point/{pointHistoryId}")
-  public void deletePointHistory(@PathVariable(name = "pointHistoryId") Long pointHistoryId) {
+  public void rollbackPointHistory(@PathVariable(name = "pointHistoryId") Long pointHistoryId) {
     pointHistoryService.rollbackPointHistory(pointHistoryId);
   }
 
