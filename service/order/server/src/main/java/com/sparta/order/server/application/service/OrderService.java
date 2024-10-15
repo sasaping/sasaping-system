@@ -10,13 +10,7 @@ import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
-
 import com.sparta.order.server.infrastructure.event.PaymentCompletedEvent;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
-import com.sparta.product_dto.ProductDto;
-import com.sparta.user.user_dto.infrastructure.AddressDto;
-
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
@@ -24,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrderService {
