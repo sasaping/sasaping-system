@@ -51,14 +51,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -D spring.datasource.password=${{secrets.DB_PASSWORD}} -x test
-        env:
-          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-          EC2_HOST: ${{secrets.EC2_HOST}}
-          TOSS_SECRET_KEY: ${{secrets.TOSS_SECRET_KEY}}
-          SLACK_TOKEN: ${{secrets.SLACK_TOKEN}}
-          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
-          ELASTIC_FINGERPRINT: ${{secrets.ELASTIC_FINGERPRINT}}
+        run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -x test
 
       - name: Check if JAR file exists
         run: |
