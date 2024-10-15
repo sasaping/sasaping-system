@@ -56,6 +56,9 @@ jobs:
         run: echo "DB_PASSWORD is set"
         if: env.DB_PASSWORD != ''
 
+      - name: Check environment variables
+        run: echo $DB_PASSWORD
+
       - name: Build with Gradle
         env:
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
