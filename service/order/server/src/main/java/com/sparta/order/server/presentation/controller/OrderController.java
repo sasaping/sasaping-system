@@ -5,8 +5,10 @@ import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.order.server.application.service.OrderCreateService;
 import com.sparta.order.server.application.service.OrderService;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
+import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +34,12 @@ public class OrderController {
   public ApiResponse<Long> cancelOrder(@AuthenticationPrincipal JwtClaim userClaim,
       @PathVariable(name = "orderId") Long orderId) {
     return ApiResponse.ok(orderService.cancelOrder(userClaim.getUserId(), orderId));
+  }
+
+  @GetMapping("/{orderId}")
+  public ApiResponse<OrderGetResponse> getOrder(@AuthenticationPrincipal JwtClaim userClaim,
+      @PathVariable(name = "orderId") Long orderId) {
+    return ApiResponse.ok(orderService.getOrder(userClaim.getUserId(), orderId));
   }
 
 }

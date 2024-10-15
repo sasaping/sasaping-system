@@ -34,6 +34,8 @@ public class OrderProduct extends BaseEntity {
   @Column(nullable = false)
   private String productId;
   @Column(nullable = false)
+  private String productName;
+  @Column(nullable = false)
   private int quantity;
   @Column(nullable = false)
   private BigDecimal purchasePrice;
@@ -45,6 +47,7 @@ public class OrderProduct extends BaseEntity {
 
   // TODO productId -> productDto 설정
   public static OrderProduct createOrderProduct(String productId, BigDecimal productPrice,
+      String productName,
       int quantity, String couponDto, Order order) {
 
     return OrderProduct.builder()
@@ -55,6 +58,7 @@ public class OrderProduct extends BaseEntity {
             couponDto != null ? productPrice.multiply(BigDecimal.valueOf(quantity))
                 .subtract(BigDecimal.valueOf(100))
                 : productPrice.multiply(BigDecimal.valueOf(quantity)))
+        .productName(productName)
         .userCouponId(couponDto != null ? 1L : null)
         .couponPrice(couponDto != null ? BigDecimal.valueOf(100) : BigDecimal.ZERO)
         .build();

@@ -94,12 +94,20 @@ public class OrderCreateService {
               ProductDto::getDiscountedPrice)
       );
 
+      Map<String, String> productNames = products.stream().collect(
+          Collectors.toMap(
+              product -> product.getProductId().toString(),
+              product -> product.getProductName()
+          )
+      );
+
       // 주문 상품 하나씩 생성 TODO couponDto
       request.getOrderProductInfos()
           .forEach(
               productInfo -> createAndSaveOrderProduct(productInfo, null,
-                  productPrices.get(productInfo.getProductId()), order));
-      
+                  productPrices.get(productInfo.getProductId()),
+                  productNames.get(productInfo.getProductId()), order));
+
       PaymentInternalDto.Create payment = new PaymentInternalDto.Create(
           userId, savedOrderId, order.getOrderNo(), request.getUserEmail(),
           order.getTotalRealAmount().longValue());
@@ -150,11 +158,12 @@ public class OrderCreateService {
 
 
   private void createAndSaveOrderProduct(OrderProductInfo productInfo, String couponDto,
-      BigDecimal productPrice,
+      BigDecimal productPrice, String productName,
       Order order) {
     OrderProduct orderProduct = OrderProduct.createOrderProduct(
         productInfo.getProductId(),
         productPrice,
+        productName,
         productInfo.getQuantity(),
         couponDto,
         order

@@ -12,6 +12,8 @@ import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.infrastructure.event.PaymentCompletedEvent;
+import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
+import com.sparta.order.server.presentation.dto.OrderDto.OrderProductResponse;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto.Cancel;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
@@ -45,6 +47,8 @@ public class OrderService {
   public Long cancelOrder(Long userId, Long orderId) {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);
+
+    order.validateOrderPermission(userId);
 
     if (!order.getState().equals(OrderState.PENDING_PAYMENT)
         && !order.getState().equals(OrderState.COMPLETED)) {
@@ -101,6 +105,20 @@ public class OrderService {
       log.error(e.getMessage());
       throw new OrderException(OrderErrorCode.EVENT_PROCESSING_FAILED);
     }
+  }
+
+  public OrderGetResponse getOrder(Long userId, Long orderId) {
+    UserDto user = userClient.getUser(userId);
+    Order order = validateOrderExists(orderId);
+
+    order.validateOrderPermission(userId);
+
+    final List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
+    final List<OrderProductResponse> orderProductResponses = orderProducts.stream().map(
+        OrderProductResponse::fromEntity).toList();
+    final PaymentInternalDto.Get payment = paymentClient.getPayment(orderId);
+
+    return OrderGetResponse.from(order, orderProductResponses, payment);
   }
 
   private Order validateOrderExists(Long orderId) {
