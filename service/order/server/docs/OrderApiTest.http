@@ -15,11 +15,12 @@ Content-Type: application/json
     }
   ],
   "pointPrice": 1,
-  "addressId": 1
+  "addressId": 1,
+  "userEmail": "linavely99@gmail.com"
 }
 
 ### 주문 취소
-PATCH http://localhost:{{Port}}/api/orders/19149/cancel
+PATCH http://localhost:{{Port}}/api/orders/19152/cancel
 Authorization: Bearer {{access_token}}
 
 ### 상품 재고 조회

@@ -8,9 +8,12 @@ import com.sparta.order.server.domain.repository.OrderProductRepository;
 import com.sparta.order.server.domain.repository.OrderRepository;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
+import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
 import com.sparta.order.server.infrastructure.event.PaymentCompletedEvent;
+import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
+import com.sparta.payment_dto.infrastructure.PaymentInternalDto.Cancel;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
@@ -24,24 +27,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Slf4j
+@Slf4j(topic = "OrderService")
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class OrderService {
 
   private final OrderRepository orderRepository;
   private final UserClient userClient;
+  private final PaymentClient paymentClient;
   private final ProductClient productClient;
   private final OrderProductRepository orderProductRepository;
   private static final String POINT_HISTORY_TYPE_REFUND = "환불";
   private static final String POINT_DESCRIPTION_ORDER_CANCEL = "주문 취소";
+  private static final String CANCEL_REASON = "단순 변심";
 
   @Transactional
   public Long cancelOrder(Long userId, Long orderId) {
     UserDto user = userClient.getUser(userId);
-    Order order = orderRepository.findById(orderId).orElseThrow(
-        () -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND)
-    );
+    Order order = validateOrderExists(orderId);
 
     if (!order.getState().equals(OrderState.PENDING_PAYMENT)
         && !order.getState().equals(OrderState.COMPLETED)) {
@@ -50,6 +53,8 @@ public class OrderService {
 
     refundPoint(userId, orderId, order.getPointPrice());
     rollbackStock(order);
+    PaymentInternalDto.Cancel paymentCancel = new Cancel(orderId, CANCEL_REASON);
+    paymentClient.cancelPayment(paymentCancel);
 
     // TODO 쿠폰 사용 롤백
 
@@ -72,6 +77,7 @@ public class OrderService {
     productClient.rollbackStock(orderProductQuantities);
   }
 
+  @Transactional
   @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
   public void handlePaymentCompletedEvent(String event) {
     try {
@@ -80,15 +86,27 @@ public class OrderService {
           PaymentCompletedEvent.class);
       Boolean success = paymentCompletedEvent.getSuccess();
       if (success) {
-        // TODO : 결제 성공시 주문 완료 처리 (주문 상태 변경, 재고 차감)
+        log.info("===== 결제 성공 =====");
+        // TODO : 재고 차감 로직
+        Order order = validateOrderExists(paymentCompletedEvent.getOrderId());
+        order.complete();
+        order.setPaymentId(paymentCompletedEvent.getPaymentId());
+        orderRepository.save(order);
+
       } else {
-        // TODO :: 결제 실패시 주문 취소 처리
+        cancelOrder(paymentCompletedEvent.getUserId(), paymentCompletedEvent.getOrderId());
       }
 
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new OrderException(OrderErrorCode.EVENT_PROCESSING_FAILED);
     }
+  }
+
+  private Order validateOrderExists(Long orderId) {
+    return orderRepository.findById(orderId).orElseThrow(
+        () -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND)
+    );
   }
 
 }

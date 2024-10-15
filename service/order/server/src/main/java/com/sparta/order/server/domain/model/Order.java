@@ -101,6 +101,14 @@ public class Order extends BaseEntity {
     state = OrderState.CANCELED;
   }
 
+  public void complete() {
+    state = OrderState.COMPLETED;
+  }
+
+  public void setPaymentId(Long paymentId) {
+    this.paymentId = paymentId;
+  }
+
   // TODO AddressDto 추가
   public static Order createOrder(Long userId, OrderCreateRequest request,
       List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
