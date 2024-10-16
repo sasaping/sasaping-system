@@ -13,30 +13,6 @@ import lombok.NoArgsConstructor;
 public class OrderDto {
 
   @Getter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class OrderCreateRequest {
-
-    private String orderType;
-    private List<OrderProductInfo> orderProductInfos = new ArrayList<>();
-    private BigDecimal pointPrice;
-    private Long addressId;
-    private String userEmail;
-
-  }
-
-  @Getter
-  @AllArgsConstructor
-  @NoArgsConstructor
-  public static class OrderProductInfo {
-
-    private String productId;
-    private int quantity;
-    private Long userCouponId;
-
-  }
-
-  @Getter
   @NoArgsConstructor
   @AllArgsConstructor
   public static class OrderGetResponse {
