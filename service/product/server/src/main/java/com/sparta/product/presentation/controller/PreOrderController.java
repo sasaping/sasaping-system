@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @Slf4j
 public class PreOrderController {
+
   private final PreOrderService preOrderService;
   private final PreOrderFacadeService preOrderFacadeService;
 
@@ -73,16 +74,17 @@ public class PreOrderController {
     return ApiResponse.ok(preOrderService.updateState(preOrderId, PreOrderState.CANCELLED));
   }
 
-  @GetMapping("/{preOrderId}")
+  @GetMapping("/search/{preOrderId}")
   public ApiResponse<PreOrderResponse> getPreOrder(
       @NotNull @PathVariable("preOrderId") Long preOrderId) {
     return ApiResponse.ok(preOrderService.getPreOrder(preOrderId));
   }
 
-  @GetMapping
+  @GetMapping("/search")
   public ApiResponse<Page<PreOrderResponse>> getPreOrderList(
       @RequestParam(defaultValue = "0") @Min(0) int page,
       @RequestParam(defaultValue = "30") @Min(1) int size) {
     return ApiResponse.ok(preOrderService.getPreOrderList(page, size));
   }
+
 }
