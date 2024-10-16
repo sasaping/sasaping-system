@@ -1,14 +1,14 @@
 package com.sparta.order.server.application.service;
 
 import com.sparta.common.domain.exception.BusinessException;
-import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductRequest;
-import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
 import com.sparta.order.server.exception.CartErrorCode;
 import com.sparta.order.server.exception.CartException;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
+import com.sparta.order.server.presentation.dto.CartDto.CartProductRequest;
+import com.sparta.order.server.presentation.dto.CartDto.CartProductResponse;
 import com.sparta.product_dto.ProductDto;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,8 @@ public class CartService {
 
   @Transactional
   public void addCart(Long userId, CartProductRequest cartProductRequest) {
-    validateProductExists(cartProductRequest.getProductId());
+    validateProductExistsAndStock(cartProductRequest.getProductId(),
+        cartProductRequest.getQuantity());
     validateUserExists(userId);
     String redisKey = createRedisKey(userId);
     Integer existingProductQuantity = cartOps.get(redisKey,
@@ -74,8 +75,8 @@ public class CartService {
 
   @Transactional
   public void updateCart(Long userId, CartProductRequest cartProductRequest) {
-    validateProductExists(cartProductRequest.getProductId());
-
+    validateProductExistsAndStock(cartProductRequest.getProductId(),
+        cartProductRequest.getQuantity());
     validateUserExists(userId);
     String redisKey = createRedisKey(userId);
     validateUserCartExists(redisKey);
@@ -149,8 +150,12 @@ public class CartService {
     }
   }
 
-  private void validateProductExists(String productId) {
-    productClient.getProductList(new ArrayList<>(Arrays.asList(productId)));
+  private void validateProductExistsAndStock(String productId, Integer quantity) {
+    List<ProductDto> products = productClient.getProductList(
+        new ArrayList<>(Arrays.asList(productId)));
+    if (products.get(0).getStock() < quantity) {
+      throw new CartException(CartErrorCode.INSUFFICIENT_STOCK);
+    }
   }
 
   private void validateUserExists(Long userId) {
