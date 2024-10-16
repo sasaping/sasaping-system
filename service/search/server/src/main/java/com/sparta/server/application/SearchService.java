@@ -28,8 +28,8 @@ public class SearchService {
     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
 
     boolQuery.must(q -> q
-        .multiMatch(m -> m
-            .query(keyword)
+        .queryString(qs -> qs
+            .query(String.format("*%s*", keyword))
             .fields("productName", "brandName", "description", "tags")
         )
     );
