@@ -140,6 +140,7 @@ public class PaymentService {
         .paymentId(payment.getPaymentId())
         .orderId(payment.getOrderId())
         .amount(payment.getAmount())
+        .userId(payment.getUserId())
         .success(true)
         .build();
 
