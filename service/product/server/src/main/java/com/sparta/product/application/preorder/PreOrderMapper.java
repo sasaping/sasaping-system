@@ -2,8 +2,8 @@ package com.sparta.product.application.preorder;
 
 import com.sparta.product.domain.model.PreOrder;
 import com.sparta.product.presentation.request.PreOrderCreateRequest;
-import dto.OrderDto.OrderCreateRequest;
-import dto.OrderDto.OrderProductInfo;
+import dto.OrderCreateRequest;
+import dto.OrderProductInfo;
 import java.util.List;
 
 public class PreOrderMapper {
@@ -18,8 +18,8 @@ public class PreOrderMapper {
         .build();
   }
 
-  public static OrderCreateRequest toDto(Long preOrderId, Long addressId) {
-    OrderProductInfo orderProduct = new OrderProductInfo(preOrderId.toString(), 1, null);
+  public static OrderCreateRequest toDto(String productId, Long addressId) {
+    OrderProductInfo orderProduct = new OrderProductInfo(productId, 1, null);
     return new OrderCreateRequest("PREORDER", List.of(orderProduct), null, addressId);
   }
 }

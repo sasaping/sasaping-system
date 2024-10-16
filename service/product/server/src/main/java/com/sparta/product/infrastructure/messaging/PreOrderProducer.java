@@ -1,6 +1,6 @@
 package com.sparta.product.infrastructure.messaging;
 
-import dto.OrderDto.OrderCreateRequest;
+import dto.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -10,8 +10,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class PreOrderProducer {
   private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public void send(String topic, Long preOrderId, OrderCreateRequest request) {
-    kafkaTemplate.send(topic, preOrderId.toString(), request);
-    log.info("send preorderRequest of {} to order server", preOrderId);
+  public void send(String topic, String userId, OrderCreateRequest request) {
+    kafkaTemplate.send(topic, userId, request);
+    log.info(
+        "send preorderRequest of {} to order server",
+        request.getOrderProductInfos().get(0).getProductId());
   }
 }
