@@ -24,7 +24,6 @@ public class ProductSearchDto {
   private BigDecimal originalPrice;
   private BigDecimal discountedPrice;
   private Double discountPercent;
-  private Integer stock;
   private String description;
   private String thumbnailImgUrl;
   private double averageRating;
@@ -47,7 +46,6 @@ public class ProductSearchDto {
       BigDecimal originalPrice,
       BigDecimal discountedPrice,
       Double discountPercent,
-      Integer stock,
       String description,
       String thumbnailImgUrl,
       double averageRating,
@@ -67,7 +65,6 @@ public class ProductSearchDto {
     this.originalPrice = originalPrice;
     this.discountedPrice = discountedPrice;
     this.discountPercent = discountPercent;
-    this.stock = stock;
     this.description = description;
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.averageRating = averageRating;
@@ -91,7 +88,6 @@ public class ProductSearchDto {
         .originalPrice(product.getOriginalPrice())
         .discountedPrice(product.getDiscountedPrice())
         .discountPercent(product.getDiscountPercent())
-        .stock(product.getStock())
         .description(product.getDescription())
         .thumbnailImgUrl(product.getThumbnailImgUrl())
         .averageRating(product.getAverageRating())

@@ -6,7 +6,7 @@ import com.sparta.product.domain.model.PreOrderState;
 import com.sparta.product.infrastructure.messaging.PreOrderProducer;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
-import dto.OrderDto.OrderCreateRequest;
+import dto.OrderCreateRequest;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,8 +23,10 @@ public class PreOrderFacadeService {
   public void preOrder(Long preOrderId, Long addressId, Long userId) {
     PreOrder preOrder = preOrderService.findPreOrderByPreOrderId(preOrderId);
     preOrderLockService.reservation(preOrderId, userId);
-    OrderCreateRequest createRequest = PreOrderMapper.toDto(preOrderId, addressId);
-    preOrderProducer.send(KafkaTopicConstant.PROCESS_PREORDER, preOrderId, createRequest);
+    OrderCreateRequest createRequest =
+        PreOrderMapper.toDto(preOrder.getProductId().toString(), addressId);
+    preOrderProducer.send(
+        KafkaTopicConstant.PROCESS_PREORDER, Long.toString(userId), createRequest);
   }
 
   private void validatePreOrder(PreOrder preOrder) {
