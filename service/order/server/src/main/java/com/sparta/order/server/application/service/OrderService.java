@@ -47,23 +47,18 @@ public class OrderService {
   public Long cancelOrder(Long userId, Long orderId) {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);
-
     order.validateOrderPermission(userId);
-
-    if (!order.getState().equals(OrderState.PENDING_PAYMENT)
-        && !order.getState().equals(OrderState.COMPLETED)) {
-      throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);
-    }
+    order.validateOrderCancel();
 
     refundPoint(userId, orderId, order.getPointPrice());
     rollbackStock(order);
-    PaymentInternalDto.Cancel paymentCancel = new Cancel(orderId, CANCEL_REASON);
-    paymentClient.cancelPayment(paymentCancel);
+
+    if (order.getState().equals(OrderState.COMPLETED)) {
+      cancelPayment(orderId);
+    }
 
     // TODO 쿠폰 사용 롤백
-
     order.cancel();
-    orderRepository.save(order);
     return orderId;
   }
 
@@ -81,6 +76,11 @@ public class OrderService {
     productClient.rollbackStock(orderProductQuantities);
   }
 
+  private void cancelPayment(Long orderId) {
+    PaymentInternalDto.Cancel paymentCancel = new Cancel(orderId, CANCEL_REASON);
+    paymentClient.cancelPayment(paymentCancel);
+  }
+
   @Transactional
   @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
   public void handlePaymentCompletedEvent(String event) {
@@ -95,8 +95,6 @@ public class OrderService {
         Order order = validateOrderExists(paymentCompletedEvent.getOrderId());
         order.complete();
         order.setPaymentId(paymentCompletedEvent.getPaymentId());
-        orderRepository.save(order);
-
       } else {
         cancelOrder(paymentCompletedEvent.getUserId(), paymentCompletedEvent.getOrderId());
       }

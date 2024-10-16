@@ -194,6 +194,13 @@ public class Order extends BaseEntity {
     }
   }
 
+  public void validateOrderCancel() {
+    if (!state.equals(OrderState.PENDING_PAYMENT)
+        && !state.equals(OrderState.COMPLETED)) {
+      throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);
+    }
+  }
+
   @AllArgsConstructor
   private static class PriceInfo {
 
