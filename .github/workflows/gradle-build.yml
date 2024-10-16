@@ -169,6 +169,8 @@ jobs:
             docker ps --format "{{.ID}} {{.Image}}" | grep -vE "docker.elastic.co/elasticsearch/elasticsearch:8.6.0|wurstmeister/zookeeper:latest" | awk '{print $1}' | xargs -r docker stop
             docker container prune -f
             docker rmi $(docker images "${ECR_REGISTRY}/${ECR_NAMESPACE}/*" -q)
+            sudo swapoff -a
+            sudo swapon -a
             sudo chmod +x /home/ubuntu/stop-used-port.sh
             /home/ubuntu/stop-used-port.sh
             docker compose pull
