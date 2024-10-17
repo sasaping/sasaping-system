@@ -175,7 +175,15 @@ public class PaymentService {
         .success(false)
         .build();
 
-    kafkaTemplate.send("payment-completed-topic", event);
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      String jsonMessage = objectMapper.writeValueAsString(event);
+      kafkaTemplate.send("payment-completed-topic", jsonMessage);
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);

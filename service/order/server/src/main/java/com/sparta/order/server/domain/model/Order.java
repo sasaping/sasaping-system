@@ -5,10 +5,12 @@ import com.sparta.order.server.domain.model.vo.OrderState;
 import com.sparta.order.server.domain.model.vo.OrderType;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import com.sparta.product_dto.ProductDto;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
+import com.sparta.user.user_dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
+import dto.OrderCreateRequest;
+import dto.OrderProductInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,11 +18,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -97,6 +101,14 @@ public class Order extends BaseEntity {
   @Column(nullable = false, length = 255)
   private String shippingAddress;
 
+  @OneToMany(mappedBy = "order")
+  @Builder.Default
+  private List<OrderProduct> orderProducts = new ArrayList<>();
+
+  public void addOrderProduct(OrderProduct orderProduct) {
+    orderProducts.add(orderProduct);
+  }
+
   public void cancel() {
     state = OrderState.CANCELED;
   }
@@ -107,6 +119,10 @@ public class Order extends BaseEntity {
 
   public void setPaymentId(Long paymentId) {
     this.paymentId = paymentId;
+  }
+
+  public void updateOrderState(OrderState state) {
+    this.state = state;
   }
 
   // TODO AddressDto 추가
@@ -188,9 +204,17 @@ public class Order extends BaseEntity {
     return sb.toString();
   }
 
-  public void validateOrderPermission(Long userId) {
-    if (!this.userId.equals(userId)) {
+  public void validateOrderPermission(UserDto user) {
+    if (!this.userId.equals(user.getUserId()) && user.getRole()
+        .equals(UserRole.ROLE_USER.name())) {
       throw new OrderException(OrderErrorCode.ORDER_PERMISSION_DENIED);
+    }
+  }
+
+  public void validateOrderCancel() {
+    if (!state.equals(OrderState.PENDING_PAYMENT)
+        && !state.equals(OrderState.COMPLETED)) {
+      throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);
     }
   }
 

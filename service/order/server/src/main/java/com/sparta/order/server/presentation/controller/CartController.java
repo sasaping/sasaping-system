@@ -2,9 +2,9 @@ package com.sparta.order.server.presentation.controller;
 
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.order.server.Cart.presentation.dto.CartDto;
-import com.sparta.order.server.Cart.presentation.dto.CartDto.CartProductResponse;
 import com.sparta.order.server.application.service.CartService;
+import com.sparta.order.server.presentation.dto.CartDto;
+import com.sparta.order.server.presentation.dto.CartDto.CartProductResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

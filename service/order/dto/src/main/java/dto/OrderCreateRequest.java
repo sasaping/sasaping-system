@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderCreateRequest {
+
   private String orderType;
   private List<OrderProductInfo> orderProductInfos = new ArrayList<>();
   private BigDecimal pointPrice;
   private Long addressId;
+
 }
