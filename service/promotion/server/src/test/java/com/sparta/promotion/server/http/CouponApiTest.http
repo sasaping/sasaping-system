@@ -5,7 +5,7 @@ POST http://localhost:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser",
+  "username": "newUser11",
   "password": "password123"
 }
 > {%
@@ -47,4 +47,8 @@ Authorization: {{access_token}}
 ### 특정 사용자 쿠폰 전체 조회
 @userId=11
 GET http://localhost:{{Port}}/api/coupons/users/{{userId}}
+Authorization: {{access_token}}
+
+### 내 쿠폰 전체 조회
+GET http://localhost:{{Port}}/api/coupons/me
 Authorization: {{access_token}}

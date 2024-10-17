@@ -61,4 +61,11 @@ public class CouponController {
     return ApiResponse.ok(couponService.getCouponListBoyUserId(userId, pageable));
   }
 
+  @PreAuthorize("hasRole('ROLE_USER')")
+  @GetMapping("/me")
+  public ApiResponse<Page<CouponResponse.Get>> getCouponListByUser(
+      @AuthenticationPrincipal JwtClaim jwtClaim, Pageable pageable) {
+    return ApiResponse.ok(couponService.getCouponListBoyUserId(jwtClaim.getUserId(), pageable));
+  }
+
 }
