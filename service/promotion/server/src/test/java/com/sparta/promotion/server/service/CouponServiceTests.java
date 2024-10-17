@@ -362,4 +362,38 @@ class CouponServiceTests {
     verify(couponRepository).findById(couponId);  // 쿠폰이 조회되었는지 확인
   }
 
+  @Test
+  void test_쿠폰_삭제_성공() {
+    // given
+    Long couponId = 1L;
+    Coupon coupon = new Coupon();  // 가상의 쿠폰 객체 생성
+
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+
+    // then
+    couponService.deleteCoupon(couponId);
+
+    verify(couponRepository).findById(couponId);  // findById 호출 여부 확인
+    verify(couponRepository).delete(coupon);      // delete 호출 여부 확인
+  }
+
+  @Test
+  void test_쿠폰_삭제_실패_쿠폰없음() {
+    // given
+    Long couponId = 1L;
+
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.empty());
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.deleteCoupon(couponId);
+    });
+
+    // 예외 메시지 확인
+    assertThrows(PromotionException.class, () -> couponService.deleteCoupon(couponId));
+    assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
 }

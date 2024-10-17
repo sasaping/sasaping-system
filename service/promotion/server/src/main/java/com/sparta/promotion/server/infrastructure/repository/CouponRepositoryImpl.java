@@ -34,4 +34,9 @@ public class CouponRepositoryImpl implements CouponRepository {
     return jpaCouponRepository.findAll(pageable);
   }
 
+  @Override
+  public void delete(Coupon coupon) {
+    jpaCouponRepository.delete(coupon);
+  }
+
 }

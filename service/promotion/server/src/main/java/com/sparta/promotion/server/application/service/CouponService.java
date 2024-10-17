@@ -80,4 +80,11 @@ public class CouponService {
     coupon.update(request);
   }
 
+  @Transactional
+  public void deleteCoupon(Long couponId) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    couponRepository.delete(coupon);
+  }
+
 }

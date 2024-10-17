@@ -15,4 +15,6 @@ public interface CouponRepository {
 
   Page<Coupon> findAll(Pageable pageable);
 
+  void delete(Coupon coupon);
+
 }

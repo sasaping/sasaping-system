@@ -5,7 +5,7 @@ POST http://localhost:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser",
+  "username": "newUser11",
   "password": "password123"
 }
 > {%
@@ -18,7 +18,7 @@ Content-Type: application/json
 Authorization: {{access_token}}
 
 {
-  "name": "Test Coupon",
+  "name": "Test Coupon3",
   "type": "EVENT",
   "discountType": "PRICE",
   "discountValue": 1000.00,
@@ -71,3 +71,7 @@ Authorization: {{access_token}}
   "userTier": "GOLD",
   "eventId": 1
 }
+
+### 쿠폰 삭제
+DELETE localhost:{{Port}}/api/coupons/1
+Authorization: {{access_token}}
