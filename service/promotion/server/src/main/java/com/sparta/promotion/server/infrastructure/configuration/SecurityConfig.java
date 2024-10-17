@@ -35,6 +35,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorize -> authorize
                 .requestMatchers("/api/events/**").permitAll()
+                .requestMatchers("/internal/**").permitAll()
                 .anyRequest().authenticated()
 
         )

@@ -7,7 +7,11 @@ import com.sparta.promotion.server.domain.repository.UserCouponRepository;
 import com.sparta.promotion.server.exception.PromotionErrorCode;
 import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
+import com.sparta.promotion.server.presentation.request.CouponRequest.Update;
+import com.sparta.promotion.server.presentation.response.CouponResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +36,7 @@ public class CouponService {
     couponRepository.save(Coupon.create(request));
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함. 아린님 코드 merge하면 수정 진행
+  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
   @Transactional
   public void provideEventCoupon(Long userId, Long couponId) {
     // UserDto userData = userService.getUser(userId);
@@ -44,6 +48,73 @@ public class CouponService {
     }
     coupon.updateQuantity(coupon.getQuantity() - 1);
     userCouponRepository.save(UserCoupon.create(userId, couponId));
+  }
+
+  public Page<CouponResponse.Get> getCouponList(Pageable pageable) {
+    Page<Coupon> coupons = couponRepository.findAll(pageable);
+    return coupons.map(CouponResponse.Get::of);
+  }
+
+  public CouponResponse.Get getCoupon(Long couponId) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    return CouponResponse.Get.of(coupon);
+  }
+
+  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
+  public Page<CouponResponse.Get> getCouponListBoyUserId(Long userId, Pageable pageable) {
+    // UserDto userData = userService.getUser(userId);
+    Page<UserCoupon> userCoupons = userCouponRepository.findByUserId(userId, pageable);
+
+    return userCoupons.map(userCoupon -> {
+      Coupon coupon = couponRepository.findById(userCoupon.getCouponId())
+          .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+      return CouponResponse.Get.of(coupon);
+    });
+  }
+
+  @Transactional
+  public void updateCoupon(Long couponId, Update request) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    coupon.update(request);
+  }
+
+  @Transactional
+  public void deleteCoupon(Long couponId) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    couponRepository.delete(coupon);
+  }
+
+  @Transactional
+  public void useCoupon(Long couponId, Long userId) {
+    UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId);
+
+    if (userCoupon == null) {
+      throw new PromotionException(PromotionErrorCode.USER_COUPON_NOT_FOUND);
+    }
+
+    if (userCoupon.getIsUsed()) {
+      throw new PromotionException(PromotionErrorCode.COUPON_ALREADY_USED);
+    }
+
+    userCoupon.updateIsUsed(true);
+  }
+
+  @Transactional
+  public void refundCoupon(Long couponId, Long userId) {
+    UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId);
+
+    if (userCoupon == null) {
+      throw new PromotionException(PromotionErrorCode.USER_COUPON_NOT_FOUND);
+    }
+
+    if (!userCoupon.getIsUsed()) {
+      throw new PromotionException(PromotionErrorCode.COUPON_NOT_USED);
+    }
+
+    userCoupon.updateIsUsed(false);
   }
 
 }
