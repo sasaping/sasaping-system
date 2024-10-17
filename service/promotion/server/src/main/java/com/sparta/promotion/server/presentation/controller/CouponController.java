@@ -48,4 +48,10 @@ public class CouponController {
     return ApiResponse.ok(couponService.getCouponList(pageable));
   }
 
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @GetMapping("/{couponId}")
+  public ApiResponse<CouponResponse.Get> getCoupon(@PathVariable(name = "couponId") Long couponId) {
+    return ApiResponse.ok(couponService.getCoupon(couponId));
+  }
+
 }

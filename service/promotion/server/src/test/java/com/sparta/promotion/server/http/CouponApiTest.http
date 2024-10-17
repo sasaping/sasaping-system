@@ -39,3 +39,7 @@ Authorization: {{access_token}}
 ### 쿠폰 전체 조회
 GET http://localhost:{{Port}}/api/coupons
 Authorization: {{access_token}}
+
+### 쿠폰 단일 조회
+GET http://localhost:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}

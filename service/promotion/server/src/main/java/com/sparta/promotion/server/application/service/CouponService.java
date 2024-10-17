@@ -54,4 +54,10 @@ public class CouponService {
     return coupons.map(CouponResponse.Get::of);
   }
 
+  public CouponResponse.Get getCoupon(Long couponId) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    return CouponResponse.Get.of(coupon);
+  }
+
 }

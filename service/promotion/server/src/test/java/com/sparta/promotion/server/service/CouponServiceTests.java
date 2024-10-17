@@ -199,4 +199,40 @@ class CouponServiceTests {
     verify(couponRepository).findAll(pageable);
   }
 
+  @Test
+  void test_단일_쿠폰_조회_성공() {
+    // given
+    Long couponId = 1L;
+    Coupon coupon = new Coupon(couponId, "Test Coupon", CouponType.EVENT, DiscountType.PRICE,
+        new BigDecimal("1000.00"), null, null, 100,
+        Timestamp.valueOf("2024-01-01 00:00:00"), Timestamp.valueOf("2024-12-31 23:59:59"),
+        null, null);
+
+    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+
+    // when
+    CouponResponse.Get response = couponService.getCoupon(couponId);
+
+    // then
+    assertEquals(couponId, response.getCouponId());
+    assertEquals("Test Coupon", response.getName());
+    verify(couponRepository).findById(couponId);
+  }
+
+  @Test
+  void test_단일_쿠폰_조회_실패() {
+    // given
+    Long couponId = 100L;
+
+    when(couponRepository.findById(couponId)).thenReturn(Optional.empty());
+
+    // when & then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.getCoupon(couponId);
+    });
+
+    assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+    verify(couponRepository).findById(couponId);
+  }
+
 }
