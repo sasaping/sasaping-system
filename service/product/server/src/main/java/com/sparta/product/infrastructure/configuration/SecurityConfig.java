@@ -32,10 +32,14 @@ public class SecurityConfig {
         .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
-                authorize.requestMatchers("/internal/**").permitAll().anyRequest().authenticated())
+                authorize.
+                    requestMatchers("/internal/**").permitAll().
+                    requestMatchers("/api/products/search/**").permitAll().
+                    anyRequest().authenticated())
         .addFilterAfter(
             new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
+
 }

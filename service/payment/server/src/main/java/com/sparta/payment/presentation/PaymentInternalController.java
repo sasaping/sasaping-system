@@ -18,9 +18,9 @@ public class PaymentInternalController {
 
   private final PaymentService paymentService;
 
-  @PostMapping("/")
-  public PaymentResponse.Create createPayment(@RequestBody PaymentRequest.Create createRequest) {
-    return paymentService.createPayment(createRequest);
+  @PostMapping("")
+  public void createPayment(@RequestBody PaymentRequest.Create createRequest) {
+    paymentService.createPayment(createRequest);
   }
 
   @PostMapping("/cancel")

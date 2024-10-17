@@ -36,7 +36,8 @@ class UserServiceTests {
   void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("existinguser", "password123", "nickname", BigDecimal.ZERO,
+        new UserRequest.Create("existinguser", "password123", "test@email.com", "nickname",
+            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
@@ -54,7 +55,8 @@ class UserServiceTests {
   void test_회원가입() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("newuser", "password123", "nickname", BigDecimal.ZERO,
+        new UserRequest.Create("newuser", "password123", "test@email.com", "nickname",
+            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
@@ -77,6 +79,7 @@ class UserServiceTests {
     User savedUser = userCaptor.getValue();
     assertEquals("newuser", savedUser.getUsername());
     assertEquals("nickname", savedUser.getNickname());
+    assertEquals("test@email.com", savedUser.getEmail());
     assertEquals(BigDecimal.ZERO, savedUser.getPoint());
     assertEquals(UserRole.ROLE_ADMIN, savedUser.getRole());
   }
@@ -100,7 +103,8 @@ class UserServiceTests {
     // Arrange
     String username = "existinguser";
     UserRequest.Create request =
-        new UserRequest.Create(username, "password123", "nickname", BigDecimal.ZERO,
+        new UserRequest.Create(username, "password123", "nickname", "test@email.com",
+            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");

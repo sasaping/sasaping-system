@@ -1,7 +1,7 @@
 package com.sparta.product.presentation.controller;
 
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.product.application.CategoryService;
+import com.sparta.product.application.category.CategoryService;
 import com.sparta.product.presentation.request.CategoryCreateRequest;
 import com.sparta.product.presentation.request.CategoryUpdateRequest;
 import com.sparta.product.presentation.response.CategoryResponse;

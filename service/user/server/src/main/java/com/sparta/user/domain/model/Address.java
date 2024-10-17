@@ -64,4 +64,13 @@ public class Address extends BaseEntity {
         .build();
   }
 
+  public void update(AddressRequest.Update request) {
+    this.alias = request.getAlias();
+    this.recipient = request.getRecipient();
+    this.phoneNumber = request.getPhoneNumber();
+    this.zipcode = request.getZipcode();
+    this.address = request.getAddress();
+    this.isDefault = request.getIsDefault();
+  }
+
 }
