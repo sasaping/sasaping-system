@@ -8,26 +8,34 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
+import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 class UserServiceTests {
 
   @MockBean
   private UserRepository userRepository;
+
+  @MockBean
+  private PasswordEncoder passwordEncoder;
 
   @Autowired
   private UserService userService;
@@ -37,7 +45,6 @@ class UserServiceTests {
     // Arrange
     UserRequest.Create request =
         new UserRequest.Create("existinguser", "password123", "test@email.com", "nickname",
-            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
@@ -56,7 +63,6 @@ class UserServiceTests {
     // Arrange
     UserRequest.Create request =
         new UserRequest.Create("newuser", "password123", "test@email.com", "nickname",
-            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
@@ -104,7 +110,6 @@ class UserServiceTests {
     String username = "existinguser";
     UserRequest.Create request =
         new UserRequest.Create(username, "password123", "nickname", "test@email.com",
-            BigDecimal.ZERO,
             UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");
@@ -120,6 +125,144 @@ class UserServiceTests {
     assertEquals(UserRole.ROLE_ADMIN.name(), userDto.getRole());
 
     verify(userRepository, times(1)).findByUsername(username);
+  }
+
+  @Test
+  void test_단일_유저_조회_성공() {
+    // Arrange
+    Long userId = 1L;
+    UserRequest.Create request =
+        new UserRequest.Create("testUser", "password123", "nickname", "test@email.com",
+            UserRole.ROLE_ADMIN);
+
+    User newUser = User.create(request, "password123");
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+
+    // Act
+    UserResponse.Info result = userService.getUserById(userId);
+
+    // Assert
+    assertEquals("testUser", result.getUsername());
+    assertEquals(UserRole.ROLE_ADMIN.name(), result.getRole());
+    assertEquals(BigDecimal.ZERO, result.getPoint());
+
+    verify(userRepository, times(1)).findById(userId);
+  }
+
+  @Test
+  void test_단일_유저_조회_실패() {
+    // Arrange
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // Act & Assert
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getUserById(userId));
+    assertEquals("사용자를 찾을 수 없습니다.", exception.getMessage());
+
+    verify(userRepository, times(1)).findById(userId);
+  }
+
+  @Test
+  void test_전체_사용자_조회() {
+    // given
+    UserRequest.Create userRequest1 = new UserRequest.Create(
+        "username1", "password", "test1@test.com", "nickname1", UserRole.ROLE_USER
+    );
+    UserRequest.Create userRequest2 = new UserRequest.Create(
+        "username2", "password", "test2@test.com", "nickname2", UserRole.ROLE_ADMIN
+    );
+
+    List<User> userList = Arrays.asList(
+        User.create(userRequest1, "password"),
+        User.create(userRequest2, "password")
+    );
+
+    // when
+    when(userRepository.findAllByIsDeletedFalse()).thenReturn(userList);
+
+    // then
+    List<UserResponse.Info> result = userService.getUserList();
+    assertEquals(2, result.size());
+    verify(userRepository, times(1)).findAllByIsDeletedFalse();
+  }
+
+  @Test
+  void test_비밀번호_업데이트_성공() {
+    // given
+    Long userId = 1L;
+    UserRequest.Create request = new UserRequest.Create(
+        "username1", "password", "test@test.com", "nickname1", UserRole.ROLE_USER
+    );
+    User newUser = User.create(request, "password123");
+    UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
+        "password123", "password"
+    );
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+    when(passwordEncoder.matches(updatePassword.getCurrentPassword(),
+        newUser.getPassword())).thenReturn(true);
+    when(passwordEncoder.encode(updatePassword.getUpdatePassword())).thenReturn("password456");
+
+    // then
+    userService.updateUserPassword(userId, updatePassword);
+
+    assertEquals("password456", newUser.getPassword());
+  }
+
+  @Test
+  void test_비밀번호_업데이트_실패_잘못된_현재_비밀번호() {
+    // given
+    Long userId = 1L;
+    UserRequest.Create request = new UserRequest.Create(
+        "username1", "password", "test@test.com", "nickname1", UserRole.ROLE_USER
+    );
+    User newUser = User.create(request, "password123");
+    UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
+        "wrongCurrentPassword", "password"
+    );
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(newUser));
+    when(passwordEncoder.matches(updatePassword.getCurrentPassword(),
+        newUser.getPassword())).thenReturn(false);
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.updateUserPassword(userId, updatePassword));
+    assertEquals(UserErrorCode.INVAILD_PASSWORD.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void test_유저_삭제_성공() {
+    // given
+    Long userId = 1L;
+    User user = new User();
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+    // when & then
+    userService.deleteUser(userId);
+
+    // verify
+    verify(userRepository).findById(userId);
+  }
+
+  @Test
+  void test_유저_삭제_실패_유저없음() {
+    // given
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // when & then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.deleteUser(userId));
+
+    assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+
+    // verify
+    verify(userRepository).findById(userId);
   }
 
 }
