@@ -1,6 +1,5 @@
 package com.sparta.order.server.application.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.order.server.domain.model.Order;
 import com.sparta.order.server.domain.model.OrderProduct;
 import com.sparta.order.server.domain.model.vo.OrderState;
@@ -11,7 +10,8 @@ import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
-import com.sparta.order.server.infrastructure.event.PaymentCompletedEvent;
+import com.sparta.order.server.presentation.dto.OrderDto.MyOrderGetResponse;
+import com.sparta.order.server.presentation.dto.OrderDto.MyOrderProductResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductResponse;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
@@ -20,12 +20,15 @@ import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,6 +86,44 @@ public class OrderService {
     return orderId;
   }
 
+  public OrderGetResponse getOrder(Long userId, Long orderId) {
+    UserDto user = userClient.getUser(userId);
+    Order order = validateOrderExists(orderId);
+    order.validateOrderPermission(user);
+
+    final List<OrderProductResponse> orderProductResponses = getOrderProductResponses(order);
+    final PaymentInternalDto.Get payment = paymentClient.getPayment(orderId);
+
+    return OrderGetResponse.from(order, orderProductResponses, payment);
+  }
+
+  public Page<MyOrderGetResponse> getMyOrder(Pageable pageable, Long userId, String keyword) {
+    UserDto user = userClient.getUser(userId);
+    Page<Order> orders = orderRepository.myOrderFind(pageable, userId, keyword);
+
+    List<MyOrderGetResponse> responses = new ArrayList<>();
+    orders.forEach(
+        order -> responses.add(MyOrderGetResponse.from(order, getMyOrderProductResponses(order))));
+
+    return new PageImpl<>(responses, pageable, orders.getTotalElements());
+  }
+
+  public Order validateOrderExists(Long orderId) {
+    return orderRepository.findById(orderId).orElseThrow(
+        () -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND)
+    );
+  }
+
+  private List<OrderProductResponse> getOrderProductResponses(Order order) {
+    final List<OrderProduct> orderProducts = order.getOrderProducts();
+    return orderProducts.stream().map(OrderProductResponse::fromEntity).toList();
+  }
+
+  private List<MyOrderProductResponse> getMyOrderProductResponses(Order order) {
+    final List<OrderProduct> orderProducts = order.getOrderProducts();
+    return orderProducts.stream().map(MyOrderProductResponse::fromEntity).toList();
+  }
+
   private void refundPoint(Long userId, Long orderId, BigDecimal pointPrice) {
     PointHistoryDto pointHistory = new PointHistoryDto(userId, orderId, pointPrice
         , POINT_HISTORY_TYPE_REFUND, POINT_DESCRIPTION_ORDER_CANCEL);
@@ -100,51 +141,6 @@ public class OrderService {
   private void cancelPayment(Long orderId) {
     PaymentInternalDto.Cancel paymentCancel = new Cancel(orderId, CANCEL_REASON);
     paymentClient.cancelPayment(paymentCancel);
-  }
-
-
-  @Transactional
-  @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
-  public void handlePaymentCompletedEvent(String event) {
-    try {
-      ObjectMapper objectMapper = new ObjectMapper();
-      PaymentCompletedEvent paymentCompletedEvent = objectMapper.readValue(event,
-          PaymentCompletedEvent.class);
-      Boolean success = paymentCompletedEvent.getSuccess();
-      if (success) {
-        log.info("===== 결제 성공 =====");
-        // TODO : 재고 차감 로직
-        Order order = validateOrderExists(paymentCompletedEvent.getOrderId());
-        order.complete();
-        order.setPaymentId(paymentCompletedEvent.getPaymentId());
-      } else {
-        cancelOrder(paymentCompletedEvent.getUserId(), paymentCompletedEvent.getOrderId());
-      }
-
-    } catch (Exception e) {
-      log.error(e.getMessage());
-      throw new OrderException(OrderErrorCode.EVENT_PROCESSING_FAILED);
-    }
-  }
-
-  public OrderGetResponse getOrder(Long userId, Long orderId) {
-    UserDto user = userClient.getUser(userId);
-    Order order = validateOrderExists(orderId);
-
-    order.validateOrderPermission(user);
-
-    final List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
-    final List<OrderProductResponse> orderProductResponses = orderProducts.stream().map(
-        OrderProductResponse::fromEntity).toList();
-    final PaymentInternalDto.Get payment = paymentClient.getPayment(orderId);
-
-    return OrderGetResponse.from(order, orderProductResponses, payment);
-  }
-
-  private Order validateOrderExists(Long orderId) {
-    return orderRepository.findById(orderId).orElseThrow(
-        () -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND)
-    );
   }
 
 

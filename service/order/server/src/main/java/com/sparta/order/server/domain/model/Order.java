@@ -18,11 +18,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -98,6 +100,14 @@ public class Order extends BaseEntity {
 
   @Column(nullable = false, length = 255)
   private String shippingAddress;
+
+  @OneToMany(mappedBy = "order")
+  @Builder.Default
+  private List<OrderProduct> orderProducts = new ArrayList<>();
+
+  public void addOrderProduct(OrderProduct orderProduct) {
+    orderProducts.add(orderProduct);
+  }
 
   public void cancel() {
     state = OrderState.CANCELED;
@@ -195,7 +205,7 @@ public class Order extends BaseEntity {
   }
 
   public void validateOrderPermission(UserDto user) {
-    if (!this.userId.equals(user.getUserId()) || user.getRole()
+    if (!this.userId.equals(user.getUserId()) && user.getRole()
         .equals(UserRole.ROLE_USER.name())) {
       throw new OrderException(OrderErrorCode.ORDER_PERMISSION_DENIED);
     }

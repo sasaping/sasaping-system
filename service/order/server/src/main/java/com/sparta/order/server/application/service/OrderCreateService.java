@@ -164,6 +164,7 @@ public class OrderCreateService {
         couponDto,
         order
     );
+    order.addOrderProduct(orderProduct);
     orderProductRepository.save(orderProduct);
   }
 
