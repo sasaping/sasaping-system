@@ -105,7 +105,7 @@ public class OrderCreateService {
                   productNames.get(productInfo.getProductId()), order));
 
       cartService.orderCartProduct(userId, productQuantities);
-      payment(userId, order, request.getUserEmail());
+      payment(userId, order, user.getEmail());
       return savedOrderId;
 
     } catch (FeignClientException | OrderException e) {

@@ -21,8 +21,7 @@ public class PreOrderMapper {
 
   public static OrderCreateRequest toDto(String productId, Long addressId) {
     OrderProductInfo orderProduct = new OrderProductInfo(productId, 1, null);
-    return new OrderCreateRequest("PREORDER", List.of(orderProduct), null, addressId,
-        "linavely99@gamil.com");
+    return new OrderCreateRequest("PREORDER", List.of(orderProduct), null, addressId);
   }
 
 }

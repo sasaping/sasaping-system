@@ -16,6 +16,5 @@ public class OrderCreateRequest {
   private List<OrderProductInfo> orderProductInfos = new ArrayList<>();
   private BigDecimal pointPrice;
   private Long addressId;
-  private String userEmail;
 
 }

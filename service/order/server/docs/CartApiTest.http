@@ -6,8 +6,8 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "productId": "800504d0-be21-450e-8598-0dc3d382d7ea",
-  "quantity": 3
+  "productId": "920164fe-8906-4a51-a6b8-1683277d09b2",
+  "quantity": 10
 }
 
 ### 장바구니 상품 조회

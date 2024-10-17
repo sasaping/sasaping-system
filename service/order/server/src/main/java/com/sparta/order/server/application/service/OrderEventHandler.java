@@ -18,7 +18,6 @@ public class OrderEventHandler {
 
   private final OrderService orderService;
 
-
   @Transactional
   @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
   public void handlePaymentCompletedEvent(String event) {
@@ -33,6 +32,7 @@ public class OrderEventHandler {
         order.complete();
         order.setPaymentId(paymentCompletedEvent.getPaymentId());
       } else {
+        log.info("===== 결제 실패 =====");
         orderService.cancelOrder(paymentCompletedEvent.getUserId(),
             paymentCompletedEvent.getOrderId());
       }
