@@ -1,6 +1,7 @@
 package com.sparta.user.presentation.request;
 
 import com.sparta.user.domain.model.vo.UserRole;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,10 @@ public class UserRequest {
         message = "비밀번호는 8자 이상, 15자 이하의 알파벳 대소문자, 숫자 및 특수문자(_#$%^!-)만 허용됩니다.")
     @NotBlank(message = "비밀번호는 비어 있을 수 없습니다.")
     private String password;
+
+    @Email(message = "이메일 형식이 유효하지 않습니다.")
+    @NotBlank(message = "이메일은 비어 있을 수 없습니다.")
+    private String email;
 
     @NotBlank(message = "닉네임은 비어 있을 수 없습니다.")
     private String nickname;

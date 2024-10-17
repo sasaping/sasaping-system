@@ -21,6 +21,7 @@ import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.AddressRequest;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class AddressServiceTest {
   void test_배송지_생성() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
 
@@ -95,7 +96,7 @@ public class AddressServiceTest {
   void test_배송지_단일_조회_성공() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
 
@@ -144,7 +145,7 @@ public class AddressServiceTest {
     // given
     Long userId = 1L;
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
 
@@ -182,7 +183,7 @@ public class AddressServiceTest {
   void test_전체_배송지_조회() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
 
@@ -220,7 +221,7 @@ public class AddressServiceTest {
     Long userId = 1L;
     Long addressId = 1L;
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     Address address = Address.create(user, new AddressRequest.Create(
@@ -265,7 +266,7 @@ public class AddressServiceTest {
     Long addressId = 1L;
 
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     Address address = Address.create(user, new AddressRequest.Create(
