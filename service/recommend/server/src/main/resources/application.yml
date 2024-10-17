@@ -1,0 +1,14 @@
+server:
+  port: 19019
+
+spring:
+  application:
+    name: recommend
+  profiles:
+    include: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
