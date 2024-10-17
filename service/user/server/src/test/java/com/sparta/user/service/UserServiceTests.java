@@ -8,14 +8,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.UserRepository;
+import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -40,7 +44,8 @@ class UserServiceTests {
   void test_회원가입_시_존재하는_유저인지_확인() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("existinguser", "password123", "test@email.com", "nickname", UserRole.ROLE_ADMIN);
+        new UserRequest.Create("existinguser", "password123", "test@email.com", "nickname",
+            UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(new User()));
 
@@ -57,7 +62,8 @@ class UserServiceTests {
   void test_회원가입() {
     // Arrange
     UserRequest.Create request =
-        new UserRequest.Create("newuser", "password123", "test@email.com", "nickname", UserRole.ROLE_ADMIN);
+        new UserRequest.Create("newuser", "password123", "test@email.com", "nickname",
+            UserRole.ROLE_ADMIN);
 
     when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
 
@@ -103,7 +109,8 @@ class UserServiceTests {
     // Arrange
     String username = "existinguser";
     UserRequest.Create request =
-        new UserRequest.Create(username, "password123", "nickname", "test@email.com", UserRole.ROLE_ADMIN);
+        new UserRequest.Create(username, "password123", "nickname", "test@email.com",
+            UserRole.ROLE_ADMIN);
 
     User existingUser = User.create(request, "password123");
 
@@ -125,7 +132,8 @@ class UserServiceTests {
     // Arrange
     Long userId = 1L;
     UserRequest.Create request =
-        new UserRequest.Create("testuser", "password123", "nickname", UserRole.ROLE_ADMIN);
+        new UserRequest.Create("testUser", "password123", "nickname", "test@email.com",
+            UserRole.ROLE_ADMIN);
 
     User newUser = User.create(request, "password123");
 
@@ -135,7 +143,7 @@ class UserServiceTests {
     UserResponse.Info result = userService.getUserById(userId);
 
     // Assert
-    assertEquals("testuser", result.getUsername());
+    assertEquals("testUser", result.getUsername());
     assertEquals(UserRole.ROLE_ADMIN.name(), result.getRole());
     assertEquals(BigDecimal.ZERO, result.getPoint());
 
@@ -160,10 +168,10 @@ class UserServiceTests {
   void test_전체_사용자_조회() {
     // given
     UserRequest.Create userRequest1 = new UserRequest.Create(
-        "username1", "password", "nickname1", UserRole.ROLE_USER
+        "username1", "password", "test1@test.com", "nickname1", UserRole.ROLE_USER
     );
     UserRequest.Create userRequest2 = new UserRequest.Create(
-        "username2", "password", "nickname2", UserRole.ROLE_ADMIN
+        "username2", "password", "test2@test.com", "nickname2", UserRole.ROLE_ADMIN
     );
 
     List<User> userList = Arrays.asList(
@@ -185,7 +193,7 @@ class UserServiceTests {
     // given
     Long userId = 1L;
     UserRequest.Create request = new UserRequest.Create(
-        "username1", "password", "nickname1", UserRole.ROLE_USER
+        "username1", "password", "test@test.com", "nickname1", UserRole.ROLE_USER
     );
     User newUser = User.create(request, "password123");
     UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
@@ -209,7 +217,7 @@ class UserServiceTests {
     // given
     Long userId = 1L;
     UserRequest.Create request = new UserRequest.Create(
-        "username1", "password", "nickname1", UserRole.ROLE_USER
+        "username1", "password", "test@test.com", "nickname1", UserRole.ROLE_USER
     );
     User newUser = User.create(request, "password123");
     UserRequest.UpdatePassword updatePassword = new UserRequest.UpdatePassword(
