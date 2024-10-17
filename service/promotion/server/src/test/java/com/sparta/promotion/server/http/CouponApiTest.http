@@ -1,10 +1,21 @@
 @Port=19091
-@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjo4LCJVU0VSX1JPTEUiOiJST0xFX0NVU1RPTUVSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg0ODc3MjQsImV4cCI6MTczMjA4NzcyNH0.txZBawu2pGD2rZUj-oHbCfUhf7WNatjQX3e-2v3cRXY
+
+### 로그인
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newuser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token", "Bearer " + response.body.data.token);
+%}
 
 ### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
-Authorization: {{Token}}
+Authorization: {{access_token}}
 
 {
   "name": "Test Coupon",
@@ -23,4 +34,8 @@ Authorization: {{Token}}
 ### 이벤트 쿠폰 발급
 @couponId = 1
 POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}
-Authorization: {{Token}}
+Authorization: {{access_token}}
+
+### 쿠폰 전체 조회
+GET http://localhost:{{Port}}/api/coupons
+Authorization: {{access_token}}

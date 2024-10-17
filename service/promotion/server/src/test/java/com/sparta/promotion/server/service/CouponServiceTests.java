@@ -19,14 +19,20 @@ import com.sparta.promotion.server.domain.repository.UserCouponRepository;
 import com.sparta.promotion.server.exception.PromotionErrorCode;
 import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
+import com.sparta.promotion.server.presentation.response.CouponResponse;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 // TODO(경민): 이벤트 테이블 생성 후 테스트 로직 수정 필요
 @SpringBootTest
@@ -161,6 +167,36 @@ class CouponServiceTests {
     assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
     verify(couponRepository).findById(couponId);
     verify(userCouponRepository, never()).save(any(UserCoupon.class)); // 저장이 일어나지 않음
+  }
+
+  @Test
+  void test_쿠폰_전체_조회() {
+    // given
+    Coupon coupon1 = new Coupon(1L, "Coupon 1", CouponType.EVENT, DiscountType.PERCENTAGE,
+        new BigDecimal("10.00"), new BigDecimal("100.00"), new BigDecimal("500.00"), 100,
+        Timestamp.valueOf("2024-01-01 00:00:00"), Timestamp.valueOf("2024-12-31 23:59:59"),
+        null, null);
+
+    Coupon coupon2 = new Coupon(2L, "Coupon 2", CouponType.EVENT, DiscountType.PRICE,
+        new BigDecimal("500.00"), null, null, 50,
+        Timestamp.valueOf("2024-02-01 00:00:00"), Timestamp.valueOf("2024-12-31 23:59:59"),
+        "VIP", 2L);
+
+    List<Coupon> coupons = List.of(coupon1, coupon2);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Coupon> couponPage = new PageImpl<>(coupons, pageable, coupons.size());
+
+    when(couponRepository.findAll(pageable)).thenReturn(couponPage);
+
+    // when
+    Page<CouponResponse.Get> responsePage = couponService.getCouponList(pageable);
+
+    // then
+    assertEquals(2, responsePage.getTotalElements());
+    assertEquals("Coupon 1", responsePage.getContent().get(0).getName());
+    assertEquals("Coupon 2", responsePage.getContent().get(1).getName());
+
+    verify(couponRepository).findAll(pageable);
   }
 
 }

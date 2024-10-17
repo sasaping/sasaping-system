@@ -7,7 +7,10 @@ import com.sparta.promotion.server.domain.repository.UserCouponRepository;
 import com.sparta.promotion.server.exception.PromotionErrorCode;
 import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
+import com.sparta.promotion.server.presentation.response.CouponResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +47,11 @@ public class CouponService {
     }
     coupon.updateQuantity(coupon.getQuantity() - 1);
     userCouponRepository.save(UserCoupon.create(userId, couponId));
+  }
+
+  public Page<CouponResponse.Get> getCouponList(Pageable pageable) {
+    Page<Coupon> coupons = couponRepository.findAll(pageable);
+    return coupons.map(CouponResponse.Get::of);
   }
 
 }

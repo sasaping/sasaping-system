@@ -4,9 +4,14 @@ import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.promotion.server.application.service.CouponService;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
+import com.sparta.promotion.server.presentation.response.CouponResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +25,14 @@ public class CouponController {
 
   private final CouponService couponService;
 
+  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
   @PostMapping("/event")
   public ApiResponse<?> createEventCoupon(@RequestBody @Valid CouponRequest.Create request) {
     couponService.createEventCoupon(request);
     return ApiResponse.ok();
   }
 
+  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
   @PostMapping("/event/{couponId}")
   public ApiResponse<?> provideEventCoupon(
       @PathVariable(name = "couponId") Long couponId,
@@ -33,6 +40,12 @@ public class CouponController {
   ) {
     couponService.provideEventCoupon(claim.getUserId(), couponId);
     return ApiResponse.ok();
+  }
+
+  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @GetMapping
+  public ApiResponse<Page<CouponResponse.Get>> getCouponList(Pageable pageable) {
+    return ApiResponse.ok(couponService.getCouponList(pageable));
   }
 
 }
