@@ -6,9 +6,10 @@ POST http://localhost:{{Port}}/api/users/sign-up
 Content-Type: application/json
 
 {
-  "username": "newUser",
+  "username": "newUser4",
   "password": "password123",
-  "nickname": "nickname",
+  "nickname": "nickname4",
+  "email": "newemail@email.com",
   "point": 0,
   "role": "관리자"
 }

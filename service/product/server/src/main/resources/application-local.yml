@@ -1,0 +1,60 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+
+  cassandra:
+    contact-points: 127.0.0.1
+    port: 9042
+    keyspace-name: product
+    schema-action: create_if_not_exists
+    local-datacenter: datacenter01
+
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  elasticsearch:
+    rest:
+      host: localhost
+      port: 9200
+      uris: http://localhost:9200
+    fingerprint: 2B:EA:5D:9B:EB:E8:B0:D9:70:42:CE:CC:5E:53:24:EE:60:AC:91:CB:9C:D1:C8:B1:9F:75:19:9E:A4:23:D5:DD
+    account: elastic
+    password: elastic-password
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    listener:
+      ack-mode: MANUAL
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
+product:
+  search-index: "sasaping-ecommerce-products"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/

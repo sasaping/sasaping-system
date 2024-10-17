@@ -48,7 +48,29 @@ public class UserService {
         userRepository
             .findByUsername(username)
             .orElseThrow(() -> new UserException(USER_NOT_FOUND));
-    return new UserDto(user.getId(), user.getUsername(), user.getPassword(), user.getRole().name());
+    return new UserDto(
+        user.getId(),
+        user.getUsername(),
+        user.getPassword(),
+        user.getEmail(),
+        user.getRole().name(),
+        user.getPoint()
+    );
+  }
+
+  public UserDto getUserByUserId(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return new UserDto(
+        user.getId(),
+        user.getUsername(),
+        user.getPassword(),
+        user.getEmail(),
+        user.getRole().name(),
+        user.getPoint()
+    );
   }
 
 }

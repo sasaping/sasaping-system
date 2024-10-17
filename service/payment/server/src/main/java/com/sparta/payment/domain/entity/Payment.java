@@ -1,6 +1,6 @@
 package com.sparta.payment.domain.entity;
 
-import com.sparta.payment.application.dto.PaymentRequest;
+import com.sparta.payment.presentation.dto.PaymentRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

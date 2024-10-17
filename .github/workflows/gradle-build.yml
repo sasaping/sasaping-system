@@ -3,24 +3,43 @@ name: CI with Gradle
 on:
   pull_request:
     branches: [ dev ]
+  push:
+    branches: [ dev ]
 
 permissions:
   contents: read
 
+env:
+  ECR_NAMESPACE: sasaping
+  STACK_VERSION: 8.6.0
+  CLUSTER_NAME: docker-cluster
+  LICENSE: basic
+  ES_PORT: 9200
+  KIBANA_PORT: 5601
+  MEM_LIMIT: 1073741824
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     permissions: write-all
+    strategy:
+      matrix:
+        service: [ eureka, user, auth, gateway, notification, order, payment, product, slack, promotion, search ]
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -31,25 +50,128 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Execute Gradle build for all modules
+      - name: Build with Gradle
+        run: ./gradlew clean build -p ./service/${{ matrix.service }}/server -D spring.profiles.active=prod -x test
+
+      - name: Check if JAR file exists
         run: |
-          set -e  # 오류 발생 시 스크립트 종료
-          
-          # 모든 모듈을 찾습니다. (build.gradle 파일이 있는 디렉토리)
-          MODULES=$(find ./service -type f \( -name "build.gradle" \) -exec dirname {} \; | sort -u)
-          
-          echo "Modules to build:"
-          echo "$MODULES"
-          
-          # 각 모듈에 대해 순차적으로 빌드
-          for folder in $MODULES; do
-            echo "----------------------------"
-            echo "Building in $folder..."
-          
-            if [ -f "$folder/build.gradle" ]; then
-              echo "Building Gradle project in $folder..."
-              ./gradlew -p "$folder" build -x test
-            else
-              echo "Skipping $folder: build.gradle not found."
-            fi
-          done
+          if [ ! -f ./service/${{ matrix.service }}/server/build/libs/*SNAPSHOT.jar ]; then
+            echo "JAR file not found!"
+            exit 1
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: '${{ matrix.service }}-artifact'
+          path: './service/${{ matrix.service }}/server/build/libs/*SNAPSHOT.jar'
+
+  Docker:
+    name: Build docker image and Push to registry
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # Push 이벤트일 때만 실행
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 모든 아티팩트를 다운로드합니다.
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: './service'
+
+      # AWS ECR 에 이미지 업로드 권한을 얻기 위해 인증을 진행합니다.
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 로그인
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Grant execute permission for dockerTagAndPush
+        run: chmod +x ./dockerTagAndPush.sh
+
+      # docker compose 를 이용해서 여러 이미지를 모두 빌드하고, 별도의 script를 사용해서 이미지를 push 합니다.
+      - name: Build, Tag and Push docker image to AWS ECR
+        run: |
+          docker compose build
+          ./dockerTagAndPush.sh
+        env:
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+
+  Deploy:
+    name: Deploy
+    needs: Docker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # Push 이벤트일 때만 실행
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # docker compose로 container를 실행하기 위해 docker-compose.yml 을 EC2로 복사합니다.
+      - name: Copy Docker compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "docker-compose.yml"
+          target: "/home/ubuntu" # target 은 디렉토리임. target directory 아래에 같은 이름의 파일로 옮겨진다.
+
+      # 사용 중인 포트를 점검하고 종료하는 script를 실행합니다.
+      - name: Upload stop-used-port script to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "stop-used-port.sh"
+          target: "/home/ubuntu"
+
+      # ssh를 통해 EC2에 접속하고 docker container를 재시작합니다.
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
+          KIBANA_PASSWORD: ${{secrets.KIBANA_PASSWORD}}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          envs: |
+            AWS_ACCESS_KEY_ID,
+            AWS_SECRET_ACCESS_KEY,
+            AWS_REGION,
+            ECR_REGISTRY,
+            ECR_NAMESPACE,
+            ELASTIC_PASSWORD,
+            KIBANA_PASSWORD, 
+            STACK_VERSION,
+            CLUSTER_NAME,
+            LICENSE,
+            ES_PORT,
+            KIBANA_PORT,
+            MEM_LIMIT
+          script: |
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            docker ps --format "{{.ID}} {{.Image}}" | grep -vE "docker.elastic.co/elasticsearch/elasticsearch:8.6.0|wurstmeister/zookeeper:latest" | awk '{print $1}' | xargs -r docker stop
+            docker container prune -f
+            docker rmi $(docker images "${ECR_REGISTRY}/${ECR_NAMESPACE}/*" -q)
+            sudo swapoff -a
+            sudo swapon -a
+            sudo chmod +x /home/ubuntu/stop-used-port.sh
+            /home/ubuntu/stop-used-port.sh
+            docker compose pull
+            docker compose up -d --no-build

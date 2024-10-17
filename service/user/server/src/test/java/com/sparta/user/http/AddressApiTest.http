@@ -1,0 +1,48 @@
+@Port=19091
+@InternalPort=19092
+@TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMCwiVVNFUl9ST0xFIjoiUk9MRV9VU0VSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg2NTUxOTgsImV4cCI6MTczMjI1NTE5OH0.o6VKKVIrBV1SNtlPCbVOWygPhcNGvmLKJsrXMvp8rgI
+@TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
+
+### (외부)배송지 등록
+POST http://localhost:{{Port}}/api/address
+Content-Type: application/json
+Authorization: {{TokenUser}}
+
+{
+  "alias": "집2",
+  "recipient": "홍길동2",
+  "phoneNumber": "010-1234-4321",
+  "zipcode": "12347",
+  "address": "서울시 강남구 테헤란로 456",
+  "isDefault": false
+}
+
+### 내 배송지 조회
+GET http://localhost:{{Port}}/api/address/me
+Authorization: {{TokenUser}}
+
+### 배송지 전체 조회(관리자)
+GET http://localhost:{{Port}}/api/address
+Authorization: {{TokenAdmin}}
+
+### 배송지 수정
+@addressId = 2
+PATCH http://localhost:{{Port}}/api/address/{{addressId}}
+Content-Type: application/json
+Authorization: {{TokenUser}}
+
+{
+  "alias": "회사",
+  "recipient": "김철수",
+  "phoneNumber": "010-9876-5432",
+  "zipcode": "54321",
+  "address": "서울시 서초구 서초대로 456",
+  "isDefault": true
+}
+
+### 배송지 삭제
+DELETE http://localhost:{{Port}}/api/address/{{addressId}}
+Authorization: {{TokenUser}}
+
+### (내부)배송지 단일 조회
+GET http://localhost:{{InternalPort}}/internal/address/{{addressId}}

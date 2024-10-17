@@ -1,0 +1,14 @@
+server:
+  port: 19021
+
+spring:
+  application:
+    name: promotion
+  profiles:
+    default: prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

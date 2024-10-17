@@ -12,8 +12,11 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,12 +45,21 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private String nickname;
 
+  @Column(unique = true, nullable = false)
+  private String email;
+
   @Column(nullable = false)
-  private Integer point;
+  private BigDecimal point;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private UserRole role;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<Address> addresses;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<PointHistory> pointHistories;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
   private UserTier userTier;
@@ -57,9 +69,14 @@ public class User extends BaseEntity {
         .username(request.getUsername())
         .password(encodedPassword)
         .nickname(request.getNickname())
+        .email(request.getEmail())
         .point(request.getPoint())
         .role(request.getRole())
         .build();
+  }
+
+  public void updatePoint(BigDecimal point) {
+    this.point = point;
   }
 
 }

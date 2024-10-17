@@ -5,13 +5,13 @@ include(':common:domain')
 include(':service:user:server')
 include(':service:user:user_dto')
 
-include(':service:product:product_server')
+include(':service:product:server')
 include(':service:product:product_dto')
 
 include(':service:payment:server')
 include(':service:payment:payment_dto')
 
-include(':service:eureka')
+include(':service:eureka:server')
 include(':service:gateway:server')
 
 include(':service:auth:server')
@@ -24,3 +24,7 @@ include(':service:notification:server')
 
 include(':service:slack:server')
 include(':service:slack:slack_dto')
+
+include(':service:promotion:server')
+
+include(':service:search:server')
