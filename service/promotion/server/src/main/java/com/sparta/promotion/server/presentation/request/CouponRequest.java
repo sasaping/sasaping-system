@@ -50,4 +50,42 @@ public class CouponRequest {
 
   }
 
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Update {
+
+    @NotNull
+    @Size(max = 100)
+    private String name;
+
+    @NotNull
+    private CouponType type;
+
+    @NotNull
+    private DiscountType discountType;
+
+    @NotNull
+    private BigDecimal discountValue;
+
+    private BigDecimal minBuyPrice;
+
+    private BigDecimal maxDiscountPrice;
+
+    @NotNull
+    private Integer quantity;
+
+    @NotNull
+    private Timestamp startDate;
+
+    @NotNull
+    private Timestamp endDate;
+
+    @Size(max = 15)
+    private String userTier;
+
+    private Long eventId;
+
+  }
+
 }

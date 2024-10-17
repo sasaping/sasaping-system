@@ -7,6 +7,7 @@ import com.sparta.promotion.server.domain.repository.UserCouponRepository;
 import com.sparta.promotion.server.exception.PromotionErrorCode;
 import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
+import com.sparta.promotion.server.presentation.request.CouponRequest.Update;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,13 @@ public class CouponService {
           .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
       return CouponResponse.Get.of(coupon);
     });
+  }
+
+  @Transactional
+  public void updateCoupon(Long couponId, Update request) {
+    Coupon coupon = couponRepository.findById(couponId)
+        .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+    coupon.update(request);
   }
 
 }

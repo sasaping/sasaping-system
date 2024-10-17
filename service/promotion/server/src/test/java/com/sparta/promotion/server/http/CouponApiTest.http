@@ -5,7 +5,7 @@ POST http://localhost:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser11",
+  "username": "newUser",
   "password": "password123"
 }
 > {%
@@ -52,3 +52,22 @@ Authorization: {{access_token}}
 ### 내 쿠폰 전체 조회
 GET http://localhost:{{Port}}/api/coupons/me
 Authorization: {{access_token}}
+
+### 쿠폰 수정
+PATCH localhost:{{Port}}/api/coupons/{{couponId}}
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "name": "Updated Coupon Name",
+  "type": "EVENT",
+  "discountType": "PERCENTAGE",
+  "discountValue": 10.00,
+  "minBuyPrice": 100.00,
+  "maxDiscountPrice": 50.00,
+  "quantity": 100,
+  "startDate": "2024-01-01T00:00:00",
+  "endDate": "2024-12-31T23:59:59",
+  "userTier": "GOLD",
+  "eventId": 1
+}

@@ -289,4 +289,77 @@ class CouponServiceTests {
     verify(couponRepository).findById(1L);
   }
 
+  @Test
+  void test_쿠폰_수정_성공() {
+    // given
+    Long couponId = 1L;
+    CouponRequest.Update updateRequest = new CouponRequest.Update(
+        "Updated Coupon Name",
+        CouponType.EVENT,
+        DiscountType.PERCENTAGE,
+        new BigDecimal("10.00"),
+        new BigDecimal("100.00"),
+        new BigDecimal("50.00"),
+        100,
+        Timestamp.valueOf("2024-01-01 00:00:00"),
+        Timestamp.valueOf("2024-12-31 23:59:59"),
+        "GOLD",
+        1L
+    );
+
+    Coupon coupon = new Coupon(1L, "Test Coupon", CouponType.EVENT, DiscountType.PRICE,
+        new BigDecimal("1000.00"), null, null, 100,
+        Timestamp.valueOf("2024-01-01 00:00:00"), Timestamp.valueOf("2024-12-31 23:59:59"),
+        null, null);
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+
+    // then
+    couponService.updateCoupon(couponId, updateRequest);
+
+    assertEquals("Updated Coupon Name", coupon.getName());
+    assertEquals(CouponType.EVENT, coupon.getType());
+    assertEquals(DiscountType.PERCENTAGE, coupon.getDiscountType());
+    assertEquals(new BigDecimal("10.00"), coupon.getDiscountValue());
+    assertEquals(new BigDecimal("100.00"), coupon.getMinBuyPrice());
+    assertEquals(new BigDecimal("50.00"), coupon.getMaxDiscountPrice());
+    assertEquals(100, coupon.getQuantity());
+    assertEquals(Timestamp.valueOf("2024-01-01 00:00:00"), coupon.getStartDate());
+    assertEquals(Timestamp.valueOf("2024-12-31 23:59:59"), coupon.getEndDate());
+    assertEquals("GOLD", coupon.getUserTier());
+    assertEquals(1L, coupon.getEventId());
+
+    verify(couponRepository).findById(couponId);
+  }
+
+  @Test
+  void test_쿠폰_수정_실패_쿠폰없음() {
+    // given
+    Long couponId = 1L;
+
+    CouponRequest.Update updateRequest = new CouponRequest.Update(
+        "Updated Coupon Name",
+        CouponType.EVENT,
+        DiscountType.PERCENTAGE,
+        new BigDecimal("10.00"),
+        new BigDecimal("100.00"),
+        new BigDecimal("50.00"),
+        100,
+        Timestamp.valueOf("2024-01-01 00:00:00"),
+        Timestamp.valueOf("2024-12-31 23:59:59"),
+        "GOLD",
+        1L
+    );
+    // when
+    when(couponRepository.findById(couponId)).thenReturn(Optional.empty());
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.updateCoupon(couponId, updateRequest);
+    });
+
+    assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+    verify(couponRepository).findById(couponId);  // 쿠폰이 조회되었는지 확인
+  }
+
 }

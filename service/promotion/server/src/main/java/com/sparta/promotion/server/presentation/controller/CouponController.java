@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,6 +67,16 @@ public class CouponController {
   public ApiResponse<Page<CouponResponse.Get>> getCouponListByUser(
       @AuthenticationPrincipal JwtClaim jwtClaim, Pageable pageable) {
     return ApiResponse.ok(couponService.getCouponListBoyUserId(jwtClaim.getUserId(), pageable));
+  }
+
+  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @PatchMapping("/{couponId}")
+  public ApiResponse<?> updateCoupon(
+      @PathVariable(name = "couponId") Long couponId,
+      @RequestBody @Valid CouponRequest.Update request) {
+    couponService.updateCoupon(couponId, request);
+    return ApiResponse.ok();
+
   }
 
 }
