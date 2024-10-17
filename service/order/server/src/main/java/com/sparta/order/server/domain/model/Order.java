@@ -7,6 +7,8 @@ import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
 import com.sparta.product_dto.ProductDto;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
+import com.sparta.user.user_dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
 import dto.OrderCreateRequest;
 import dto.OrderProductInfo;
 import jakarta.persistence.Column;
@@ -109,6 +111,10 @@ public class Order extends BaseEntity {
     this.paymentId = paymentId;
   }
 
+  public void updateOrderState(OrderState state) {
+    this.state = state;
+  }
+
   // TODO AddressDto 추가
   public static Order createOrder(Long userId, OrderCreateRequest request,
       List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
@@ -188,8 +194,9 @@ public class Order extends BaseEntity {
     return sb.toString();
   }
 
-  public void validateOrderPermission(Long userId) {
-    if (!this.userId.equals(userId)) {
+  public void validateOrderPermission(UserDto user) {
+    if (!this.userId.equals(user.getUserId()) || user.getRole()
+        .equals(UserRole.ROLE_USER.name())) {
       throw new OrderException(OrderErrorCode.ORDER_PERMISSION_DENIED);
     }
   }

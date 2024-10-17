@@ -7,6 +7,7 @@ import com.sparta.order.server.application.service.OrderService;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
 import dto.OrderCreateRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,5 +42,15 @@ public class OrderController {
       @PathVariable(name = "orderId") Long orderId) {
     return ApiResponse.ok(orderService.getOrder(userClaim.getUserId(), orderId));
   }
+
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+  @PatchMapping("/{orderId}/{orderState}")
+  public ApiResponse<Long> updateOrderState(@AuthenticationPrincipal JwtClaim userClaim,
+      @PathVariable(name = "orderId") Long orderId,
+      @PathVariable(name = "orderState") String orderState) {
+    return ApiResponse.ok(
+        orderService.updateOrderState(userClaim.getUserId(), orderId, orderState));
+  }
+
 
 }

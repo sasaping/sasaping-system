@@ -18,6 +18,7 @@ import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto.Cancel;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
+import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class OrderService {
   public Long cancelOrder(Long userId, Long orderId) {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);
-    order.validateOrderPermission(userId);
+    order.validateOrderPermission(user);
     order.validateOrderCancel();
 
     refundPoint(userId, orderId, order.getPointPrice());
@@ -62,6 +63,26 @@ public class OrderService {
     return orderId;
   }
 
+  @Transactional
+  public Long updateOrderState(Long userId, Long orderId, String orderState) {
+    UserDto user = userClient.getUser(userId);
+
+    if (user.getRole().equals(UserRole.ROLE_USER.name())) {
+      throw new OrderException(OrderErrorCode.ORDER_PERMISSION_DENIED);
+    }
+
+    Order order = validateOrderExists(orderId);
+
+    try {
+      OrderState state = OrderState.valueOf(orderState);
+      order.updateOrderState(state);
+    } catch (IllegalArgumentException e) {
+      throw new OrderException(OrderErrorCode.ORDER_STATE_NOT_FOUND);
+    }
+
+    return orderId;
+  }
+
   private void refundPoint(Long userId, Long orderId, BigDecimal pointPrice) {
     PointHistoryDto pointHistory = new PointHistoryDto(userId, orderId, pointPrice
         , POINT_HISTORY_TYPE_REFUND, POINT_DESCRIPTION_ORDER_CANCEL);
@@ -71,7 +92,7 @@ public class OrderService {
   private void rollbackStock(Order order) {
     List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
     Map<String, Integer> orderProductQuantities = orderProducts.stream().collect(Collectors.toMap(
-        orderProduct -> orderProduct.getProductId(), orderProduct -> orderProduct.getQuantity()));
+        OrderProduct::getProductId, OrderProduct::getQuantity));
 
     productClient.rollbackStock(orderProductQuantities);
   }
@@ -80,6 +101,7 @@ public class OrderService {
     PaymentInternalDto.Cancel paymentCancel = new Cancel(orderId, CANCEL_REASON);
     paymentClient.cancelPayment(paymentCancel);
   }
+
 
   @Transactional
   @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
@@ -109,7 +131,7 @@ public class OrderService {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);
 
-    order.validateOrderPermission(userId);
+    order.validateOrderPermission(user);
 
     final List<OrderProduct> orderProducts = orderProductRepository.findByOrder(order);
     final List<OrderProductResponse> orderProductResponses = orderProducts.stream().map(
@@ -124,5 +146,6 @@ public class OrderService {
         () -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND)
     );
   }
+
 
 }
