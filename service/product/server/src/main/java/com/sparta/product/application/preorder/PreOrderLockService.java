@@ -13,7 +13,7 @@ public class PreOrderLockService {
   private final PreOrderCacheService cacheService;
   private final DistributedLockComponent lockComponent;
 
-  public void reservation(long preOrderId, long userId) {
+  public PreOrderRedisDto reservation(long preOrderId, long userId) {
     PreOrderRedisDto cachedPreOrder = cacheService.getPreOrderCache(preOrderId);
     cachedPreOrder.validateReservationDate(); // 사전예약기간인지 검증
     lockComponent.execute( // 락을 걸고
@@ -24,5 +24,6 @@ public class PreOrderLockService {
           redisService.validateQuantity(cachedPreOrder, userId); // 이미 예약에 성공한 유저인지, 수량안에 든 유저인지 검증
         });
     redisService.preOrder(getRedisKeyOfPreOrder(preOrderId), userId);
+    return cachedPreOrder;
   }
 }

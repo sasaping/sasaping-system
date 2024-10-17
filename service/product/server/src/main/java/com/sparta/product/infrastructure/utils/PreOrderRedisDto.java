@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 public record PreOrderRedisDto(
     Long preOrderId,
+    String productId,
     Integer availableQuantity,
     @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -21,6 +22,7 @@ public record PreOrderRedisDto(
   public PreOrderRedisDto(PreOrder preOrder) {
     this(
         preOrder.getPreOrderId(),
+        preOrder.getProductId().toString(),
         preOrder.getAvailableQuantity(),
         preOrder.getStartDateTime(),
         preOrder.getEndDateTime());
