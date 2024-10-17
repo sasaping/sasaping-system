@@ -23,4 +23,9 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     return jpaUserCouponRepository.findAllByUserId(userId, pageable);
   }
 
+  @Override
+  public UserCoupon findByUserIdAndCouponId(Long userId, Long couponId) {
+    return jpaUserCouponRepository.findByUserIdAndCouponId(userId, couponId);
+  }
+
 }

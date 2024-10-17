@@ -1,7 +1,9 @@
 package com.sparta.promotion.server.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -394,6 +396,118 @@ class CouponServiceTests {
     // 예외 메시지 확인
     assertThrows(PromotionException.class, () -> couponService.deleteCoupon(couponId));
     assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  public void test_쿠폰_사용_성공() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+    UserCoupon userCoupon = UserCoupon.create(userId, 1L);
+
+    //when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(userCoupon);
+
+    // then
+    couponService.useCoupon(couponId, userId);
+
+    // assert
+    assertTrue(userCoupon.getIsUsed());
+    verify(userCouponRepository).findByUserIdAndCouponId(userId, couponId);
+  }
+
+  @Test
+  public void test_쿠폰_사용_사용자_쿠폰_존재하지_않음() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+
+    //when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(null);
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.useCoupon(couponId, userId);
+    });
+
+    // assert
+    assertEquals(PromotionErrorCode.USER_COUPON_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @Test
+  public void test_쿠폰_사용_이미_사용된_쿠폰() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+    UserCoupon userCoupon = UserCoupon.create(userId, couponId);
+    userCoupon.updateIsUsed(true);
+
+    //when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(userCoupon);
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.useCoupon(couponId, userId);
+    });
+
+    // assert
+    assertEquals(PromotionErrorCode.COUPON_ALREADY_USED, exception.getErrorCode());
+  }
+
+  @Test
+  public void test_쿠폰_환불_성공() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+    UserCoupon userCoupon = UserCoupon.create(userId, couponId);
+    userCoupon.updateIsUsed(true);
+
+    //when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(userCoupon);
+
+    // then
+    couponService.refundCoupon(couponId, userId);
+
+    // assert
+    assertFalse(userCoupon.getIsUsed());
+    verify(userCouponRepository).findByUserIdAndCouponId(userId, couponId);
+  }
+
+  @Test
+  public void test_쿠폰_환불_사용자_쿠폰_존재하지_않음() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+
+    // when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(null);
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.refundCoupon(couponId, userId);
+    });
+
+    // assert
+    assertEquals(PromotionErrorCode.USER_COUPON_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @Test
+  public void test_쿠폰_환불_사용되지_않은_쿠폰() {
+    // given
+    Long couponId = 1L;
+    Long userId = 1L;
+    UserCoupon userCoupon = UserCoupon.create(userId, couponId);
+
+    // when
+    when(userCouponRepository.findByUserIdAndCouponId(userId, couponId)).thenReturn(userCoupon);
+
+    // then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.refundCoupon(couponId, userId);
+    });
+
+    // assert
+    assertEquals(PromotionErrorCode.COUPON_NOT_USED, exception.getErrorCode());
   }
 
 }

@@ -87,4 +87,34 @@ public class CouponService {
     couponRepository.delete(coupon);
   }
 
+  @Transactional
+  public void useCoupon(Long couponId, Long userId) {
+    UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId);
+
+    if (userCoupon == null) {
+      throw new PromotionException(PromotionErrorCode.USER_COUPON_NOT_FOUND);
+    }
+
+    if (userCoupon.getIsUsed()) {
+      throw new PromotionException(PromotionErrorCode.COUPON_ALREADY_USED);
+    }
+
+    userCoupon.updateIsUsed(true);
+  }
+
+  @Transactional
+  public void refundCoupon(Long couponId, Long userId) {
+    UserCoupon userCoupon = userCouponRepository.findByUserIdAndCouponId(userId, couponId);
+
+    if (userCoupon == null) {
+      throw new PromotionException(PromotionErrorCode.USER_COUPON_NOT_FOUND);
+    }
+
+    if (!userCoupon.getIsUsed()) {
+      throw new PromotionException(PromotionErrorCode.COUPON_NOT_USED);
+    }
+
+    userCoupon.updateIsUsed(false);
+  }
+
 }

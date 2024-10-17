@@ -1,4 +1,6 @@
 @Port=19091
+@couponId=1
+@userId=11
 
 ### 로그인
 POST http://localhost:{{Port}}/api/auth/sign-in
@@ -32,7 +34,6 @@ Authorization: {{access_token}}
 }
 
 ### 이벤트 쿠폰 발급
-@couponId=1
 POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}
 Authorization: {{access_token}}
 
@@ -45,7 +46,6 @@ GET http://localhost:{{Port}}/api/coupons/{{couponId}}
 Authorization: {{access_token}}
 
 ### 특정 사용자 쿠폰 전체 조회
-@userId=11
 GET http://localhost:{{Port}}/api/coupons/users/{{userId}}
 Authorization: {{access_token}}
 
@@ -73,5 +73,13 @@ Authorization: {{access_token}}
 }
 
 ### 쿠폰 삭제
-DELETE localhost:{{Port}}/api/coupons/1
+DELETE localhost:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}
+
+### 쿠폰 사용
+PATCH http://localhost:19021/internal/coupons/{{couponId}}/use?userId={{userId}}
+Authorization: {{access_token}}
+
+### 쿠폰 환불
+PATCH http://localhost:19021/internal/coupons/{{couponId}}/refund?userId={{userId}}
 Authorization: {{access_token}}
