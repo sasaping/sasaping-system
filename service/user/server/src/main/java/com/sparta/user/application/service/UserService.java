@@ -75,7 +75,7 @@ public class UserService {
 
   public List<UserResponse.Info> getUserList() {
     return userRepository
-        .findAll()
+        .findAllByIsDeletedFalse()
         .stream()
         .map(UserResponse.Info::of)
         .collect(Collectors.toList());
@@ -91,6 +91,15 @@ public class UserService {
       throw new UserException(UserErrorCode.INVAILD_PASSWORD);
     }
     user.updatePassword(passwordEncoder.encode(request.getUpdatePassword()));
+  }
+
+  @Transactional
+  public void deleteUser(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    user.delete(true);
   }
 
 }

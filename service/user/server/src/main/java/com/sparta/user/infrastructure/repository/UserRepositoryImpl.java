@@ -29,8 +29,8 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Collection<User> findAll() {
-    return jpaUserRepository.findAll();
+  public Collection<User> findAllByIsDeletedFalse() {
+    return jpaUserRepository.findAllByIsDeletedFalse();
   }
 
 }

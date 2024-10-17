@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,25 +40,32 @@ public class UserController {
     return ApiResponse.ok(userService.getUserById(claim.getUserId()));
   }
 
-  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
   @GetMapping("/{userId}")
   public ApiResponse<UserResponse.Info> getUser(@PathVariable(name = "userId") Long userId) {
     return ApiResponse.ok(userService.getUserById(userId));
   }
 
-  @PreAuthorize("hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
   @GetMapping
   public ApiResponse<List<UserResponse.Info>> getUserList() {
     return ApiResponse.ok(userService.getUserList());
   }
 
-  @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")
+  @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
   @PatchMapping("/reset-password")
   public ApiResponse<?> updateUserPassword(
       @RequestBody @Valid UserRequest.UpdatePassword request,
       @AuthenticationPrincipal JwtClaim claim
   ) {
     userService.updateUserPassword(claim.getUserId(), request);
+    return ApiResponse.ok();
+  }
+
+  @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+  @DeleteMapping("/{userId}")
+  public ApiResponse<?> deleteUser(@PathVariable(name = "userId") Long userId) {
+    userService.deleteUser(userId);
     return ApiResponse.ok();
   }
 

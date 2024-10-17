@@ -59,6 +59,9 @@ public class User extends BaseEntity {
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<PointHistory> pointHistories;
 
+  @Column
+  private Boolean isDeleted = false;
+
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
         .username(request.getUsername())
@@ -76,6 +79,10 @@ public class User extends BaseEntity {
 
   public void updatePassword(String password) {
     this.password = password;
+  }
+
+  public void delete(Boolean isDeleted) {
+    this.isDeleted = isDeleted;
   }
 
 }

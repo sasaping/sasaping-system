@@ -180,12 +180,12 @@ class UserServiceTests {
     );
 
     // when
-    when(userRepository.findAll()).thenReturn(userList);
+    when(userRepository.findAllByIsDeletedFalse()).thenReturn(userList);
 
     // then
     List<UserResponse.Info> result = userService.getUserList();
     assertEquals(2, result.size());
-    verify(userRepository, times(1)).findAll();
+    verify(userRepository, times(1)).findAllByIsDeletedFalse();
   }
 
   @Test
@@ -233,6 +233,36 @@ class UserServiceTests {
     UserException exception = assertThrows(UserException.class,
         () -> userService.updateUserPassword(userId, updatePassword));
     assertEquals(UserErrorCode.INVAILD_PASSWORD.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void test_유저_삭제_성공() {
+    // given
+    Long userId = 1L;
+    User user = new User();
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+    // when & then
+    userService.deleteUser(userId);
+
+    // verify
+    verify(userRepository).findById(userId);
+  }
+
+  @Test
+  void test_유저_삭제_실패_유저없음() {
+    // given
+    Long userId = 1L;
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // when & then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.deleteUser(userId));
+
+    assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+
+    // verify
+    verify(userRepository).findById(userId);
   }
 
 }
