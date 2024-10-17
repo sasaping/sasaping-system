@@ -43,6 +43,9 @@ public class User extends BaseEntity {
   @Column(nullable = false)
   private String nickname;
 
+  @Column(unique = true, nullable = false)
+  private String email;
+
   @Column(nullable = false)
   private BigDecimal point;
 
@@ -61,6 +64,7 @@ public class User extends BaseEntity {
         .username(request.getUsername())
         .password(encodedPassword)
         .nickname(request.getNickname())
+        .email(request.getEmail())
         .point(request.getPoint())
         .role(request.getRole())
         .build();

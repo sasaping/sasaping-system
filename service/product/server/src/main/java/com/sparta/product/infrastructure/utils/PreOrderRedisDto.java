@@ -8,9 +8,12 @@ import com.sparta.product.domain.model.PreOrder;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
 import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public record PreOrderRedisDto(
     Long preOrderId,
+    String productId,
     Integer availableQuantity,
     @JsonSerialize(using = LocalDateTimeSerializer.class)
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -21,6 +24,7 @@ public record PreOrderRedisDto(
   public PreOrderRedisDto(PreOrder preOrder) {
     this(
         preOrder.getPreOrderId(),
+        preOrder.getProductId().toString(),
         preOrder.getAvailableQuantity(),
         preOrder.getStartDateTime(),
         preOrder.getEndDateTime());
