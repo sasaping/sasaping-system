@@ -32,14 +32,20 @@ public class SecurityConfig {
         .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
-                authorize.
-                    requestMatchers("/internal/**").permitAll().
-                    requestMatchers("/api/products/search/**").permitAll().
-                    anyRequest().authenticated())
+                authorize
+                    .requestMatchers("/internal/**")
+                    .permitAll()
+                    .requestMatchers("/api/products/search/**")
+                    .permitAll()
+                    .requestMatchers("/api/categories/search/**")
+                    .permitAll()
+                    .requestMatchers("/api/preorders/search/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .addFilterAfter(
             new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
-
 }

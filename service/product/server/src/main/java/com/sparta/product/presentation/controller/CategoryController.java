@@ -45,7 +45,7 @@ public class CategoryController {
     return ApiResponse.ok();
   }
 
-  @GetMapping
+  @GetMapping("/search")
   public ApiResponse<List<CategoryResponse>> getCategories() {
     return ApiResponse.ok(categoryService.fetchAndCacheCategories());
   }
