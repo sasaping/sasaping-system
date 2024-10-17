@@ -8,7 +8,9 @@ import com.sparta.product.domain.model.PreOrder;
 import com.sparta.product.presentation.exception.ProductErrorCode;
 import com.sparta.product.presentation.exception.ProductServerException;
 import java.time.LocalDateTime;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public record PreOrderRedisDto(
     Long preOrderId,
     String productId,
