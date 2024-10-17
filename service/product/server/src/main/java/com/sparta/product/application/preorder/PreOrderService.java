@@ -13,6 +13,7 @@ import com.sparta.product.presentation.response.PreOrderResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ public class PreOrderService {
     return savedPreOrder.getPreOrderId();
   }
 
+  @CacheEvict(cacheNames = "preOrder", key = "#request.preOrderId()")
   public PreOrderResponse updatePreOrder(PreOrderUpdateRequest request) {
     PreOrder preOrder = findPreOrderByPreOrderId(request.preOrderId());
     if (preOrder.getProductId() != request.productId()) {
@@ -63,6 +65,7 @@ public class PreOrderService {
     return preOrderRepository.findAllByIsPublicTrue(pageable).map(PreOrderResponse::of);
   }
 
+  @CacheEvict(cacheNames = "preOrder", key = "#preOrderId")
   public PreOrderResponse updateState(Long preOrderId, PreOrderState state) {
     PreOrder preOrder = findPreOrderByPreOrderId(preOrderId);
     if (state == PreOrderState.OPEN_FOR_ORDER) preOrder.open();
@@ -70,11 +73,13 @@ public class PreOrderService {
     return PreOrderResponse.of(preOrder);
   }
 
+  @CacheEvict(cacheNames = "preOrder", key = "#preOrderId")
   public void deletePreOrder(Long preOrderId) {
     PreOrder preOrder = findPreOrderByPreOrderId(preOrderId);
     preOrderRepository.delete(preOrder);
   }
 
+  @Transactional(readOnly = true)
   public PreOrder findPreOrderByPreOrderId(Long preOrderId) {
     return preOrderRepository
         .findByPreOrderIdAndIsPublicTrue(preOrderId)
