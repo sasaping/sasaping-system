@@ -22,6 +22,7 @@ import com.sparta.promotion.server.presentation.request.CouponRequest;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -233,6 +234,59 @@ class CouponServiceTests {
 
     assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
     verify(couponRepository).findById(couponId);
+  }
+
+  @Test
+  void test_특정_사용자의_아이디로_쿠폰_조회_성공() {
+    // given
+    Long userId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    UserCoupon userCoupon = UserCoupon.create(userId, 1L);
+    List<UserCoupon> userCouponList = Arrays.asList(userCoupon);
+    Page<UserCoupon> userCouponPage = new PageImpl<>(userCouponList, pageable,
+        userCouponList.size());
+
+    Coupon coupon = new Coupon(1L, "Test Coupon", CouponType.EVENT, DiscountType.PRICE,
+        new BigDecimal("1000.00"), null, null, 100,
+        Timestamp.valueOf("2024-01-01 00:00:00"), Timestamp.valueOf("2024-12-31 23:59:59"),
+        null, null);
+
+    when(userCouponRepository.findByUserId(userId, pageable)).thenReturn(userCouponPage);
+    when(couponRepository.findById(1L)).thenReturn(Optional.of(coupon));
+
+    // when
+    Page<CouponResponse.Get> response = couponService.getCouponListBoyUserId(userId, pageable);
+
+    // then
+    assertEquals(1, response.getTotalElements());
+    assertEquals("Test Coupon", response.getContent().get(0).getName());
+    verify(userCouponRepository).findByUserId(userId, pageable);
+    verify(couponRepository).findById(1L);
+  }
+
+  @Test
+  void test_특정_사용자의_아이디로_쿠폰_조회_실패_쿠폰없음() {
+    // given
+    Long userId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    UserCoupon userCoupon = UserCoupon.create(userId, 1L); // create 메서드를 사용해 생성
+    List<UserCoupon> userCouponList = Arrays.asList(userCoupon);
+    Page<UserCoupon> userCouponPage = new PageImpl<>(userCouponList, pageable,
+        userCouponList.size());
+
+    when(userCouponRepository.findByUserId(userId, pageable)).thenReturn(userCouponPage);
+    when(couponRepository.findById(1L)).thenReturn(Optional.empty()); // 쿠폰을 찾을 수 없는 경우
+
+    // when & then
+    PromotionException exception = assertThrows(PromotionException.class, () -> {
+      couponService.getCouponListBoyUserId(userId, pageable);
+    });
+
+    assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
+    verify(userCouponRepository).findByUserId(userId, pageable);
+    verify(couponRepository).findById(1L);
   }
 
 }

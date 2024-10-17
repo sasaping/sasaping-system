@@ -35,7 +35,7 @@ public class CouponService {
     couponRepository.save(Coupon.create(request));
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함. 아린님 코드 merge하면 수정 진행
+  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
   @Transactional
   public void provideEventCoupon(Long userId, Long couponId) {
     // UserDto userData = userService.getUser(userId);
@@ -58,6 +58,18 @@ public class CouponService {
     Coupon coupon = couponRepository.findById(couponId)
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
     return CouponResponse.Get.of(coupon);
+  }
+
+  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
+  public Page<CouponResponse.Get> getCouponListBoyUserId(Long userId, Pageable pageable) {
+    // UserDto userData = userService.getUser(userId);
+    Page<UserCoupon> userCoupons = userCouponRepository.findByUserId(userId, pageable);
+
+    return userCoupons.map(userCoupon -> {
+      Coupon coupon = couponRepository.findById(userCoupon.getCouponId())
+          .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
+      return CouponResponse.Get.of(coupon);
+    });
   }
 
 }
