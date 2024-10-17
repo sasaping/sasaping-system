@@ -1,10 +1,8 @@
 package com.sparta.product.infrastructure.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.product.infrastructure.filter.CustomAccessDeniedHandler;
 import com.sparta.product.infrastructure.filter.SecurityContextFilter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,10 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Configuration
-@Slf4j(topic = "SecurityConfig")
 public class SecurityConfig {
-  private final CustomAccessDeniedHandler accessDeniedHandler;
-
   @Bean
   public SecurityFilterChain httpSecurity(HttpSecurity http, ObjectMapper objectMapper)
       throws Exception {
@@ -47,9 +42,6 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .exceptionHandling(
-            exceptionHandling ->
-                exceptionHandling.accessDeniedHandler(accessDeniedHandler))
         .addFilterAfter(
             new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 

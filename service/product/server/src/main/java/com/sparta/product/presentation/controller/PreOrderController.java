@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,29 +46,34 @@ public class PreOrderController {
     return ApiResponse.ok();
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PostMapping
   public ApiResponse<Long> createPreOrder(@RequestBody @Valid PreOrderCreateRequest request) {
     return ApiResponse.created(preOrderService.createPreOrder(request));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PatchMapping
   public ApiResponse<PreOrderResponse> updatePreOrder(
       @RequestBody @Valid PreOrderUpdateRequest request) {
     return ApiResponse.ok(preOrderService.updatePreOrder(request));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @DeleteMapping("/{preOrderId}")
   public ApiResponse<Void> deletePreOrder(@NotNull @PathVariable("preOrderId") Long preOrderId) {
     preOrderService.deletePreOrder(preOrderId);
     return ApiResponse.ok();
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PatchMapping("/{preOrderId}/open")
   public ApiResponse<PreOrderResponse> openPreOrder(
       @NotNull @PathVariable("preOrderId") Long preOrderId) {
     return ApiResponse.ok(preOrderService.updateState(preOrderId, PreOrderState.OPEN_FOR_ORDER));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PatchMapping("/{preOrderId}/cancel")
   public ApiResponse<PreOrderResponse> cancelPreOrder(
       @NotNull @PathVariable("preOrderId") Long preOrderId) {
@@ -86,5 +92,4 @@ public class PreOrderController {
       @RequestParam(defaultValue = "30") @Min(1) int size) {
     return ApiResponse.ok(preOrderService.getPreOrderList(page, size));
   }
-
 }
