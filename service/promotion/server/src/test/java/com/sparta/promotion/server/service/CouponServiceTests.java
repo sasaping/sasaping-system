@@ -114,18 +114,17 @@ class CouponServiceTests {
     Long couponId = 100L;
 
     Coupon coupon = mock(Coupon.class);
-    when(coupon.getQuantity()).thenReturn(10);
+    when(coupon.getQuantity()).thenReturn(100);
 
     UserCoupon userCoupon = UserCoupon.create(userId, couponId);
-
     // when
-    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+    when(couponRepository.findByIdWithPessimisticLock(couponId)).thenReturn(Optional.of(coupon));
     when(userCouponRepository.save(any(UserCoupon.class))).thenReturn(userCoupon);
 
     // then
     couponService.provideEventCoupon(userId, couponId);
 
-    verify(couponRepository).findById(couponId);
+    verify(couponRepository).findByIdWithPessimisticLock(couponId);
     verify(coupon).updateQuantity(anyInt());
     verify(userCouponRepository).save(any(UserCoupon.class));
   }
@@ -140,7 +139,7 @@ class CouponServiceTests {
     when(coupon.getQuantity()).thenReturn(0); // 수량이 0일 경우
 
     // when
-    when(couponRepository.findById(couponId)).thenReturn(Optional.of(coupon));
+    when(couponRepository.findByIdWithPessimisticLock(couponId)).thenReturn(Optional.of(coupon));
 
     // then
     PromotionException exception = assertThrows(PromotionException.class, () -> {
@@ -148,7 +147,7 @@ class CouponServiceTests {
     });
 
     assertEquals(PromotionErrorCode.INSUFFICIENT_COUPON.getMessage(), exception.getMessage());
-    verify(couponRepository).findById(couponId);
+    verify(couponRepository).findByIdWithPessimisticLock(couponId);
     verify(coupon, never()).updateQuantity(anyInt());
     verify(userCouponRepository, never()).save(any(UserCoupon.class));
   }
@@ -160,7 +159,7 @@ class CouponServiceTests {
     Long couponId = 100L;
 
     // when
-    when(couponRepository.findById(couponId)).thenReturn(Optional.empty());
+    when(couponRepository.findByIdWithPessimisticLock(couponId)).thenReturn(Optional.empty());
 
     // then
     PromotionException exception = assertThrows(PromotionException.class, () -> {
@@ -168,7 +167,7 @@ class CouponServiceTests {
     });
 
     assertEquals(PromotionErrorCode.COUPON_NOT_FOUND.getMessage(), exception.getMessage());
-    verify(couponRepository).findById(couponId);
+    verify(couponRepository).findByIdWithPessimisticLock(couponId);
     verify(userCouponRepository, never()).save(any(UserCoupon.class)); // 저장이 일어나지 않음
   }
 
