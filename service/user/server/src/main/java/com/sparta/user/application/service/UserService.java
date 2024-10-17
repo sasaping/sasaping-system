@@ -40,6 +40,7 @@ public class UserService {
         user.getId(),
         user.getUsername(),
         user.getPassword(),
+        user.getEmail(),
         user.getRole().name(),
         user.getPoint()
     );
@@ -54,6 +55,7 @@ public class UserService {
         user.getId(),
         user.getUsername(),
         user.getPassword(),
+        user.getEmail(),
         user.getRole().name(),
         user.getPoint()
     );
