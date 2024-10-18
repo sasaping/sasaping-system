@@ -1,15 +1,22 @@
 package com.sparta.user.application.service;
 
+import static com.sparta.user.exception.UserErrorCode.USER_NOT_FOUND;
+
+import com.sparta.user.application.dto.PointResponse;
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
 import com.sparta.user.domain.model.vo.PointHistoryType;
+import com.sparta.user.domain.model.vo.UserRole;
 import com.sparta.user.domain.repository.PointHistoryRepository;
 import com.sparta.user.domain.repository.UserRepository;
 import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +60,19 @@ public class PointHistoryService {
     userRepository.save(user);
   }
 
+  public Page<PointResponse.Get> getPointHistoryByUserId(Long userId, Pageable pageable) {
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    return pointHistoryRepository
+        .findAllByUserId(user.getId(), pageable)
+        .map(PointResponse.Get::of);
+  }
+
+  public Page<PointResponse.Get> getPointHistoryList(Pageable pageable) {
+    return pointHistoryRepository.findAll(pageable).map(PointResponse.Get::of);
+  }
+
   @Transactional
   public void rollbackPointHistory(Long pointHistoryId) {
     PointHistory pointHistory = pointHistoryRepository.findById(pointHistoryId).orElseThrow(
@@ -60,6 +80,21 @@ public class PointHistoryService {
     );
     handlePointAdd(pointHistory.getUser(), pointHistory.getPoint());
     pointHistoryRepository.rollback(pointHistory);
+  }
+
+  @Transactional
+  public void deletePointHistory(Long pointHistoryId, Long userId) {
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    PointHistory pointHistory = pointHistoryRepository
+        .findById(pointHistoryId)
+        .orElseThrow(() -> new UserException(UserErrorCode.POINT_HISTORY_NOT_FOUND));
+    if (user.getRole() == UserRole.ROLE_USER &&
+        !Objects.equals(user.getId(), pointHistory.getUser().getId())) {
+      throw new UserException(UserErrorCode.INVAILD_POINT_USER);
+    }
+    pointHistoryRepository.delete(pointHistory);
   }
 
 }
