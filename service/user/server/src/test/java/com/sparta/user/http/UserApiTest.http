@@ -1,7 +1,7 @@
 @Port=19091
 @TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX05BTUUiOiJuZXdVc2VyMiIsIlVTRVJfUk9MRSI6IlJPTEVfVVNFUiIsIlVTRVJfSUQiOjEwLCJpYXQiOjE3Mjg4Mjk4MjMsImV4cCI6MTczMjQyOTgyM30.E1Tzyf9TUh7sWeFKnBfz_W_1xd_MR-WgBw0VRgDCXO4
 @TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
-@userId=15
+@userId=17
 
 ### 회원가입
 POST http://localhost:{{Port}}/api/users/sign-up
@@ -55,4 +55,8 @@ Authorization: {{access_token}}
 
 ### 현재 유저 등급 조회
 GET http://localhost:{{Port}}/api/users/tier/me
+Authorization: {{access_token}}
+
+### 특정 유저 등급 조회
+GET http://localhost:{{Port}}/api/users/tier/{{userId}}
 Authorization: {{access_token}}
