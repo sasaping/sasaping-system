@@ -1,6 +1,7 @@
 @Port=19091
 @InternalPort=19092
 @userId=17
+@pointHistoryId=12
 
 ### 로그인(유저)
 POST http://localhost:{{Port}}/api/auth/sign-in
@@ -64,4 +65,8 @@ Authorization: {{access_token_admin}}
 
 ### 전체 사용자 포인트 내역 조회
 GET http://localhost:{{Port}}/api/users/point
+Authorization: {{access_token_admin}}
+
+### 단일 포인트 내역 삭제(사용자)
+DELETE localhost:{{Port}}/api/users/point/11
 Authorization: {{access_token_admin}}

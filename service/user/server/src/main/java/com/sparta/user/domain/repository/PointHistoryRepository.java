@@ -19,4 +19,6 @@ public interface PointHistoryRepository {
 
   Page<PointHistory> findAll(Pageable pageable);
 
+  void delete(PointHistory pointHistory);
+
 }

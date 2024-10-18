@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,5 +45,16 @@ public class PointHistoryController {
   public ApiResponse<Page<PointResponse.Get>> getPointHistoryList(Pageable pageable) {
     return ApiResponse.ok(pointHistoryService.getPointHistoryList(pageable));
   }
+
+  @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+  @DeleteMapping("/{pointHistoryId}")
+  public ApiResponse<?> deletePointHistory(
+      @PathVariable(name = "pointHistoryId") Long pointHistoryId,
+      @AuthenticationPrincipal JwtClaim claim
+  ) {
+    pointHistoryService.deletePointHistory(pointHistoryId, claim.getUserId());
+    return ApiResponse.ok();
+  }
+
 
 }
