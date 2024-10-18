@@ -141,4 +141,18 @@ public class UserService {
     });
   }
 
+  @Transactional
+  public void updateUserTier(Long userId, UserRequest.UpdateTier request) {
+    User user = userRepository
+        .findById(userId)
+        .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    UserTier userTier = userTierRepository
+        .findByUserId(user.getId())
+        .orElseThrow(() -> new UserException(UserErrorCode.USER_TIER_NOT_FOUND));
+    Tier tier = tierRepository
+        .findByName(request.getTier())
+        .orElseThrow(() -> new UserException(UserErrorCode.TIER_NOT_FOUND));
+    userTier.update(tier);
+  }
+
 }

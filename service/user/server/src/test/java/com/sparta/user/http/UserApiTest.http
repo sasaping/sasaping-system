@@ -64,3 +64,12 @@ Authorization: {{access_token}}
 ### 전체 사용자 등급 조회
 GET localhost:{{Port}}/api/users/tier
 Authorization: {{access_token}}
+
+### 사용자 등급 수정
+PATCH localhost:{{Port}}/api/users/tier/{{userId}}
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "tier": "실버핑"
+}

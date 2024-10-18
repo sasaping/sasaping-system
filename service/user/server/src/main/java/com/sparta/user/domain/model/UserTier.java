@@ -48,4 +48,8 @@ public class UserTier {
         .build();
   }
 
+  public void update(Tier tier) {
+    this.tier = tier;
+  }
+
 }

@@ -419,4 +419,71 @@ class UserServiceTests {
     verify(tierRepository, times(2)).findById(anyLong());
   }
 
+  @Test
+  void test_유저_티어_업데이트_성공() {
+    // given
+    Long userId = 1L;
+    Long tierId = 1L;
+
+    User user = mock(User.class);
+    Tier oldTier = new Tier(tierId, "애기핑", 50000L);
+
+    UserTier userTier = UserTier.create(user, oldTier);
+
+    Tier newTier = new Tier(tierId, "실버핑", 100000L);
+    UserRequest.UpdateTier request = new UserRequest.UpdateTier("실버핑");
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(userTierRepository.findByUserId(user.getId())).thenReturn(Optional.of(userTier));
+    when(tierRepository.findByName("실버핑")).thenReturn(Optional.of(newTier));
+
+    // then
+    userService.updateUserTier(userId, request);
+
+    // assert
+    assertEquals("실버핑", userTier.getTier().getName());
+  }
+
+  @Test
+  void test_유저_티어_업데이트_실패_유저없음() {
+    // given
+    Long userId = 1L;
+    UserRequest.UpdateTier request = new UserRequest.UpdateTier("실버핑");
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.updateUserTier(userId, request));
+
+    // assert
+    assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @Test
+  void test_유저_티어_업데이트_실패_티어없음() {
+    // given
+    Long userId = 1L;
+    User user = mock(User.class);
+    Tier tier = mock(Tier.class);
+
+    UserTier userTier = UserTier.create(user, tier);
+
+    UserRequest.UpdateTier request = new UserRequest.UpdateTier("실버핑");
+
+    // when
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(userTierRepository.findByUserId(user.getId())).thenReturn(Optional.of(userTier));
+    when(tierRepository.findByName("실버핑")).thenReturn(Optional.empty());
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.updateUserTier(userId, request));
+
+    // assert
+    assertEquals(UserErrorCode.TIER_NOT_FOUND, exception.getErrorCode());
+  }
+
 }
