@@ -5,6 +5,8 @@ import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.user.application.dto.UserTierResponse;
 import com.sparta.user.application.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,12 @@ public class UserTierController {
       @PathVariable Long userId
   ) {
     return ApiResponse.ok(userService.getUserTierByUserId(userId));
+  }
+
+  @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+  @GetMapping
+  public ApiResponse<Page<UserTierResponse.Get>> getUserTierList(Pageable pageable) {
+    return ApiResponse.ok(userService.getUserTierList(pageable));
   }
 
 

@@ -17,6 +17,8 @@ import com.sparta.user.user_dto.infrastructure.UserDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,6 +126,19 @@ public class UserService {
         .findById(userTier.getTier().getId())
         .orElseThrow(() -> new UserException(UserErrorCode.TIER_NOT_FOUND));
     return UserTierResponse.Get.of(user, tier);
+  }
+
+  public Page<UserTierResponse.Get> getUserTierList(Pageable pageable) {
+    Page<UserTier> userTiers = userTierRepository.findAll(pageable);
+    return userTiers.map(userTier -> {
+      User user = userRepository
+          .findById(userTier.getUser().getId())
+          .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+      Tier tier = tierRepository
+          .findById(userTier.getTier().getId())
+          .orElseThrow(() -> new UserException(UserErrorCode.TIER_NOT_FOUND));
+      return UserTierResponse.Get.of(user, tier);
+    });
   }
 
 }

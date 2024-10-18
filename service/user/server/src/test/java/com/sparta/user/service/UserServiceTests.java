@@ -33,6 +33,10 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
@@ -382,6 +386,37 @@ class UserServiceTests {
     verify(userTierRepository, times(1)).findByUserId(userId);
     verify(userRepository, times(1)).findById(userTier.getUser().getId());
     verify(tierRepository, times(1)).findById(userTier.getTier().getId());
+  }
+
+  @Test
+  void test_유저_티어_전체_조회_성공() {
+    // given
+    Pageable pageable = PageRequest.of(0, 10);
+
+    User user = mock(User.class);
+    Tier tier = mock(Tier.class);
+    UserTier userTier1 = UserTier.create(user, tier);
+    UserTier userTier2 = UserTier.create(user, tier);
+
+    List<UserTier> userTierList = Arrays.asList(userTier1, userTier2);
+    Page<UserTier> userTierPage = new PageImpl<>(userTierList, pageable, userTierList.size());
+
+    // when
+    when(userTierRepository.findAll(pageable)).thenReturn(userTierPage);
+    when(userRepository.findById(userTier1.getUser().getId())).thenReturn(Optional.of(user));
+    when(userRepository.findById(userTier2.getUser().getId())).thenReturn(Optional.of(user));
+    when(tierRepository.findById(userTier1.getTier().getId())).thenReturn(Optional.of(tier));
+    when(tierRepository.findById(userTier2.getTier().getId())).thenReturn(Optional.of(tier));
+
+    // then
+    Page<UserTierResponse.Get> response = userService.getUserTierList(pageable);
+
+    // assert
+    assertEquals(2, response.getTotalElements());
+
+    verify(userTierRepository, times(1)).findAll(pageable);
+    verify(userRepository, times(2)).findById(anyLong());
+    verify(tierRepository, times(2)).findById(anyLong());
   }
 
 }
