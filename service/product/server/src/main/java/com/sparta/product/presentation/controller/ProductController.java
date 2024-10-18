@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,23 +35,27 @@ public class ProductController {
   private final ProductFacadeService facadeService;
   private final ProductService productService;
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PostMapping
   public ApiResponse<String> createProduct(@RequestBody @Valid ProductCreateRequest request) {
     return ApiResponse.created(facadeService.createProduct(request));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PatchMapping
   public ApiResponse<ProductResponse> updateProduct(
       @RequestBody @Valid ProductUpdateRequest request) {
     return ApiResponse.ok(facadeService.updateProduct(request));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @PatchMapping("/{productId}")
   public ApiResponse<ProductResponse> updateStatus(
       @PathVariable("productId") @NotNull UUID productId, @RequestParam("soldout") boolean status) {
     return ApiResponse.ok(facadeService.updateStatus(productId, status));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @DeleteMapping("/{productId}")
   public ApiResponse<Boolean> deleteProduct(@PathVariable("productId") @NotNull UUID productId) {
     return ApiResponse.ok(facadeService.deleteProduct(productId));
@@ -62,6 +67,7 @@ public class ProductController {
     return ApiResponse.ok(productService.getProduct(productId));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
   @GetMapping
   public ApiResponse<Page<ProductResponse>> getProductList(
       @RequestParam(defaultValue = "0") @Min(0) int page,
@@ -86,5 +92,4 @@ public class ProductController {
             mainColor,
             sortOption));
   }
-
 }

@@ -5,7 +5,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum OrderErrorCode {
-  ORDER_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "자신의 주문만 조회할 수 있습니다."),
+  ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 상태입니다."),
+  ORDER_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "해당 주문에 대한 권한이 존재하지 않습니다."),
   ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
   CANNOT_CANCEL_WHILE_SHIPPING(HttpStatus.FORBIDDEN, "배송이 시작된 주문은 취소할 수 없습니다. : [%s]"),
   INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),

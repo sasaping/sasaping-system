@@ -5,6 +5,7 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,13 @@ public class ProductControllerAdvice {
     log.error("Error occurs in ProductServer : {}", e.getErrorCode());
     return ResponseEntity.status(errorCode.getStatus())
         .body(ApiResponse.error(errorCode.getStatus().name(), errorCode.getMessage()));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<?> accessDeniedException(AccessDeniedException e) {
+    log.error("Access Denied Exception : {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(ApiResponse.error(HttpStatus.FORBIDDEN.name(), e.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)

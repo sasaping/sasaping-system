@@ -9,13 +9,13 @@ import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderCreateRequest;
-import com.sparta.order.server.presentation.dto.OrderDto.OrderProductInfo;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
 import com.sparta.product_dto.ProductDto;
 import com.sparta.user.user_dto.infrastructure.AddressDto;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
+import dto.OrderCreateRequest;
+import dto.OrderProductInfo;
 import feign.FeignException.FeignClientException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -48,26 +48,25 @@ public class OrderCreateService {
 
   @Transactional
   public Long createOrder(Long userId, OrderCreateRequest request) {
+
     Map<String, Integer> deductedProductsQuantities = new HashMap<>();
     List<Long> usedCoupons = new ArrayList<>(); // 사용 쿠폰 목록
     Long pointHistoryId = null; // 포인트 내역 ID
 
     try {
-      UserDto user = userClient.getUser(userId); //사용자 조회
+      UserDto user = userClient.getUser(userId);
 
       List<String> productIds = createProductIdList(request);
       Map<String, Integer> productQuantities = createProductQuantityMap(request);
-      // 배송지 조회 API, 사용자 배송지인지 확인
+
       AddressDto address = userClient.getAddress(request.getAddressId());
       validateAddress(address, userId);
-      // 주문할 상품들 Product 리스트 조회 API
+
       List<ProductDto> products = productClient.getProductList(productIds);
 
-      // 쿠폰 사용 가능 여부 조회
       validateUseCoupon(request, products);
-      // 각 상품 재고 확인
       validateProductStock(products, productQuantities);
-      // 재고 감소 API
+
       productClient.updateStock(productQuantities);
       deductedProductsQuantities = productQuantities;
 
@@ -82,24 +81,21 @@ public class OrderCreateService {
 
       // 포인트 유효성 검사 및 사용
       if (request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
-        PointHistoryDto pointUserRequest = new PointHistoryDto(userId, savedOrderId,
+        PointHistoryDto pointHistoryRequest = new PointHistoryDto(userId, savedOrderId,
             request.getPointPrice(), POINT_HISTORY_TYPE_USE, POINT_DESCRIPTION_ORDER_PAYMENT);
+
         pointHistoryId = validateAndUsePoint(user.getPoint(), request.getPointPrice(),
-            pointUserRequest);
+            pointHistoryRequest);
       }
 
-      Map<String, BigDecimal> productPrices = products.stream().collect(
-          Collectors.toMap(
-              product -> product.getProductId().toString(),
-              ProductDto::getDiscountedPrice)
-      );
+      Map<String, BigDecimal> productPrices = new HashMap<>();
+      Map<String, String> productNames = new HashMap<>();
 
-      Map<String, String> productNames = products.stream().collect(
-          Collectors.toMap(
-              product -> product.getProductId().toString(),
-              product -> product.getProductName()
-          )
-      );
+      products.forEach(product -> {
+        String productId = product.getProductId().toString();
+        productPrices.put(productId, product.getDiscountedPrice());
+        productNames.put(productId, product.getProductName());
+      });
 
       // 주문 상품 하나씩 생성 TODO couponDto
       request.getOrderProductInfos()
@@ -108,15 +104,8 @@ public class OrderCreateService {
                   productPrices.get(productInfo.getProductId()),
                   productNames.get(productInfo.getProductId()), order));
 
-      PaymentInternalDto.Create payment = new PaymentInternalDto.Create(
-          userId, savedOrderId, order.getOrderNo(), request.getUserEmail(),
-          order.getTotalRealAmount().longValue());
-      // 결제 API 호출
-      paymentClient.payment(payment);
-
-      // 장바구니에 상품 삭제
       cartService.orderCartProduct(userId, productQuantities);
-
+      payment(userId, order, user.getEmail());
       return savedOrderId;
 
     } catch (FeignClientException | OrderException e) {
@@ -126,6 +115,13 @@ public class OrderCreateService {
           pointHistoryId);
       throw e;
     }
+  }
+
+  private void payment(Long userId, Order order, String userEmail) {
+    PaymentInternalDto.Create payment = new PaymentInternalDto.Create(
+        userId, order.getOrderId(), order.getOrderNo(), userEmail,
+        order.getTotalRealAmount().longValue());
+    paymentClient.payment(payment);
   }
 
   private void validateAddress(AddressDto address, Long userId) {
@@ -168,6 +164,7 @@ public class OrderCreateService {
         couponDto,
         order
     );
+    order.addOrderProduct(orderProduct);
     orderProductRepository.save(orderProduct);
   }
 

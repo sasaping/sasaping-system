@@ -76,6 +76,20 @@ public class Coupon {
         .build();
   }
 
+  public void update(CouponRequest.Update request) {
+    this.name = request.getName();
+    this.type = request.getType();
+    this.discountType = request.getDiscountType();
+    this.discountValue = request.getDiscountValue();
+    this.minBuyPrice = request.getMinBuyPrice();
+    this.maxDiscountPrice = request.getMaxDiscountPrice();
+    this.quantity = request.getQuantity();
+    this.startDate = request.getStartDate();
+    this.endDate = request.getEndDate();
+    this.userTier = request.getUserTier();
+    this.eventId = request.getEventId();
+  }
+
   public void updateQuantity(Integer quantity) {
     this.quantity = quantity;
   }

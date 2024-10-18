@@ -64,19 +64,30 @@ public class User extends BaseEntity {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
   private UserTier userTier;
 
+  @Column
+  private Boolean isDeleted = false;
+
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
         .username(request.getUsername())
         .password(encodedPassword)
         .nickname(request.getNickname())
+        .point(BigDecimal.ZERO)
         .email(request.getEmail())
-        .point(request.getPoint())
         .role(request.getRole())
         .build();
   }
 
   public void updatePoint(BigDecimal point) {
     this.point = point;
+  }
+
+  public void updatePassword(String password) {
+    this.password = password;
+  }
+
+  public void delete(Boolean isDeleted) {
+    this.isDeleted = isDeleted;
   }
 
 }
