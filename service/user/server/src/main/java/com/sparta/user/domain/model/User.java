@@ -8,10 +8,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
@@ -59,8 +61,11 @@ public class User extends BaseEntity {
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<PointHistory> pointHistories;
 
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+  private UserTier userTier;
+
   @Column
-  private Boolean isDeleted = false;
+  private Boolean isDeleted;
 
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
@@ -70,6 +75,7 @@ public class User extends BaseEntity {
         .point(BigDecimal.ZERO)
         .email(request.getEmail())
         .role(request.getRole())
+        .isDeleted(false)
         .build();
   }
 

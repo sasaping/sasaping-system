@@ -1,17 +1,17 @@
 @Port=19091
 @TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX05BTUUiOiJuZXdVc2VyMiIsIlVTRVJfUk9MRSI6IlJPTEVfVVNFUiIsIlVTRVJfSUQiOjEwLCJpYXQiOjE3Mjg4Mjk4MjMsImV4cCI6MTczMjQyOTgyM30.E1Tzyf9TUh7sWeFKnBfz_W_1xd_MR-WgBw0VRgDCXO4
 @TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
-@userId=15
+@userId=17
 
 ### 회원가입
 POST http://localhost:{{Port}}/api/users/sign-up
 Content-Type: application/json
 
 {
-  "username": "newUser20",
+  "username": "newUser13",
   "password": "password123",
-  "nickname": "nickname",
-  "email": "newemail20@email.com",
+  "nickname": "nickname13",
+  "email": "newemail13@email.com",
   "role": "사용자"
 }
 
@@ -50,5 +50,26 @@ Authorization: {{access_token}}
 }
 
 ### 사용자 삭제
-DELETE localhost:{{Port}}/api/users/{{userId}}
+DELETE http://localhost:{{Port}}/api/users/{{userId}}
 Authorization: {{access_token}}
+
+### 현재 사용자 등급 조회
+GET http://localhost:{{Port}}/api/users/tier/me
+Authorization: {{access_token}}
+
+### 특정 사용자 등급 조회
+GET http://localhost:{{Port}}/api/users/tier/{{userId}}
+Authorization: {{access_token}}
+
+### 전체 사용자 등급 조회
+GET localhost:{{Port}}/api/users/tier
+Authorization: {{access_token}}
+
+### 사용자 등급 수정
+PATCH localhost:{{Port}}/api/users/tier/{{userId}}
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "tier": "실버핑"
+}

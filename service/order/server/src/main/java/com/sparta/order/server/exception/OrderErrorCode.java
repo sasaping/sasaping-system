@@ -8,7 +8,8 @@ public enum OrderErrorCode {
   ORDER_STATE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문 상태입니다."),
   ORDER_PERMISSION_DENIED(HttpStatus.FORBIDDEN, "해당 주문에 대한 권한이 존재하지 않습니다."),
   ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 주문입니다."),
-  CANNOT_CANCEL_WHILE_SHIPPING(HttpStatus.FORBIDDEN, "배송이 시작된 주문은 취소할 수 없습니다. : [%s]"),
+  ORDER_CANNOT_CANCEL_WHILE_SHIPPING(HttpStatus.FORBIDDEN, "배송이 시작된 주문은 취소할 수 없습니다. : [%s]"),
+  ORDER_CANNOT_DELETE(HttpStatus.FORBIDDEN, "구매 확정된 주문 내역만 삭제 가능합니다. : [%s]"),
   INSUFFICIENT_POINT(HttpStatus.BAD_REQUEST, "포인트가 부족합니다."),
   ADDRESS_MISMATCH(HttpStatus.BAD_REQUEST, "배송지 정보가 사용자가 등록한 배송지와 일치하지 않습니다. : [%s]"),
   ORDER_NO_GENERATION_FAILED(
