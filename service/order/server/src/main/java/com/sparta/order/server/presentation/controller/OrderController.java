@@ -4,6 +4,7 @@ import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
 import com.sparta.order.server.application.service.OrderCreateService;
 import com.sparta.order.server.application.service.OrderService;
+import com.sparta.order.server.presentation.dto.OrderDto.AllOrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.MyOrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
 import dto.OrderCreateRequest;
@@ -78,9 +79,21 @@ public class OrderController {
   public ApiResponse<Page<MyOrderGetResponse>> getMyOrder(
       @AuthenticationPrincipal JwtClaim userClaim,
       Pageable pageable,
-      @RequestParam(required = false) String keyword) {
+      @RequestParam(required = false, name = "keyword") String keyword) {
     return ApiResponse.ok(orderService.getMyOrder(pageable, userClaim.getUserId(), keyword));
   }
+
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+  @GetMapping("/all")
+  public ApiResponse<Page<AllOrderGetResponse>> getAllOrder(
+      @AuthenticationPrincipal JwtClaim userClaim,
+      Pageable pageable,
+      @RequestParam(required = false, name = "user_id") Long orderUserId,
+      @RequestParam(required = false, name = "product_id") String productId) {
+    return ApiResponse.ok(
+        orderService.getAllOrder(pageable, userClaim.getUserId(), orderUserId, productId));
+  }
+
 
   @DeleteMapping("/{orderId}")
   public ApiResponse<?> deleteOrder(@AuthenticationPrincipal JwtClaim jwtClaim,

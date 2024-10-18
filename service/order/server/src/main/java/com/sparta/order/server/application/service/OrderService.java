@@ -10,6 +10,7 @@ import com.sparta.order.server.exception.OrderException;
 import com.sparta.order.server.infrastructure.client.PaymentClient;
 import com.sparta.order.server.infrastructure.client.ProductClient;
 import com.sparta.order.server.infrastructure.client.UserClient;
+import com.sparta.order.server.presentation.dto.OrderDto.AllOrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.MyOrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.MyOrderProductResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
@@ -125,11 +126,23 @@ public class OrderService {
 
   public Page<MyOrderGetResponse> getMyOrder(Pageable pageable, Long userId, String keyword) {
     UserDto user = userClient.getUser(userId);
-    Page<Order> orders = orderRepository.myOrderFind(pageable, userId, keyword);
+    Page<Order> orders = orderRepository.getMyOrder(pageable, userId, keyword);
 
     List<MyOrderGetResponse> responses = new ArrayList<>();
     orders.forEach(
         order -> responses.add(MyOrderGetResponse.from(order, getMyOrderProductResponses(order))));
+
+    return new PageImpl<>(responses, pageable, orders.getTotalElements());
+  }
+
+  public Page<AllOrderGetResponse> getAllOrder(Pageable pageable, Long userId, Long orderUserId,
+      String productId) {
+    UserDto user = userClient.getUser(userId);
+    Page<Order> orders = orderRepository.getAllOrder(pageable, orderUserId, productId);
+
+    List<AllOrderGetResponse> responses = new ArrayList<>();
+    orders.forEach(
+        order -> responses.add(AllOrderGetResponse.from(order)));
 
     return new PageImpl<>(responses, pageable, orders.getTotalElements());
   }
