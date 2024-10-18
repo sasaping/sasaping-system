@@ -1,5 +1,5 @@
 @Port=19091
-@couponId=1
+@couponId=4
 @userId=11
 
 ### 로그인
@@ -7,17 +7,29 @@ POST http://localhost:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser11",
+  "username": "newUser12",
   "password": "password123"
 }
 > {%
   client.global.set("access_token", "Bearer " + response.body.data.token);
 %}
 
+### 로그인
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token_admin", "Bearer " + response.body.data.token);
+%}
+
 ### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
-Authorization: {{access_token}}
+Authorization: {{access_token_admin}}
 
 {
   "name": "Test Coupon3",
@@ -26,7 +38,7 @@ Authorization: {{access_token}}
   "discountValue": 1000.00,
   "minBuyPrice": null,
   "maxDiscountPrice": null,
-  "quantity": 100,
+  "quantity": 100000,
   "startDate": "2024-01-01T00:00:00",
   "endDate": "2024-12-31T23:59:59",
   "userTier": null,

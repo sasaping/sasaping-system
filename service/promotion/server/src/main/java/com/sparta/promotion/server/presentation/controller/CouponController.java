@@ -2,6 +2,7 @@ package com.sparta.promotion.server.presentation.controller;
 
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
+import com.sparta.promotion.server.application.service.CouponLockService;
 import com.sparta.promotion.server.application.service.CouponService;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CouponController {
 
   private final CouponService couponService;
+  private final CouponLockService couponLockService;
 
   @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
   @PostMapping("/event")
@@ -40,7 +42,7 @@ public class CouponController {
       @PathVariable(name = "couponId") Long couponId,
       @AuthenticationPrincipal JwtClaim claim
   ) {
-    couponService.provideEventCoupon(claim.getUserId(), couponId);
+    couponLockService.provideEventCoupon(claim.getUserId(), couponId);
     return ApiResponse.ok();
   }
 

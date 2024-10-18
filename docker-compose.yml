@@ -349,12 +349,26 @@ services:
     networks:
       - sasaping-network
 
+  coupon-cache:
+    container_name: coupon-cache
+    image: redis:7.4.0
+    ports:
+      - "6381:6381"
+    command: [ "redis-server", "--port", "6381" ]
+    volumes:
+      - redis-coupon-data:/data
+    restart: always
+    networks:
+      - sasaping-network
+
 volumes:
   cassandra_data:
     driver: local
   redis-cart-data:
     driver: local
   redis-product-data:
+    driver: local
+  redis-coupon-data:
     driver: local
   certs:
     driver: local

@@ -12,6 +12,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
+  data:
+    redis:
+      host: coupon-cache
+      port: 6381
+
 eureka:
   client:
     service-url:

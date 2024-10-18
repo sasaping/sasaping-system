@@ -36,12 +36,10 @@ public class CouponService {
     couponRepository.save(Coupon.create(request));
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
   @Transactional
-  public void provideEventCoupon(Long userId, Long couponId) {
-    // UserDto userData = userService.getUser(userId);
+  public void provideEventCouponInternal(Long userId, Long couponId) {
     Coupon coupon = couponRepository
-        .findByIdWithPessimisticLock(couponId)
+        .findById(couponId)
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
     if (coupon.getQuantity() - 1 < 0) {
       throw new PromotionException(PromotionErrorCode.INSUFFICIENT_COUPON);
