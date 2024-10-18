@@ -90,6 +90,9 @@ public class Order extends BaseEntity {
   private String invoiceNumber;
 
   @Column(nullable = false, length = 100)
+  private String addressAlias;
+
+  @Column(nullable = false, length = 100)
   private String recipient;
 
   @Column(nullable = false, length = 100)
@@ -121,8 +124,16 @@ public class Order extends BaseEntity {
     this.paymentId = paymentId;
   }
 
-  public void updateOrderState(OrderState state) {
+  public void updateState(OrderState state) {
     this.state = state;
+  }
+
+  public void updateAddress(AddressDto address) {
+    this.addressAlias = address.getAlias();
+    this.recipient = address.getRecipient();
+    this.phoneNumber = address.getPhoneNumber();
+    this.zipcode = address.getZipcode();
+    this.shippingAddress = address.getAddress();
   }
 
   // TODO AddressDto 추가
@@ -145,6 +156,7 @@ public class Order extends BaseEntity {
         .totalRealAmount(priceInfo.totalRealAmount)
         .pointPrice(request.getPointPrice())
         .couponPrice(couponPrice)
+        .addressAlias(address.getAlias())
         .recipient(address.getRecipient())
         .phoneNumber(address.getPhoneNumber())
         .zipcode(address.getZipcode())
@@ -211,7 +223,7 @@ public class Order extends BaseEntity {
     }
   }
 
-  public void validateOrderCancel() {
+  public void validateOrderUpdate() {
     if (!state.equals(OrderState.PENDING_PAYMENT)
         && !state.equals(OrderState.COMPLETED)) {
       throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);

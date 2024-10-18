@@ -41,6 +41,14 @@ public class OrderController {
     return ApiResponse.ok(orderService.cancelOrder(userClaim.getUserId(), orderId));
   }
 
+  @PatchMapping("/{orderId}")
+  public ApiResponse<Long> updateOrderAddress(@AuthenticationPrincipal JwtClaim userClaim,
+      @PathVariable(name = "orderId") Long orderId,
+      @RequestParam(name = "address_id") Long addressId) {
+    return ApiResponse.ok(
+        orderService.updateOrderAddress(userClaim.getUserId(), orderId, addressId));
+  }
+
   @GetMapping("/{orderId}")
   public ApiResponse<OrderGetResponse> getOrder(@AuthenticationPrincipal JwtClaim userClaim,
       @PathVariable(name = "orderId") Long orderId) {

@@ -16,6 +16,7 @@ import com.sparta.order.server.presentation.dto.OrderDto.OrderGetResponse;
 import com.sparta.order.server.presentation.dto.OrderDto.OrderProductResponse;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto;
 import com.sparta.payment_dto.infrastructure.PaymentInternalDto.Cancel;
+import com.sparta.user.user_dto.infrastructure.AddressDto;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
@@ -43,6 +44,7 @@ public class OrderService {
   private final PaymentClient paymentClient;
   private final ProductClient productClient;
   private final OrderProductRepository orderProductRepository;
+  private final OrderCreateService orderCreateService;
   private static final String POINT_HISTORY_TYPE_REFUND = "환불";
   private static final String POINT_DESCRIPTION_ORDER_CANCEL = "주문 취소";
   private static final String CANCEL_REASON = "단순 변심";
@@ -52,7 +54,7 @@ public class OrderService {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);
     order.validateOrderPermission(user);
-    order.validateOrderCancel();
+    order.validateOrderUpdate();
 
     refundPoint(userId, orderId, order.getPointPrice());
     rollbackStock(order);
@@ -78,11 +80,25 @@ public class OrderService {
 
     try {
       OrderState state = OrderState.valueOf(orderState);
-      order.updateOrderState(state);
+      order.updateState(state);
     } catch (IllegalArgumentException e) {
       throw new OrderException(OrderErrorCode.ORDER_STATE_NOT_FOUND);
     }
 
+    return orderId;
+  }
+
+  @Transactional
+  public Long updateOrderAddress(Long userId, Long orderId, Long addressId) {
+    UserDto user = userClient.getUser(userId);
+    Order order = validateOrderExists(orderId);
+    order.validateOrderPermission(user);
+    order.validateOrderUpdate();
+
+    AddressDto address = userClient.getAddress(addressId);
+    orderCreateService.validateAddress(address, userId);
+
+    order.updateAddress(address);
     return orderId;
   }
 
@@ -107,6 +123,7 @@ public class OrderService {
 
     return new PageImpl<>(responses, pageable, orders.getTotalElements());
   }
+
 
   public Order validateOrderExists(Long orderId) {
     return orderRepository.findById(orderId).orElseThrow(
