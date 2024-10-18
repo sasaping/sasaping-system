@@ -134,6 +134,15 @@ public class OrderService {
     return new PageImpl<>(responses, pageable, orders.getTotalElements());
   }
 
+  @Transactional
+  public void deleteOrder(Long userId, Long orderId) {
+    UserDto user = userClient.getUser(userId);
+    Order order = validateOrderExists(orderId);
+    order.validateOrderPermission(user);
+    order.validateOrderDelete();
+    order.delete();
+  }
+
 
   public Order validateOrderExists(Long orderId) {
     return orderRepository.findById(orderId).orElseThrow(

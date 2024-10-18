@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,6 +59,15 @@ public class OrderController {
         orderService.registerOrderInvoiceNumber(userClaim.getUserId(), orderId, invoiceNumber));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+  @PatchMapping("/{orderId}/{orderState}")
+  public ApiResponse<Long> updateOrderState(@AuthenticationPrincipal JwtClaim userClaim,
+      @PathVariable(name = "orderId") Long orderId,
+      @PathVariable(name = "orderState") String orderState) {
+    return ApiResponse.ok(
+        orderService.updateOrderState(userClaim.getUserId(), orderId, orderState));
+  }
+
   @GetMapping("/{orderId}")
   public ApiResponse<OrderGetResponse> getOrder(@AuthenticationPrincipal JwtClaim userClaim,
       @PathVariable(name = "orderId") Long orderId) {
@@ -72,13 +82,11 @@ public class OrderController {
     return ApiResponse.ok(orderService.getMyOrder(pageable, userClaim.getUserId(), keyword));
   }
 
-  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
-  @PatchMapping("/{orderId}/{orderState}")
-  public ApiResponse<Long> updateOrderState(@AuthenticationPrincipal JwtClaim userClaim,
-      @PathVariable(name = "orderId") Long orderId,
-      @PathVariable(name = "orderState") String orderState) {
-    return ApiResponse.ok(
-        orderService.updateOrderState(userClaim.getUserId(), orderId, orderState));
+  @DeleteMapping("/{orderId}")
+  public ApiResponse<?> deleteOrder(@AuthenticationPrincipal JwtClaim jwtClaim,
+      @PathVariable(name = "orderId") Long orderId) {
+    orderService.deleteOrder(jwtClaim.getUserId(), orderId);
+    return ApiResponse.ok();
   }
 
 

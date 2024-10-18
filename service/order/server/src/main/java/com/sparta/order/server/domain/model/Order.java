@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -42,6 +43,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "P_ORDER",
     uniqueConstraints = @UniqueConstraint(columnNames = "order_no", name = "UK_ORDER_NO"))
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity {
 
   private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("20000");
@@ -54,7 +56,7 @@ public class Order extends BaseEntity {
   @Column(nullable = false)
   private Long userId;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private Long paymentId;
 
   @Column(nullable = false, unique = true, length = 50)
@@ -104,6 +106,9 @@ public class Order extends BaseEntity {
   @Column(nullable = false, length = 255)
   private String shippingAddress;
 
+  @Column(nullable = false)
+  private Boolean isDeleted = false;
+
   @OneToMany(mappedBy = "order")
   @Builder.Default
   private List<OrderProduct> orderProducts = new ArrayList<>();
@@ -126,6 +131,10 @@ public class Order extends BaseEntity {
 
   public void updateState(OrderState state) {
     this.state = state;
+  }
+
+  public void delete() {
+    isDeleted = true;
   }
 
   public void updateAddress(AddressDto address) {
@@ -151,7 +160,6 @@ public class Order extends BaseEntity {
 
     return Order.builder()
         .userId(userId)
-        .paymentId(1L)
         .orderNo(orderNo)
         .type(OrderType.valueOf(request.getOrderType()))
         .state(OrderState.PENDING_PAYMENT)
@@ -231,7 +239,13 @@ public class Order extends BaseEntity {
   public void validateOrderUpdate() {
     if (!state.equals(OrderState.PENDING_PAYMENT)
         && !state.equals(OrderState.COMPLETED)) {
-      throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);
+      throw new OrderException(OrderErrorCode.ORDER_CANNOT_CANCEL_WHILE_SHIPPING, orderId);
+    }
+  }
+
+  public void validateOrderDelete() {
+    if (!state.equals(OrderState.PURCHASE_CONFIRMED)) {
+      throw new OrderException(OrderErrorCode.ORDER_CANNOT_DELETE, orderId);
     }
   }
 
