@@ -136,7 +136,12 @@ public class Order extends BaseEntity {
     this.shippingAddress = address.getAddress();
   }
 
-  // TODO AddressDto 추가
+  public void registerOrderInvoiceNumber(String invoiceNumber) {
+    this.invoiceNumber = invoiceNumber;
+    this.state = OrderState.SHIPPING;
+  }
+
+
   public static Order createOrder(Long userId, OrderCreateRequest request,
       List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
 

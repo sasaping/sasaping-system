@@ -102,6 +102,16 @@ public class OrderService {
     return orderId;
   }
 
+  @Transactional
+  public Long registerOrderInvoiceNumber(Long userId, Long orderId, String invoiceNumber) {
+    UserDto user = userClient.getUser(userId);
+    Order order = validateOrderExists(orderId);
+    order.validateOrderPermission(user);
+
+    order.registerOrderInvoiceNumber(invoiceNumber);
+    return orderId;
+  }
+
   public OrderGetResponse getOrder(Long userId, Long orderId) {
     UserDto user = userClient.getUser(userId);
     Order order = validateOrderExists(orderId);

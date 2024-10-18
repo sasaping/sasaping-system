@@ -45,6 +45,10 @@ Authorization: Bearer {{access_token}}
 PATCH http://localhost:{{Port}}/api/orders/19152?address_id=4
 Authorization: Bearer {{access_token}}
 
+### 주문 주소지 변경
+PATCH http://localhost:{{Port}}/api/orders/19152/invoice-number/1234
+Authorization: Bearer {{access_token}}
+
 ### 결제 실패
 GET http://localhost:19061/payments/fail?paymentKey=tviva20241017164604o7BU8
 Authorization: Bearer {{access_token}}

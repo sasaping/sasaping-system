@@ -41,12 +41,21 @@ public class OrderController {
     return ApiResponse.ok(orderService.cancelOrder(userClaim.getUserId(), orderId));
   }
 
-  @PatchMapping("/{orderId}")
+  @PatchMapping("/{orderId}/")
   public ApiResponse<Long> updateOrderAddress(@AuthenticationPrincipal JwtClaim userClaim,
       @PathVariable(name = "orderId") Long orderId,
       @RequestParam(name = "address_id") Long addressId) {
     return ApiResponse.ok(
         orderService.updateOrderAddress(userClaim.getUserId(), orderId, addressId));
+  }
+
+  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+  @PatchMapping("/{orderId}/invoice-number/{invoiceNumber}")
+  public ApiResponse<Long> addOrderInvoiceNumber(@AuthenticationPrincipal JwtClaim userClaim,
+      @PathVariable(name = "orderId") Long orderId,
+      @PathVariable(name = "invoiceNumber") String invoiceNumber) {
+    return ApiResponse.ok(
+        orderService.registerOrderInvoiceNumber(userClaim.getUserId(), orderId, invoiceNumber));
   }
 
   @GetMapping("/{orderId}")
