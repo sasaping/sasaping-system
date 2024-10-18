@@ -1,24 +1,25 @@
-@Port=19071
+@Port=19091
 
 ### 장바구니 상품 추가
 POST http://localhost:{{Port}}/api/carts/products
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "userId": 123456,
-  "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
-  "quantity": 3
+  "productId": "920164fe-8906-4a51-a6b8-1683277d09b2",
+  "quantity": 10
 }
 
 ### 장바구니 상품 조회
-GET http://localhost:{{Port}}/api/carts?userId=123456
+GET http://localhost:{{Port}}/api/carts
+Authorization: Bearer {{access_token}}
 
 ### 장바구니 상품 개수 수정
 PATCH http://localhost:{{Port}}/api/carts/products
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "userId": 123456,
   "productId": "5052b3c6-838c-4506-b658-9ff8f59fb4da",
   "quantity": 1
 }
@@ -26,12 +27,15 @@ Content-Type: application/json
 ### 장바구니 상품 삭제
 DELETE http://localhost:{{Port}}/api/carts/products/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb1g?
     userId=123456
+Authorization: Bearer {{access_token}}
 
 ### 장바구니 전체 삭제
 DELETE http://localhost:{{Port}}/api/carts/clear?userId=123456
+Authorization: Bearer {{access_token}}
 
 ### 상품 생성
-POST http://localhost:19081/api/products
+POST http://localhost:19091/api/products
+Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
@@ -54,4 +58,14 @@ Content-Type: application/json
     "DISCOUNT",
     "NEW"
   ]
+}
+
+### 카테고리 생성
+POST http://localhost:{{Port}}/api/categories
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "name": "CLOTHES",
+  "parentCategoryId": null
 }

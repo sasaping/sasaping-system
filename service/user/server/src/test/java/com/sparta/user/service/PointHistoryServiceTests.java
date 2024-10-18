@@ -43,7 +43,7 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_성공() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", BigDecimal.ZERO, UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryDto request = new PointHistoryDto(
@@ -56,6 +56,7 @@ public class PointHistoryServiceTests {
 
     // Mock user repository
     when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+    when(pointHistoryRepository.save(any(PointHistory.class))).thenReturn(new PointHistory());
 
     // When
     pointHistoryService.createPointHistory(request);
@@ -91,7 +92,7 @@ public class PointHistoryServiceTests {
   void test_포인트_내역_추가_시_유저의_포인트_부족() {
     // Given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryDto request = new PointHistoryDto(

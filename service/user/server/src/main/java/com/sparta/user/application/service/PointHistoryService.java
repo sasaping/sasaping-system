@@ -26,7 +26,7 @@ public class PointHistoryService {
   private final PointHistoryRepository pointHistoryRepository;
 
   @Transactional
-  public void createPointHistory(PointHistoryDto request) {
+  public Long createPointHistory(PointHistoryDto request) {
     User user = userRepository
         .findById(request.getUserId())
         .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
@@ -42,8 +42,7 @@ public class PointHistoryService {
       default:
         throw new UserException(UserErrorCode.INVALID_POINT_HISTORY_TYPE);
     }
-
-    pointHistoryRepository.save(PointHistory.create(user, request));
+    return pointHistoryRepository.save(PointHistory.create(user, request)).getId();
   }
 
   private void handlePointAdd(User user, BigDecimal point) {
@@ -68,6 +67,15 @@ public class PointHistoryService {
         .stream()
         .map(PointResponse.Get::of)
         .collect(Collectors.toList());
+  }
+
+  @Transactional
+  public void rollbackPointHistory(Long pointHistoryId) {
+    PointHistory pointHistory = pointHistoryRepository.findById(pointHistoryId).orElseThrow(
+        () -> new UserException(UserErrorCode.POINT_HISTORY_NOT_FOUND)
+    );
+    handlePointAdd(pointHistory.getUser(), pointHistory.getPoint());
+    pointHistoryRepository.rollback(pointHistory);
   }
 
 }

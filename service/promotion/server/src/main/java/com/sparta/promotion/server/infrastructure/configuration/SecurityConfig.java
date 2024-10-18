@@ -33,7 +33,12 @@ public class SecurityConfig {
         .logout(AbstractHttpConfigurer::disable)
         .requestCache(RequestCacheConfigurer::disable)
         .authorizeHttpRequests(
-            authorize -> authorize.anyRequest().authenticated())
+            authorize -> authorize
+                .requestMatchers("/api/events/**").permitAll()
+                .requestMatchers("/internal/**").permitAll()
+                .anyRequest().authenticated()
+
+        )
         .addFilterAfter(
             new SecurityContextFilter(objectMapper), UsernamePasswordAuthenticationFilter.class);
 

@@ -1,13 +1,26 @@
 @Port=19091
-@Token=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjo4LCJVU0VSX1JPTEUiOiJST0xFX0NVU1RPTUVSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg0ODc3MjQsImV4cCI6MTczMjA4NzcyNH0.txZBawu2pGD2rZUj-oHbCfUhf7WNatjQX3e-2v3cRXY
+@couponId=1
+@userId=11
+
+### 로그인
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser11",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token", "Bearer " + response.body.data.token);
+%}
 
 ### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
-Authorization: {{Token}}
+Authorization: {{access_token}}
 
 {
-  "name": "Test Coupon",
+  "name": "Test Coupon3",
   "type": "EVENT",
   "discountType": "PRICE",
   "discountValue": 1000.00,
@@ -21,6 +34,52 @@ Authorization: {{Token}}
 }
 
 ### 이벤트 쿠폰 발급
-@couponId = 1
 POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}
-Authorization: {{Token}}
+Authorization: {{access_token}}
+
+### 쿠폰 전체 조회
+GET http://localhost:{{Port}}/api/coupons
+Authorization: {{access_token}}
+
+### 쿠폰 단일 조회
+GET http://localhost:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}
+
+### 특정 사용자 쿠폰 전체 조회
+GET http://localhost:{{Port}}/api/coupons/users/{{userId}}
+Authorization: {{access_token}}
+
+### 내 쿠폰 전체 조회
+GET http://localhost:{{Port}}/api/coupons/me
+Authorization: {{access_token}}
+
+### 쿠폰 수정
+PATCH localhost:{{Port}}/api/coupons/{{couponId}}
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "name": "Updated Coupon Name",
+  "type": "EVENT",
+  "discountType": "PERCENTAGE",
+  "discountValue": 10.00,
+  "minBuyPrice": 100.00,
+  "maxDiscountPrice": 50.00,
+  "quantity": 100,
+  "startDate": "2024-01-01T00:00:00",
+  "endDate": "2024-12-31T23:59:59",
+  "userTier": "GOLD",
+  "eventId": 1
+}
+
+### 쿠폰 삭제
+DELETE localhost:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}
+
+### 쿠폰 사용
+PATCH http://localhost:19021/internal/coupons/{{couponId}}/use?userId={{userId}}
+Authorization: {{access_token}}
+
+### 쿠폰 환불
+PATCH http://localhost:19021/internal/coupons/{{couponId}}/refund?userId={{userId}}
+Authorization: {{access_token}}

@@ -1,16 +1,14 @@
 package com.sparta.product.presentation.controller;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.product.application.ElasticsearchService;
-import com.sparta.product.infrastructure.elasticsearch.dto.ProductSearchDto;
+import com.sparta.product.application.product.ElasticsearchService;
+import com.sparta.product.infrastructure.utils.ProductSearchDto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,15 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class ProductSearchController {
   private final ElasticsearchService elasticSearchService;
-  private final ElasticsearchClient esClient;
-
-  @GetMapping(value = "/api/products/exists/{indexName}/{documentId}")
-  public boolean exists(
-      @PathVariable(name = "indexName") String indexName,
-      @PathVariable(name = "documentId") String documentId)
-      throws IOException {
-    return esClient.exists(b -> b.index(indexName).id(documentId)).value();
-  }
 
   @GetMapping("/api/products/search")
   public ApiResponse<Page<ProductSearchDto>> getProductList(

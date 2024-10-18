@@ -1,0 +1,44 @@
+@Port=19091
+
+### 회원가입
+POST http://localhost:{{Port}}/api/users/sign-up
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123",
+  "nickname": "nickname",
+  "point": 10000,
+  "role": "관리자"
+}
+
+### 로그인
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token", response.body.data.token);
+%}
+
+
+### 배송지 조회
+GET http://localhost:19092/internal/address/1
+Authorization: Bearer {{access_token}}
+
+### 배송지 생성
+POST http://localhost:{{Port}}/api/address
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "alias": "Home",
+  "recipient": "John Doe",
+  "phoneNumber": "010-1234-5678",
+  "zipcode": "12345",
+  "address": "123 Main St, Anytown, AT 12345",
+  "isDefault": true
+}

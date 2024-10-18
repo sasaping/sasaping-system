@@ -9,7 +9,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.json.JsonData;
 import com.sparta.product.domain.model.SortOption;
-import com.sparta.product.infrastructure.elasticsearch.dto.ProductSearchDto;
+import com.sparta.product.infrastructure.utils.ProductSearchDto;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;

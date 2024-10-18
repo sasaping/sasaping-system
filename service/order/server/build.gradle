@@ -27,17 +27,29 @@ ext {
     set('springCloudVersion', "2023.0.3")
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/main/generated']
+        }
+    }
+}
+
 
 dependencies {
     implementation project(':common:domain')
+    implementation project(':service:user:user_dto')
     implementation project(':service:product:product_dto')
+    implementation project(':service:auth:auth_dto')
+    implementation project(':service:payment:payment_dto')
+    implementation project(':service:order:dto')
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -45,6 +57,18 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+    implementation 'org.springframework.kafka:spring-kafka'
 }
 dependencyManagement {
     imports {

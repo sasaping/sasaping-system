@@ -1,12 +1,6 @@
-server:
-  port: 19021
-
 spring:
-  application:
-    name: promotion
-
   datasource:
-    url: jdbc:mysql://localhost:3306/user
+    url: jdbc:mysql://localhost:3306/promotion
     username: user
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -17,12 +11,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info
 
 eureka:
   client:

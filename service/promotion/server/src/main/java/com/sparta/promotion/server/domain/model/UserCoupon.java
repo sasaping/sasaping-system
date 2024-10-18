@@ -42,4 +42,8 @@ public class UserCoupon {
         .build();
   }
 
+  public void updateIsUsed(boolean isUsed) {
+    this.isUsed = isUsed;
+  }
+
 }

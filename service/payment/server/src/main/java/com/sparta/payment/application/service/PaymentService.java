@@ -1,5 +1,6 @@
 package com.sparta.payment.application.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
 import com.sparta.payment.domain.entity.PaymentState;
@@ -8,6 +9,7 @@ import com.sparta.payment.domain.repository.PaymentRepository;
 import com.sparta.payment.exception.PaymentErrorCode;
 import com.sparta.payment.exception.PaymentException;
 import com.sparta.payment.infrastructure.client.MessageClient;
+import com.sparta.payment.infrastructure.event.PaymentCompletedEvent;
 import com.sparta.payment.presentation.dto.PaymentHistoryResponse;
 import com.sparta.payment.presentation.dto.PaymentRequest;
 import com.sparta.payment.presentation.dto.PaymentRequest.Create;
@@ -27,6 +29,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -37,27 +40,34 @@ public class PaymentService {
 
   @Value("${TOSS_SECRET_KEY}")
   private String originalKey;
+
+  @Value("${PAYMENT.SUCCESS_URL}")
+  private String SUCCESS_URL;
+
+  @Value("${PAYMENT.FAIL_URL}")
+  private String FAIL_URL;
   private final String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments";
+
+  private final KafkaTemplate<String, Object> kafkaTemplate;
 
   private final PaymentRepository paymentRepository;
   private final PaymentHistoryRepository paymentHistoryRepository;
   private final RestTemplate restTemplate;
   private final MessageClient messageClient;
-  private final ElasticSearchService elasticSearchService;
 
-  public PaymentService(PaymentRepository paymentRepository,
+  public PaymentService(KafkaTemplate<String, Object> kafkaTemplate,
+      PaymentRepository paymentRepository,
       PaymentHistoryRepository paymentHistoryRepository,
-      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient,
-      ElasticSearchService elasticSearchService) {
+      RestTemplateBuilder restTemplateBuilder, MessageClient messageClient) {
+    this.kafkaTemplate = kafkaTemplate;
     this.paymentRepository = paymentRepository;
     this.paymentHistoryRepository = paymentHistoryRepository;
     this.restTemplate = restTemplateBuilder.build();
     this.messageClient = messageClient;
-    this.elasticSearchService = elasticSearchService;
   }
 
 
-  public PaymentResponse.Create createPayment(Create request) {
+  public void createPayment(Create request) {
     String secretKey = Base64.getEncoder().encodeToString(originalKey.getBytes());
     try {
       HttpHeaders headers = new HttpHeaders();
@@ -67,6 +77,8 @@ public class PaymentService {
       body.setOrderId(request.getOrderId());
       body.setOrderName(request.getOrderName());
       body.setAmount(request.getAmount());
+      body.setSuccessUrl(SUCCESS_URL);
+      body.setFailUrl(FAIL_URL);
 
       HttpEntity<PaymentRequest.CreateExt> entity = new HttpEntity<>(body, headers);
 
@@ -80,8 +92,6 @@ public class PaymentService {
       sendMessage(response.getBody().getCheckout(), request.getEmail());
 
       paymentRepository.save(payment);
-
-      return response.getBody();
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
@@ -105,7 +115,7 @@ public class PaymentService {
 
 
   @Transactional
-  public void paymentSuccess(String paymentKey) {
+  public Payment paymentSuccess(String paymentKey) {
     Payment payment = paymentRepository.findByPaymentKey(paymentKey);
     if (payment == null) {
       throw new PaymentException(PaymentErrorCode.PAYMENT_NOT_FOUND);
@@ -126,18 +136,29 @@ public class PaymentService {
         Object.class
     );
 
-    // TODO : 주문 상태 변경 Feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .userId(payment.getUserId())
+        .success(true)
+        .build();
 
     try {
-      elasticSearchService.savePayment(payment);
+      ObjectMapper objectMapper = new ObjectMapper();
+      String jsonMessage = objectMapper.writeValueAsString(event);
+      kafkaTemplate.send("payment-completed-topic", jsonMessage);
+
     } catch (Exception e) {
       log.error(e.getMessage());
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
-    
+
     payment.setState(PaymentState.PAYMENT);
     PaymentHistory history = PaymentHistory.create(payment);
     paymentHistoryRepository.save(history);
+
+    return payment;
   }
 
   public void paymentFail(String paymentKey) {
@@ -146,7 +167,23 @@ public class PaymentService {
       throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
     }
 
-    // TODO : 주문 상태 변경 feign API 호출
+    PaymentCompletedEvent event = PaymentCompletedEvent.builder()
+        .paymentId(payment.getPaymentId())
+        .orderId(payment.getOrderId())
+        .amount(payment.getAmount())
+        .userId(payment.getUserId())
+        .success(false)
+        .build();
+
+    try {
+      ObjectMapper objectMapper = new ObjectMapper();
+      String jsonMessage = objectMapper.writeValueAsString(event);
+      kafkaTemplate.send("payment-completed-topic", jsonMessage);
+
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw new PaymentException(PaymentErrorCode.INVALID_PARAMETER);
+    }
 
     payment.setState(PaymentState.CANCEL);
     paymentRepository.save(payment);

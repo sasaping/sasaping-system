@@ -1,0 +1,46 @@
+@Port=19091
+
+### 주문 생성
+POST http://localhost:{{Port}}/api/orders
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "orderType": "STANDARD",
+  "orderProductInfos": [
+    {
+      "productId": "920164fe-8906-4a51-a6b8-1683277d09b2",
+      "quantity": 10
+    }
+  ],
+  "pointPrice": 0,
+  "addressId": 1
+}
+
+### 주문 취소
+PATCH http://localhost:{{Port}}/api/orders/19157/cancel
+Authorization: Bearer {{access_token}}
+
+### 상품 재고 조회
+GET http://localhost:{{Port}}/api/products/search/97a88cea-2174-4d3f-b9ed-96d45e4e2341
+Authorization: Bearer {{access_token}}
+
+### 주문 단건 조회
+GET http://localhost:{{Port}}/api/orders/19152
+Authorization: Bearer {{access_token}}
+
+### 주문 단건 조회
+GET http://localhost:{{Port}}/api/orders/19152
+Authorization: Bearer {{access_token}}
+
+### 주문 상태 변경
+PATCH http://localhost:{{Port}}/api/orders/19152/SHIPPING
+Authorization: Bearer {{access_token}}
+
+### 내 주문 조회
+GET http://localhost:{{Port}}/api/orders/me?page=0&size=10
+Authorization: Bearer {{access_token}}
+
+### 결제 실패
+GET http://localhost:19061/payments/fail?paymentKey=tviva20241017164604o7BU8
+Authorization: Bearer {{access_token}}

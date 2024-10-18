@@ -31,10 +31,13 @@ dependencies {
     implementation project(':common:domain')
     implementation project(':service:product:product_dto')
     implementation project(':service:auth:auth_dto')
+    implementation project(':service:order:dto')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-cassandra'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.redisson:redisson:3.35.0'
+    implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.springframework.data:spring-data-elasticsearch:5.3.0'
     implementation 'co.elastic.clients:elasticsearch-java:8.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.4'
