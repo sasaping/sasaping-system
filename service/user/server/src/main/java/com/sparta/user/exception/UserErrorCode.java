@@ -19,7 +19,9 @@ public enum UserErrorCode {
 
   ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "배송지를 찾을 수 없습니다."),
   POINT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "포인트 내역을 찾을 수 없습니다."),
-  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 에러 입니다.");
+  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 에러 입니다."),
+
+  USER_TIER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자의 등급을 찾을 수 없습니다.");
 
   private final HttpStatus status;
   private final String message;

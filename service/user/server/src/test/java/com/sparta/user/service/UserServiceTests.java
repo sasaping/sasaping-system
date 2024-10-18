@@ -3,12 +3,15 @@ package com.sparta.user.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sparta.user.application.dto.UserResponse;
+import com.sparta.user.application.dto.UserTierResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.domain.model.Tier;
 import com.sparta.user.domain.model.User;
@@ -51,7 +54,7 @@ class UserServiceTests {
   private UserService userService;
 
   @Test
-  void test_회원가입_시_존재하는_유저인지_확인() {
+  void test_회원가입_실패_존재하는_유저() {
     // Arrange
     UserRequest.Create request =
         new UserRequest.Create("existinguser", "password123", "test@email.com", "nickname",
@@ -69,7 +72,7 @@ class UserServiceTests {
   }
 
   @Test
-  void test_회원가입() {
+  void test_회원가입_성공() {
     // Arrange
     UserRequest.Create request =
         new UserRequest.Create("newuser", "password123", "test@email.com", "nickname",
@@ -106,7 +109,7 @@ class UserServiceTests {
   }
 
   @Test
-  void test_유저_조회_시_존재하지_않는_유저() {
+  void test_유저_조회_실패_존재하지_않는_유저() {
     // Arrange
     String username = "nonexistentuser";
     when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
@@ -278,6 +281,107 @@ class UserServiceTests {
 
     // verify
     verify(userRepository).findById(userId);
+  }
+
+  @Test
+  void test_유저_티어_단일_조회_성공() {
+    // given
+    Long userId = 1L;
+    Long tierId = 1L;
+
+    UserRequest.Create requestUser = new UserRequest.Create(
+        "testUser", "password", "test@test.com", "nickname1", UserRole.ROLE_USER
+    );
+    User user = User.create(requestUser, "password123");
+    Tier tier = new Tier(tierId, "실버핑", 100000L);
+    UserTier userTier = UserTier.create(user, tier);
+
+    // when
+    when(userTierRepository.findByUserId(userId)).thenReturn(Optional.of(userTier));
+    when(userRepository.findById(userTier.getUser().getId())).thenReturn(Optional.of(user));
+    when(tierRepository.findById(userTier.getTier().getId())).thenReturn(Optional.of(tier));
+
+    // then
+    UserTierResponse.Get response = userService.getUserTierByUserId(userId);
+
+    // assert
+    assertEquals("testUser", response.getUsername());
+    assertEquals("실버핑", response.getTier());
+
+    verify(userTierRepository, times(1)).findByUserId(userId);
+    verify(userRepository, times(1)).findById(userTier.getUser().getId());
+    verify(tierRepository, times(1)).findById(userTier.getTier().getId());
+  }
+
+  @Test
+  void test_유저_티어_단일_조회_실패_유저티어_없음() {
+    // given
+    Long userId = 1L;
+
+    // when
+    when(userTierRepository.findByUserId(userId)).thenReturn(Optional.empty());
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getUserTierByUserId(userId));
+
+    // assert
+    assertEquals(UserErrorCode.USER_TIER_NOT_FOUND, exception.getErrorCode());
+
+    verify(userTierRepository, times(1)).findByUserId(userId);
+    verify(userRepository, never()).findById(anyLong());
+    verify(tierRepository, never()).findById(anyLong());
+  }
+
+  @Test
+  void test_유저_티어_단일_조회_실패_유저_없음() {
+    // given
+    Long userId = 1L;
+
+    User user = mock(User.class);
+    Tier tier = mock(Tier.class);
+    UserTier userTier = UserTier.create(user, tier);
+
+    // when
+    when(userTierRepository.findByUserId(userId)).thenReturn(Optional.of(userTier));
+    when(userRepository.findById(userTier.getUser().getId())).thenReturn(Optional.empty());
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getUserTierByUserId(userId));
+
+    // assert
+    assertEquals(UserErrorCode.USER_NOT_FOUND, exception.getErrorCode());
+
+    verify(userTierRepository, times(1)).findByUserId(userId);
+    verify(userRepository, times(1)).findById(userTier.getUser().getId());
+    verify(tierRepository, never()).findById(anyLong());
+  }
+
+  @Test
+  void test_유저_티어_단일_조회_실패_티어_없음() {
+    // given
+    Long userId = 1L;
+
+    User user = mock(User.class);
+    Tier tier = mock(Tier.class);
+    UserTier userTier = UserTier.create(user, tier);
+
+    // when
+    when(userTierRepository.findByUserId(userId)).thenReturn(Optional.of(userTier));
+    when(userRepository.findById(userTier.getUser().getId())).thenReturn(Optional.of(user));
+    when(tierRepository.findById(userTier.getTier().getId())).thenReturn(Optional.empty());
+
+    // then
+    UserException exception = assertThrows(UserException.class,
+        () -> userService.getUserTierByUserId(userId));
+
+    // assert
+    assertEquals(UserErrorCode.TIER_NOT_FOUND, exception.getErrorCode());
+
+    verify(userTierRepository, times(1)).findByUserId(userId);
+    verify(userRepository, times(1)).findById(userTier.getUser().getId());
+    verify(tierRepository, times(1)).findById(userTier.getTier().getId());
   }
 
 }

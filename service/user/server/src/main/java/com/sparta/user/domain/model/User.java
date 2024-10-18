@@ -65,7 +65,7 @@ public class User extends BaseEntity {
   private UserTier userTier;
 
   @Column
-  private Boolean isDeleted = false;
+  private Boolean isDeleted;
 
   public static User create(UserRequest.Create request, String encodedPassword) {
     return User.builder()
@@ -75,6 +75,7 @@ public class User extends BaseEntity {
         .point(BigDecimal.ZERO)
         .email(request.getEmail())
         .role(request.getRole())
+        .isDeleted(false)
         .build();
   }
 

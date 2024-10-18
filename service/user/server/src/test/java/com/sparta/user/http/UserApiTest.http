@@ -8,10 +8,10 @@ POST http://localhost:{{Port}}/api/users/sign-up
 Content-Type: application/json
 
 {
-  "username": "newUser20",
+  "username": "newUser12",
   "password": "password123",
-  "nickname": "nickname",
-  "email": "newemail20@email.com",
+  "nickname": "nickname12",
+  "email": "newemail12@email.com",
   "role": "사용자"
 }
 
@@ -20,7 +20,7 @@ POST http://localhost:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser",
+  "username": "newUser12",
   "password": "password123"
 }
 > {%
@@ -50,5 +50,9 @@ Authorization: {{access_token}}
 }
 
 ### 사용자 삭제
-DELETE localhost:{{Port}}/api/users/{{userId}}
+DELETE http://localhost:{{Port}}/api/users/{{userId}}
+Authorization: {{access_token}}
+
+### 현재 유저 등급 조회
+GET http://localhost:{{Port}}/api/users/tier/me
 Authorization: {{access_token}}
