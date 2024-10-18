@@ -118,7 +118,7 @@ public class PointHistoryServiceTests {
   void test_현재_사용자_포인트_내역_조회_성공() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
-        "username", "password", "nickname", new BigDecimal("100"), UserRole.ROLE_USER
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
     );
     User user = User.create(userRequest, "encodedPassword");
     PointHistoryDto request = new PointHistoryDto(
