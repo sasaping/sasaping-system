@@ -161,4 +161,46 @@ public class PointHistoryServiceTests {
     assertEquals(pointHistory2.getPoint(), result.getContent().get(1).getPoint());
   }
 
+  @Test
+  void test_전체_사용자_포인트_내역_조회() {
+    // given
+    UserRequest.Create userRequest1 = new UserRequest.Create(
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
+    );
+    User user1 = User.create(userRequest1, "encodedPassword");
+    UserRequest.Create userRequest2 = new UserRequest.Create(
+        "username2", "password", "test2@email.com", "nickname2", UserRole.ROLE_USER
+    );
+    User user2 = User.create(userRequest2, "encodedPassword");
+    PointHistoryDto request = new PointHistoryDto(
+        1L,
+        10L,
+        new BigDecimal("50.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory1 = PointHistory.create(user1, request);
+    PointHistoryDto request2 = new PointHistoryDto(
+        1L,
+        11L,
+        new BigDecimal("100.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory2 = PointHistory.create(user2, request2);
+
+    List<PointHistory> pointHistories = Arrays.asList(pointHistory1, pointHistory2);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<PointHistory> pointHistoryPage = new PageImpl<>(pointHistories, pageable,
+        pointHistories.size());
+
+    // when
+    when(pointHistoryRepository.findAll(pageable)).thenReturn(pointHistoryPage);
+
+    Page<PointResponse.Get> result = pointHistoryService.getPointHistoryList(pageable);
+
+    // then
+    assertEquals(2, result.getTotalElements());
+  }
+
 }

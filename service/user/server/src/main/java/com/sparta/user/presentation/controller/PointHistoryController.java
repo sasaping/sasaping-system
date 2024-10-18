@@ -39,4 +39,10 @@ public class PointHistoryController {
     return ApiResponse.ok(pointHistoryService.getPointHistoryByUserId(userId, pageable));
   }
 
+  @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+  @GetMapping
+  public ApiResponse<Page<PointResponse.Get>> getPointHistoryList(Pageable pageable) {
+    return ApiResponse.ok(pointHistoryService.getPointHistoryList(pageable));
+  }
+
 }

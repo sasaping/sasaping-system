@@ -67,6 +67,10 @@ public class PointHistoryService {
         .map(PointResponse.Get::of);
   }
 
+  public Page<PointResponse.Get> getPointHistoryList(Pageable pageable) {
+    return pointHistoryRepository.findAll(pageable).map(PointResponse.Get::of);
+  }
+
   @Transactional
   public void rollbackPointHistory(Long pointHistoryId) {
     PointHistory pointHistory = pointHistoryRepository.findById(pointHistoryId).orElseThrow(

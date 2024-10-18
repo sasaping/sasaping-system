@@ -61,3 +61,7 @@ Authorization: {{access_token_user}}
 ### 특정 사용자 포인트 내역 조회
 GET http://localhost:{{Port}}/api/users/point/{{userId}}
 Authorization: {{access_token_admin}}
+
+### 전체 사용자 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point
+Authorization: {{access_token_admin}}

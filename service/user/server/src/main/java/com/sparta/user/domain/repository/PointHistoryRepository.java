@@ -17,4 +17,6 @@ public interface PointHistoryRepository {
 
   void rollback(PointHistory pointHistory);
 
+  Page<PointHistory> findAll(Pageable pageable);
+
 }

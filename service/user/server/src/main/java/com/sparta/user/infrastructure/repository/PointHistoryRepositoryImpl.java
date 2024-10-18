@@ -34,4 +34,9 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
     jpaPointHistoryRepository.delete(pointHistory);
   }
 
+  @Override
+  public Page<PointHistory> findAll(Pageable pageable) {
+    return jpaPointHistoryRepository.findAll(pageable);
+  }
+
 }
