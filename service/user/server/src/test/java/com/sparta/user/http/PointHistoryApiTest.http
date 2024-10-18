@@ -1,20 +1,41 @@
 @Port=19091
 @InternalPort=19092
-@TokenUser=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMCwiVVNFUl9ST0xFIjoiUk9MRV9VU0VSIiwiVVNFUl9OQU1FIjoibmV3VXNlcjIiLCJpYXQiOjE3Mjg2NTUxOTgsImV4cCI6MTczMjI1NTE5OH0.o6VKKVIrBV1SNtlPCbVOWygPhcNGvmLKJsrXMvp8rgI
-@TokenAdmin=Bearer eyJhbGciOiJIUzI1NiJ9.eyJVU0VSX0lEIjoxMSwiVVNFUl9ST0xFIjoiUk9MRV9BRE1JTiIsIlVTRVJfTkFNRSI6Im5ld1VzZXIiLCJpYXQiOjE3Mjg2NTYxMjUsImV4cCI6MTczMjI1NjEyNX0.z_M-s8XwM2SKA7ojdNR9ZoMRd7isn8VLlKmL0i5iI4s
+@userId=17
 
-## 외부 API
-### 내 포인트 내역 조회
-GET http://localhost:{{Port}}/api/users/point/me
-Authorization: {{TokenUser}}
+### 로그인(유저)
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
 
-## 내부 API
+{
+  "username": "newUser12",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token_user", "Bearer " + response.body.data.token);
+%}
+
+### 로그인(관리자)
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token_admin", "Bearer " + response.body.data.token);
+%}
+
+### 마이페이지 조회
+GET http://localhost:{{Port}}/api/users/me
+Authorization: {{access_token_user}}
+
 ### 포인트 적립
 POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 10,
+  "userId": {{userId}},
   "orderId": 10,
   "point": 50,
   "type": "적립",
@@ -26,9 +47,17 @@ POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 10,
+  "userId": {{userId}},
   "orderId": 11,
   "point": 30,
   "type": "사용",
   "description": "포인트 사용입니다."
 }
+
+### 내 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point/me
+Authorization: {{access_token_user}}
+
+### 특정 사용자 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point/{{userId}}
+Authorization: {{access_token_admin}}

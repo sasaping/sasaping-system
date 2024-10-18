@@ -12,9 +12,9 @@ import com.sparta.user.exception.UserErrorCode;
 import com.sparta.user.exception.UserException;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,15 +58,13 @@ public class PointHistoryService {
     userRepository.save(user);
   }
 
-  public List<PointResponse.Get> getPointHistoryByUserid(Long userId) {
+  public Page<PointResponse.Get> getPointHistoryByUserId(Long userId, Pageable pageable) {
     User user = userRepository
         .findById(userId)
         .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     return pointHistoryRepository
-        .findAllByUserId(user.getId())
-        .stream()
-        .map(PointResponse.Get::of)
-        .collect(Collectors.toList());
+        .findAllByUserId(user.getId(), pageable)
+        .map(PointResponse.Get::of);
   }
 
   @Transactional

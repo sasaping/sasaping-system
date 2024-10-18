@@ -26,6 +26,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class PointHistoryServiceTests {
@@ -115,7 +119,7 @@ public class PointHistoryServiceTests {
   }
 
   @Test
-  void test_현재_사용자_포인트_내역_조회_성공() {
+  void test_단일_사용자_포인트_내역_조회_성공() {
     // given
     UserRequest.Create userRequest = new UserRequest.Create(
         "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
@@ -139,16 +143,22 @@ public class PointHistoryServiceTests {
     PointHistory pointHistory2 = PointHistory.create(user, request2);
 
     List<PointHistory> pointHistories = Arrays.asList(pointHistory1, pointHistory2);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<PointHistory> pointHistoryPage = new PageImpl<>(pointHistories, pageable,
+        pointHistories.size());
 
     // when
     when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-    when(pointHistoryRepository.findAllByUserId(user.getId())).thenReturn(pointHistories);
-    List<PointResponse.Get> result = pointHistoryService.getPointHistoryByUserid(user.getId());
+    when(pointHistoryRepository.findAllByUserId(user.getId(), pageable)).thenReturn(
+        pointHistoryPage);
+
+    Page<PointResponse.Get> result = pointHistoryService.getPointHistoryByUserId(user.getId(),
+        pageable);
 
     // then
-    assertEquals(2, result.size());
-    assertEquals(pointHistory1.getPoint(), result.get(0).getPoint());
-    assertEquals(pointHistory2.getPoint(), result.get(1).getPoint());
+    assertEquals(2, result.getTotalElements());
+    assertEquals(pointHistory1.getPoint(), result.getContent().get(0).getPoint());
+    assertEquals(pointHistory2.getPoint(), result.getContent().get(1).getPoint());
   }
 
 }

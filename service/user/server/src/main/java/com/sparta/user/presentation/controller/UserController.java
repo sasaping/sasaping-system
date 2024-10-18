@@ -2,13 +2,11 @@ package com.sparta.user.presentation.controller;
 
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.common.domain.response.ApiResponse;
-import com.sparta.user.application.dto.PointResponse;
-import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.application.dto.UserResponse;
 import com.sparta.user.application.service.UserService;
 import com.sparta.user.presentation.request.UserRequest;
-import java.util.List;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,20 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-  private final PointHistoryService pointHistoryService;
 
   @PostMapping("/sign-up")
   public ApiResponse<Void> createUser(@RequestBody UserRequest.Create request) {
     userService.createUser(request);
     return ApiResponse.created(null);
-  }
-
-  @PreAuthorize("hasRole('ROLE_USER')")
-  @GetMapping("/point/me")
-  public ApiResponse<List<PointResponse.Get>> getPointHistoryByUserid(
-      @AuthenticationPrincipal JwtClaim claim
-  ) {
-    return ApiResponse.ok(pointHistoryService.getPointHistoryByUserid(claim.getUserId()));
   }
 
   @PreAuthorize("hasRole('ROLE_USER')")
