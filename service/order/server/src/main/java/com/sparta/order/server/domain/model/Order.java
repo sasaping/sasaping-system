@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
@@ -42,6 +43,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "P_ORDER",
     uniqueConstraints = @UniqueConstraint(columnNames = "order_no", name = "UK_ORDER_NO"))
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity {
 
   private static final BigDecimal FREE_SHIPPING_THRESHOLD = new BigDecimal("20000");
@@ -54,7 +56,7 @@ public class Order extends BaseEntity {
   @Column(nullable = false)
   private Long userId;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private Long paymentId;
 
   @Column(nullable = false, unique = true, length = 50)
@@ -90,6 +92,9 @@ public class Order extends BaseEntity {
   private String invoiceNumber;
 
   @Column(nullable = false, length = 100)
+  private String addressAlias;
+
+  @Column(nullable = false, length = 100)
   private String recipient;
 
   @Column(nullable = false, length = 100)
@@ -100,6 +105,9 @@ public class Order extends BaseEntity {
 
   @Column(nullable = false, length = 255)
   private String shippingAddress;
+
+  @Column(nullable = false)
+  private Boolean isDeleted = false;
 
   @OneToMany(mappedBy = "order")
   @Builder.Default
@@ -121,11 +129,28 @@ public class Order extends BaseEntity {
     this.paymentId = paymentId;
   }
 
-  public void updateOrderState(OrderState state) {
+  public void updateState(OrderState state) {
     this.state = state;
   }
 
-  // TODO AddressDto 추가
+  public void delete() {
+    isDeleted = true;
+  }
+
+  public void updateAddress(AddressDto address) {
+    this.addressAlias = address.getAlias();
+    this.recipient = address.getRecipient();
+    this.phoneNumber = address.getPhoneNumber();
+    this.zipcode = address.getZipcode();
+    this.shippingAddress = address.getAddress();
+  }
+
+  public void registerOrderInvoiceNumber(String invoiceNumber) {
+    this.invoiceNumber = invoiceNumber;
+    this.state = OrderState.SHIPPING;
+  }
+
+
   public static Order createOrder(Long userId, OrderCreateRequest request,
       List<ProductDto> products, BigDecimal couponPrice, AddressDto address) {
 
@@ -135,7 +160,6 @@ public class Order extends BaseEntity {
 
     return Order.builder()
         .userId(userId)
-        .paymentId(1L)
         .orderNo(orderNo)
         .type(OrderType.valueOf(request.getOrderType()))
         .state(OrderState.PENDING_PAYMENT)
@@ -145,6 +169,7 @@ public class Order extends BaseEntity {
         .totalRealAmount(priceInfo.totalRealAmount)
         .pointPrice(request.getPointPrice())
         .couponPrice(couponPrice)
+        .addressAlias(address.getAlias())
         .recipient(address.getRecipient())
         .phoneNumber(address.getPhoneNumber())
         .zipcode(address.getZipcode())
@@ -211,10 +236,16 @@ public class Order extends BaseEntity {
     }
   }
 
-  public void validateOrderCancel() {
+  public void validateOrderUpdate() {
     if (!state.equals(OrderState.PENDING_PAYMENT)
         && !state.equals(OrderState.COMPLETED)) {
-      throw new OrderException(OrderErrorCode.CANNOT_CANCEL_WHILE_SHIPPING, orderId);
+      throw new OrderException(OrderErrorCode.ORDER_CANNOT_CANCEL_WHILE_SHIPPING, orderId);
+    }
+  }
+
+  public void validateOrderDelete() {
+    if (!state.equals(OrderState.PURCHASE_CONFIRMED)) {
+      throw new OrderException(OrderErrorCode.ORDER_CANNOT_DELETE, orderId);
     }
   }
 

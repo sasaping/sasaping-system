@@ -126,6 +126,37 @@ public class OrderDto {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class AllOrderGetResponse {
+
+    private Long orderId;
+    private Long userId;
+    private String orderNo;
+    private String orderType;
+    private String orderState;
+    private List<String> productIds = new ArrayList<>();
+    private Integer totalQuantity;
+    private String invoiceNumber;
+    private LocalDateTime orderDate;
+
+    public static AllOrderGetResponse from(Order order) {
+      return new AllOrderGetResponse(
+          order.getOrderId(),
+          order.getUserId(),
+          order.getOrderNo(),
+          order.getType().getDescription(),
+          order.getState().getDescription(),
+          order.getOrderProducts().stream().map(orderProduct -> orderProduct.getProductId())
+              .toList(),
+          order.getTotalQuantity(),
+          order.getInvoiceNumber(),
+          order.getCreatedAt());
+    }
+
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class MyOrderProductResponse {
 
     private Long orderProductId;

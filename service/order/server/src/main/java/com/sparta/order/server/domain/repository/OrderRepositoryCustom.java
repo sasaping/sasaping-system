@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderRepositoryCustom {
 
-  Page<Order> myOrderFind(Pageable pageable, Long userId, String keyword);
+  Page<Order> getMyOrder(Pageable pageable, Long userId, String keyword);
+
+  Page<Order> getAllOrder(Pageable pageable, Long orderUserId, String productId);
 
 }
