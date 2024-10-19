@@ -23,6 +23,7 @@ public class ProductResponse {
   private Double discountPercent;
   private Integer stock;
   private String description;
+  private String originImgUrl;
   private String thumbnailImgUrl;
   private String detailImgUrl;
   private int limitCountPerUser;
@@ -48,6 +49,7 @@ public class ProductResponse {
       Double discountPercent,
       int stock,
       String description,
+      String originImgUrl,
       String thumbnailImgUrl,
       String detailImgUrl,
       int limitCountPerUser,
@@ -70,6 +72,7 @@ public class ProductResponse {
     this.discountPercent = discountPercent;
     this.stock = stock;
     this.description = description;
+    this.originImgUrl = originImgUrl;
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.detailImgUrl = detailImgUrl;
     this.limitCountPerUser = limitCountPerUser;
@@ -92,6 +95,7 @@ public class ProductResponse {
         .mainColor(product.getMainColor())
         .size(product.getSize())
         .description(product.getDescription())
+        .originImgUrl(product.getOriginImgUrl())
         .thumbnailImgUrl(product.getThumbnailImgUrl())
         .detailImgUrl(product.getDetailImgUrl())
         .originalPrice(product.getOriginalPrice())

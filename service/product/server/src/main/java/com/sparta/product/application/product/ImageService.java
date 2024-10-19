@@ -4,7 +4,9 @@ import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ImageService {
-  public String uploadImage(MultipartFile file) throws IOException;
+  String uploadImage(String type, MultipartFile file) throws IOException;
 
-  public String generateFileName(String originName);
+  String generateFileName(String originName);
+
+  void deleteImage(String imgUrl);
 }
