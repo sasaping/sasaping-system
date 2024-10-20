@@ -158,6 +158,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    platform: linux/amd64
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_READONLY: "false"
+    networks:
+      - sasaping-network
+
   cassandra:
     image: cassandra:latest
     container_name: cassandra-node-01
