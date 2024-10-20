@@ -1,7 +1,7 @@
 name: CD
 
 on:
-  pull_request:
+  push:
     branches: [ dev ]
 
 concurrency:
@@ -91,6 +91,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
+          ECR_NAMESPACE: ${{ vars.ECR_NAMESPACE }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -101,5 +103,5 @@ jobs:
             docker container prune -f
             docker rmi $(docker images "${ECR_REGISTRY}/${ECR_NAMESPACE}/*" -q)
             sudo chmod +x /home/ubuntu/stop-used-port.sh && /home/ubuntu/stop-used-port.sh
-            docker compose pull
+            docker compose pull --quiet
             docker compose up -d --no-build
