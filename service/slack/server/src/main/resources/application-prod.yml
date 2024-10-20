@@ -2,8 +2,8 @@ spring:
   application:
     name: slack
   datasource:
-    url: jdbc:mysql://sasaping-database.ctem8i2eavmt.ap-northeast-2.rds.amazonaws.com:3306/payment
-    username: sasaping
+    url: ${DB_URL}/payment
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
