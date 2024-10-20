@@ -349,12 +349,27 @@ services:
     networks:
       - sasaping-network
 
+  gateway-cache:
+    container_name: gateway-cache
+    image: redis:7.4.0
+    ports:
+      - "6381:6381"
+    command: [ "redis-server", "--port", "6381" ]
+    volumes:
+      - redis-gateway-data:/data
+    restart: always
+    networks:
+      - sasaping-network
+
+
 volumes:
   cassandra_data:
     driver: local
   redis-cart-data:
     driver: local
   redis-product-data:
+    driver: local
+  redis-gateway-data:
     driver: local
   certs:
     driver: local
