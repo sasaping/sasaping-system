@@ -13,6 +13,18 @@ services:
     ports:
       - "19090:19090"
 
+  config-server:
+    container_name: config-server
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/config/server
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/config
+
   gateway:
     container_name: gateway-service
     env_file:
@@ -23,6 +35,7 @@ services:
         - FILE_DIRECTORY=./service/gateway/server
     depends_on:
       - eureka-service
+      - config-server
     ports:
       - "19091:19091"
     networks:
@@ -39,6 +52,7 @@ services:
         - FILE_DIRECTORY=./service/user/server
     depends_on:
       - eureka-service
+      - config-server
     networks:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user

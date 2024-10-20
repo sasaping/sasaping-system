@@ -1,14 +1,24 @@
 server:
-  port: 19092
+  port: 0
 
 spring:
   application:
     name: user
-  profiles:
-    active: prod
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
 
 management:
   endpoints:
     web:
       exposure:
         include: health, info
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/

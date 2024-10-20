@@ -1,8 +1,11 @@
+server:
+  port: 19092
+
 spring:
   datasource:
-    url: ${DB_URL}/user
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3306/user
+    username: user
+    password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -15,4 +18,4 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://eureka-service:19090/eureka/
+      defaultZone: http://localhost:19090/eureka/

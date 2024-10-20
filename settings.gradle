@@ -2,6 +2,12 @@ rootProject.name = 'sasaping'
 
 include(':common:domain')
 
+include(':service:eureka:server')
+
+include(':service:config:server')
+
+include(':service:gateway:server')
+
 include(':service:user:server')
 include(':service:user:user_dto')
 
@@ -10,9 +16,6 @@ include(':service:product:product_dto')
 
 include(':service:payment:server')
 include(':service:payment:payment_dto')
-
-include(':service:eureka:server')
-include(':service:gateway:server')
 
 include(':service:auth:server')
 include(':service:auth:auth_dto')
