@@ -3,6 +3,16 @@ server:
 
 spring:
   profiles:
-    active: native, prod
+    active: native
   application:
     name: config-server
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config-repo/prod
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/
