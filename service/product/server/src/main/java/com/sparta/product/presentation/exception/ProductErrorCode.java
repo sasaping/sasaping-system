@@ -19,7 +19,9 @@ public enum ProductErrorCode {
   EXCEED_PREORDER_QUANTITY(HttpStatus.CONFLICT, "사전예약가능 수량을 초과하였습니다"),
 
   INVALID_PERMISSION(HttpStatus.FORBIDDEN, "요청 권한이 없습니다"),
-  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다");
+  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다"),
+
+  STOCK_NOT_AVAILABLE(HttpStatus.CONFLICT, "재고가 부족합니다.");
 
   private final HttpStatus status;
   private final String message;

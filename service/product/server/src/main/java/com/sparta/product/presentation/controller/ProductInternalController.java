@@ -1,5 +1,6 @@
 package com.sparta.product.presentation.controller;
 
+import com.sparta.product.application.product.ProductLockService;
 import com.sparta.product.application.product.ProductService;
 import com.sparta.product_dto.ProductDto;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductInternalController {
 
   private final ProductService productService;
+  private final ProductLockService productLockService;
 
   @GetMapping
   public List<ProductDto> getProductList(
@@ -27,12 +29,12 @@ public class ProductInternalController {
 
   @PostMapping("/reduce-stock")
   public void updateStock(@RequestBody Map<String, Integer> productQuantities) {
-    productService.reduceStock(productQuantities);
+    productLockService.reduceStock(productQuantities);
   }
 
   @PostMapping("/rollback-stock")
   public void rollbackStock(@RequestBody Map<String, Integer> productQuantities) {
-    productService.rollbackStock(productQuantities);
+    productLockService.rollbackStock(productQuantities);
   }
 
 }
