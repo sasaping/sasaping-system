@@ -1,6 +1,8 @@
 services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    env_file:
+      - .env
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
     user: "0"
@@ -49,6 +51,8 @@ services:
       retries: 120
 
   es01:
+    env_file:
+      - .env
     depends_on:
       setup:
         condition: service_healthy
@@ -93,6 +97,8 @@ services:
       retries: 120
 
   kibana:
+    env_file:
+      - .env
     depends_on:
       es01:
         condition: service_healthy
