@@ -4,9 +4,6 @@ on:
   pull_request:
     branches: [ dev ]
 
-env:
-  ECR_NAMESPACE: ${{ vars.ECR_NAMESPACE }}
-
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
@@ -52,6 +49,9 @@ jobs:
 
       - name: build docker image
         run: docker compose build
+        env:
+          ECR_NAMESPACE: ${{ vars.ECR_NAMESPACE }}
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
 
 #      - name: push docker image to AWS ECR
 #        run: |
@@ -94,8 +94,7 @@ jobs:
 #          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #          AWS_REGION: ${{ secrets.AWS_REGION }}
 #          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-#          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
-#          KIBANA_PASSWORD: ${{secrets.KIBANA_PASSWORD}}
+#          ECR_NAMESPACE: ${{ vars.ECR_NAMESPACE }}
 #        with:
 #          host: ${{ secrets.EC2_HOST }}
 #          username: ubuntu
