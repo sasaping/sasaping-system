@@ -5,7 +5,7 @@ spring:
   application:
     name: user
   config:
-    import: "configserver:"
+    import: "configserver:http://config-server:8888"
   cloud:
     config:
       discovery:
