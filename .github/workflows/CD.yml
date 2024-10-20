@@ -57,6 +57,8 @@ jobs:
         run: docker compose build
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ELASTIC_PASSWORD: ${{secrets.ELASTIC_PASSWORD}}
+          KIBANA_PASSWORD: ${{secrets.KIBANA_PASSWORD}}
           STACK_VERSION: ${{ vars.STACK_VERSION }}
           CLUSTER_NAME: ${{ vars.CLUSTER_NAME }}
           LICENSE: ${{ vars.LICENSE }}

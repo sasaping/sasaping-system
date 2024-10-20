@@ -1,15 +1,11 @@
-x-build-args:
-  dockerfile_name: &dockerfile_name Dockerfile-prod
-
 services:
   eureka-service:
     container_name: eureka-service
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
     networks:
       - sasaping-network
@@ -22,9 +18,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
     depends_on:
       - eureka-service
@@ -39,9 +34,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
     depends_on:
       - eureka-service
@@ -54,9 +48,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
     depends_on:
       - eureka-service
@@ -69,9 +62,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/order-artifact
         - FILE_DIRECTORY=./service/order/server
     depends_on:
       - eureka-service
@@ -84,9 +76,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/payment-artifact
         - FILE_DIRECTORY=./service/payment/server
     depends_on:
       - eureka-service
@@ -101,9 +92,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/slack-artifact
         - FILE_DIRECTORY=./service/slack/server
     depends_on:
       - eureka-service
@@ -116,9 +106,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/product-artifact
         - FILE_DIRECTORY=./service/product/server
     depends_on:
       - eureka-service
@@ -131,9 +120,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/promotion-artifact
         - FILE_DIRECTORY=./service/promotion/server
     depends_on:
       - eureka-service
@@ -146,9 +134,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/search-artifact
         - FILE_DIRECTORY=./service/search/server
     depends_on:
       - eureka-service
