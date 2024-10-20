@@ -12,7 +12,3 @@ management:
     web:
       exposure:
         include: health, info
-
-jwt:
-  secret-key: Zr2PMyKH4UheWy6zscq6Wc/nSLl6L/AJ6b5QvLzWXJg5wzQiGdJncTTOBCxvW8Rkl1T0N+1bqF52Mw2eZvwA0i5zyq+VVbIjPyz+b7DW0Xd2wTnXifwxM12LU2oyXpyLz
-  access-token-expire-in: 3600000
