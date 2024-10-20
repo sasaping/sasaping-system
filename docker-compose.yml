@@ -21,9 +21,13 @@ services:
       dockerfile: Dockerfile
       args:
         - FILE_DIRECTORY=./service/config/server
+    depends_on:
+      - eureka-service
     networks:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/config
+    ports:
+      - "8888:8888"
 
   gateway:
     container_name: gateway-service
