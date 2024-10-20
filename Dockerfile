@@ -1,5 +1,5 @@
 # Dockerfile
-FROM gradle:8.10.1-jdk17
+FROM openjdk:17-jdk-slim
 
 # 시간대 설정
 ENV TZ=Asia/Seoul

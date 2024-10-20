@@ -47,14 +47,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build docker image
-        run: docker compose build
+      - name: Build, Tag and Push docker image to AWS ECR
+        run: |
+          docker compose build
+          chmod +x ./dockerTagAndPush.sh
+          ./dockerTagAndPush.sh
         env:
           ECR_NAMESPACE: ${{ vars.ECR_NAMESPACE }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
-
-      - name: Push docker image to AWS ECR
-        run: chmod +x ./dockerTagAndPush.sh && ./dockerTagAndPush.sh
 
   Deploy:
     name: Deploy
