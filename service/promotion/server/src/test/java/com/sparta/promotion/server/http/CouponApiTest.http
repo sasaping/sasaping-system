@@ -26,13 +26,26 @@ Content-Type: application/json
   client.global.set("access_token_admin", "Bearer " + response.body.data.token);
 %}
 
+### 이벤트 생성
+POST http://localhost:{{Port}}/api/events
+Content-Type: application/json
+Authorization: {{access_token_admin}}
+
+{
+  "title": "2024 가을 세일 이벤트",
+  "imgUrl": "https://example.com/images/fall-sale.jpg",
+  "content": "올 가을, 특별한 세일을 놓치지 마세요! 다양한 상품이 최대 50% 할인됩니다.",
+  "startAt": "2024-10-21T10:00:00",
+  "endAt": "2024-10-31T23:59:59"
+}
+
 ### 이벤트 쿠폰 생성
 POST http://localhost:{{Port}}/api/coupons/event
 Content-Type: application/json
 Authorization: {{access_token_admin}}
 
 {
-  "name": "Test Coupon3",
+  "name": "Test Coupon5",
   "type": "EVENT",
   "discountType": "PRICE",
   "discountValue": 1000.00,
