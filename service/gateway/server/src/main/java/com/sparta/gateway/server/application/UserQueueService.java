@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class UserQueueService {
   private final String USER_QUEUE_PROCEED_KEY = "users:queue:proceed";
   private final String USER_ACTIVE_SET_KEY = "users:active";
   private final long MAX_ACTIVE_USERS = 2;
+  private final long INACTIVITY_THRESHOLD = 300;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
     return reactiveRedisTemplate.opsForSet().size(USER_ACTIVE_SET_KEY)
@@ -83,7 +85,13 @@ public class UserQueueService {
     return reactiveRedisTemplate.opsForZSet()
         .rank(USER_QUEUE_PROCEED_KEY, userId)
         .defaultIfEmpty(-1L)
-        .map(rank -> rank >= 0);
+        .map(rank -> rank >= 0)
+        .flatMap(isAllowed -> {
+          if (isAllowed) {
+            return updateUserActivityTime(userId).thenReturn(true);
+          }
+          return Mono.just(false);
+        });
   }
 
   public Mono<Long> getRank(String userId) {
@@ -92,13 +100,29 @@ public class UserQueueService {
         .map(rank -> rank >= 0 ? rank + 1 : rank);
   }
 
-  @Scheduled(initialDelay = 50000, fixedRate = 30000)
+  @Scheduled(fixedRate = 30000)
   public void scheduleAllowUser() {
     log.info("Scheduling allow user task");
-    allowUserTask().subscribe(
-        movedUsers -> log.info("Moved {} users to proceed queue", movedUsers),
-        error -> log.error("Error in scheduled task", error)
-    );
+    removeInactiveUsers()
+        .then(allowUserTask())
+        .subscribe(
+            movedUsers -> log.info("Processed users. Moved {} users to proceed queue", movedUsers),
+            error -> log.error("Error in scheduled task", error)
+        );
+  }
+
+  private Mono<Void> removeInactiveUsers() {
+    long currentTime = Instant.now().getEpochSecond();
+    return reactiveRedisTemplate.opsForZSet()
+        .rangeWithScores(USER_QUEUE_PROCEED_KEY, Range.closed(0L, -1L))
+        .filter(userWithScore -> currentTime - userWithScore.getScore() > INACTIVITY_THRESHOLD)
+        .flatMap(userWithScore -> {
+          String userId = userWithScore.getValue();
+          return reactiveRedisTemplate.opsForZSet().remove(USER_QUEUE_PROCEED_KEY, userId)
+              .then(reactiveRedisTemplate.opsForSet().remove(USER_ACTIVE_SET_KEY, userId))
+              .doOnSuccess(v -> log.info("Removed inactive user {} from proceed queue", userId));
+        })
+        .then();
   }
 
   private Mono<Long> allowUserTask() {
@@ -117,18 +141,15 @@ public class UserQueueService {
         .popMin(USER_QUEUE_WAIT_KEY, count)
         .flatMap(user -> {
           String userId = Objects.requireNonNull(user.getValue());
-          return reactiveRedisTemplate.opsForZSet()
-              .add(USER_QUEUE_PROCEED_KEY, userId, Instant.now().getEpochSecond())
+          return updateUserActivityTime(userId)
               .then(reactiveRedisTemplate.opsForSet().add(USER_ACTIVE_SET_KEY, userId));
         })
         .count();
   }
 
-  // TODO : proceed에 있는 사용자가 이탈했는지 확인하는 방법?
-  // 1 - 사용자 활동을 추적해 N 시간동안 활동이 없으면 Proceed 에서 제거
-  // 2 - proceed queue의 MAX_ACTIVE_USERS를 일정 시간마다 늘려줌
-
-  // TODO : JwtFilter 전에 Queue filter를 타게 변경..? userId 대신 request Id로 queue 처리
-
+  private Mono<Boolean> updateUserActivityTime(String userId) {
+    long currentTime = Instant.now().getEpochSecond();
+    return reactiveRedisTemplate.opsForZSet().add(USER_QUEUE_PROCEED_KEY, userId, currentTime);
+  }
 
 }

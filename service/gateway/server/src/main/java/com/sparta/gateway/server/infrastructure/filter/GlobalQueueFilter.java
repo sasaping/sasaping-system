@@ -33,31 +33,41 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     String path = exchange.getRequest().getURI().getPath();
 
-    if (path.startsWith("/api/auth/")
+    if (isPublicPath(path)) {
+      return chain.filter(exchange);
+    }
+
+    return extractUserId(exchange)
+        .flatMap(userId -> processRequest(exchange, chain, userId))
+        .onErrorResume(e -> handleError(exchange, e));
+  }
+
+  private boolean isPublicPath(String path) {
+    return path.startsWith("/api/auth/")
         || path.startsWith("/api/users/sign-up")
         || path.startsWith("/api/search")
         || path.startsWith("/api/products/search")
         || path.startsWith("/api/preorder/search")
-        || path.startsWith("/api/categories/search")) {
-      return chain.filter(exchange);
-    }
-    
+        || path.startsWith("/api/categories/search");
+  }
+
+  private Mono<String> extractUserId(ServerWebExchange exchange) {
     String encodedClaims = exchange.getRequest().getHeaders().getFirst(X_USER_CLAIMS);
     if (encodedClaims == null) {
-      exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-      return exchange.getResponse().setComplete();
+      return Mono.error(new UnauthorizedException("Missing user claims"));
     }
     String decodedClaims = URLDecoder.decode(encodedClaims, StandardCharsets.UTF_8);
-    JwtClaim claims;
     try {
-      claims = objectMapper.readValue(decodedClaims, JwtClaim.class);
+      JwtClaim claims = objectMapper.readValue(decodedClaims, JwtClaim.class);
+      return Mono.just(claims.getUserId().toString());
     } catch (JsonProcessingException e) {
       log.error("Error parsing JWT claims", e);
-      exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
-      return exchange.getResponse().setComplete();
+      return Mono.error(new BadRequestException("Invalid user claims"));
     }
-    String userId = claims.getUserId().toString();
+  }
 
+  private Mono<Void> processRequest(ServerWebExchange exchange, GatewayFilterChain chain,
+      String userId) {
     return userQueueService.isAllowed(userId)
         .flatMap(isAllowed -> {
           if (isAllowed) {
@@ -78,19 +88,40 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
                   }
                 });
           }
-        })
-        .onErrorResume(e -> {
-          log.error("Error in GlobalQueueFilter", e);
-          exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-          return exchange.getResponse().setComplete();
         });
+  }
+
+  private Mono<Void> handleError(ServerWebExchange exchange, Throwable e) {
+    log.error("Error in GlobalQueueFilter", e);
+    if (e instanceof UnauthorizedException) {
+      exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+    } else if (e instanceof BadRequestException) {
+      exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
+    } else {
+      exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return exchange.getResponse().setComplete();
   }
 
   @Override
   public int getOrder() {
-    // Set the order of this filter
-    // You might want to adjust this value depending on when you want this filter to run
     return Ordered.LOWEST_PRECEDENCE;
+  }
+
+  private static class UnauthorizedException extends RuntimeException {
+
+    UnauthorizedException(String message) {
+      super(message);
+    }
+
+  }
+
+  private static class BadRequestException extends RuntimeException {
+
+    BadRequestException(String message) {
+      super(message);
+    }
+
   }
 
 }
