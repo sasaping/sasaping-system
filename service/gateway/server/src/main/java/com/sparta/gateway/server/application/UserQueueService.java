@@ -1,6 +1,8 @@
 package com.sparta.gateway.server.application;
 
 import com.sparta.gateway.server.application.dto.RegisterUserResponse;
+import com.sparta.gateway.server.infrastructure.exception.GatewayErrorCode;
+import com.sparta.gateway.server.infrastructure.exception.GatewayException;
 import java.time.Instant;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +56,7 @@ public class UserQueueService {
                 .then(reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY, userId))
         )
         .map(rank -> new RegisterUserResponse(rank + 1))
-        .doOnNext(response -> log.info("User {} updated in wait queue at rank {}", userId,
-            response.rank()));
+        ;
   }
 
   private Mono<RegisterUserResponse> addToProceedQueue(String userId) {
@@ -63,10 +64,10 @@ public class UserQueueService {
     return reactiveRedisTemplate.opsForZSet()
         .add(USER_QUEUE_PROCEED_KEY, userId, unixTime)
         .filter(i -> i)
-        .switchIfEmpty(Mono.error(new Exception("Failed to add user to proceed queue")))
+        .switchIfEmpty(
+            Mono.error(new GatewayException(GatewayErrorCode.TOO_MANY_REQUESTS)))
         .then(reactiveRedisTemplate.opsForSet().add(USER_ACTIVE_SET_KEY, userId))
-        .map(i -> new RegisterUserResponse(0L))
-        .doOnNext(response -> log.info("User {} is added to proceed queue", userId));
+        .map(i -> new RegisterUserResponse(0L));
   }
 
   private Mono<RegisterUserResponse> addToWaitQueue(String userId) {
@@ -74,11 +75,11 @@ public class UserQueueService {
     return reactiveRedisTemplate.opsForZSet()
         .add(USER_QUEUE_WAIT_KEY, userId, unixTime)
         .filter(i -> i)
-        .switchIfEmpty(Mono.error(new Exception("Failed to add user to wait queue")))
+        .switchIfEmpty(Mono.error(new GatewayException(GatewayErrorCode.TOO_MANY_REQUESTS)))
         .flatMap(i -> reactiveRedisTemplate.opsForZSet()
             .rank(USER_QUEUE_WAIT_KEY, userId))
         .map(rank -> new RegisterUserResponse(rank + 1))
-        .doOnNext(rank -> log.info("User {} is registered at rank {}", userId, rank.rank()));
+        ;
   }
 
   public Mono<Boolean> isAllowed(String userId) {
@@ -102,12 +103,12 @@ public class UserQueueService {
 
   @Scheduled(fixedRate = 30000)
   public void scheduleAllowUser() {
-    log.info("Scheduling allow user task");
     removeInactiveUsers()
         .then(allowUserTask())
         .subscribe(
-            movedUsers -> log.info("Processed users. Moved {} users to proceed queue", movedUsers),
-            error -> log.error("Error in scheduled task", error)
+            movedUsers -> {
+            },
+            error -> log.error(GatewayErrorCode.INTERNAL_SERVER_ERROR.getMessage(), error)
         );
   }
 
@@ -119,8 +120,7 @@ public class UserQueueService {
         .flatMap(userWithScore -> {
           String userId = userWithScore.getValue();
           return reactiveRedisTemplate.opsForZSet().remove(USER_QUEUE_PROCEED_KEY, userId)
-              .then(reactiveRedisTemplate.opsForSet().remove(USER_ACTIVE_SET_KEY, userId))
-              .doOnSuccess(v -> log.info("Removed inactive user {} from proceed queue", userId));
+              .then(reactiveRedisTemplate.opsForSet().remove(USER_ACTIVE_SET_KEY, userId));
         })
         .then();
   }
