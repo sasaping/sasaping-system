@@ -20,8 +20,7 @@ public class ProductMapper {
         .build();
   }
 
-  public static Product toEntity(
-      ProductCreateRequest request, String productImgUrl, String detailImgUrl) {
+  public static Product toEntity(ProductCreateRequest request, ImgDto imgDto) {
     return Product.builder()
         .categoryId(request.categoryId())
         .productName(request.productName())
@@ -31,8 +30,9 @@ public class ProductMapper {
         .description(request.description())
         .originalPrice(request.originalPrice())
         .discountPercent(request.discountPercent())
-        .originImgUrl(productImgUrl)
-        .detailImgUrl(detailImgUrl)
+        .originImgUrl(imgDto.originImgUrl())
+        .detailImgUrl(imgDto.detailImgUrl())
+        .thumbnailImgUrl(imgDto.thumbnailImgUrl())
         .stock(request.stock())
         .limitCountPerUser(request.limitCountPerUser())
         .tags(request.tags())
@@ -53,6 +53,7 @@ public class ProductMapper {
         request.description(),
         imgUrls.originImgUrl(),
         imgUrls.detailImgUrl(),
+        imgUrls.thumbnailImgUrl(),
         request.limitCountPerUser(),
         request.tags(),
         request.isPublic());

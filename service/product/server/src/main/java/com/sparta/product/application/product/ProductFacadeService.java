@@ -33,7 +33,10 @@ public class ProductFacadeService {
     validateCategoryId(request.categoryId());
     String productImgUrl = imageService.uploadImage("origin", productImg);
     String detailImgUrl = imageService.uploadImage("detail", detailImg);
-    ProductResponse product = productService.createProduct(request, productImgUrl, detailImgUrl);
+    String thumbnailImgUrl = getThumbnailImgUrl(productImgUrl);
+    ProductResponse product =
+        productService.createProduct(
+            request, new ImgDto(productImgUrl, detailImgUrl, thumbnailImgUrl));
     elasticSearchService.saveProduct(product);
     return product.getProductId();
   }
@@ -44,7 +47,6 @@ public class ProductFacadeService {
       throws IOException {
     validateCategoryId(request.categoryId());
     Product savedProduct = productService.getSavedProduct(request.productId());
-
     ImgDto imgData = fetchImgUrls(savedProduct, productImg, detailImg);
     ProductResponse newProduct = productService.updateProduct(request, savedProduct, imgData);
     elasticSearchService.updateProduct(newProduct);
@@ -72,15 +74,31 @@ public class ProductFacadeService {
       Product savedProduct, MultipartFile productImg, MultipartFile detailImg) throws IOException {
     String productImgUrl = savedProduct.getOriginImgUrl();
     String detailImgUrl = savedProduct.getDetailImgUrl();
+    String thumbnailImgUrl = savedProduct.getThumbnailImgUrl();
     if (productImg != null && !productImg.isEmpty()) {
       imageService.deleteImage(productImgUrl);
+      imageService.deleteImage(thumbnailImgUrl);
       productImgUrl = imageService.uploadImage("origin", productImg);
+      thumbnailImgUrl = getThumbnailImgUrl(productImgUrl);
     }
     if (detailImg != null && !detailImg.isEmpty()) {
       imageService.deleteImage(detailImgUrl);
       detailImgUrl = imageService.uploadImage("detail", detailImg);
     }
-    return new ImgDto(productImgUrl, detailImgUrl);
+    return new ImgDto(productImgUrl, detailImgUrl, thumbnailImgUrl);
+  }
+
+  private String getThumbnailImgUrl(String productImgUrl) {
+    String[] parts = productImgUrl.split("/");
+    String fileNameWithExtension = parts[parts.length - 1];
+
+    String imageName = "resized-" + fileNameWithExtension;
+
+    String baseUrl =
+        productImgUrl
+            .substring(0, productImgUrl.lastIndexOf("/") + 1)
+            .replace("sasaping-products-origin", "sasaping-products-thumbnail");
+    return baseUrl + imageName;
   }
 
   private void validateCategoryId(Long categoryId) {

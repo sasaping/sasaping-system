@@ -99,6 +99,7 @@ public class Product extends BaseEntity implements Persistable {
       String description,
       String originImgUrl,
       String detailImgUrl,
+      String thumbnailImgUrl,
       Integer limitCountPerUser,
       List<String> tags,
       boolean isPublic) {
@@ -114,6 +115,7 @@ public class Product extends BaseEntity implements Persistable {
     this.description = description;
     this.originImgUrl = originImgUrl;
     this.detailImgUrl = detailImgUrl;
+    this.thumbnailImgUrl = thumbnailImgUrl;
     this.tags = tags;
     this.limitCountPerUser = limitCountPerUser;
     this.isPublic = isPublic;

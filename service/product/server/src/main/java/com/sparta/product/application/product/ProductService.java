@@ -34,9 +34,8 @@ public class ProductService {
   private final ProductRepository productRepository;
 
   @Transactional
-  public ProductResponse createProduct(
-      ProductCreateRequest request, String productImgUrl, String detailImgUrl) {
-    Product newProduct = ProductMapper.toEntity(request, productImgUrl, detailImgUrl);
+  public ProductResponse createProduct(ProductCreateRequest request, ImgDto imgDto) {
+    Product newProduct = ProductMapper.toEntity(request, imgDto);
     newProduct.setIsNew(true);
     Product savedProduct = productRepository.save(newProduct);
     return ProductResponse.fromEntity(savedProduct);
@@ -146,6 +145,5 @@ public class ProductService {
     if (product.getStock() < reduceCount) {
       throw new ProductServerException(ProductErrorCode.STOCK_NOT_AVAILABLE);
     }
-
   }
 }
