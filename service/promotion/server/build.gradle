@@ -31,6 +31,7 @@ ext {
 
 dependencies {
     implementation project(':common:domain')
+    implementation project(':service:user:user_dto')
     implementation project(':service:auth:auth_dto')
 
     implementation 'org.springframework.kafka:spring-kafka'

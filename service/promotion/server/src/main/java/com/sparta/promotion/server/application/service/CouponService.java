@@ -11,6 +11,7 @@ import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import com.sparta.promotion.server.presentation.request.CouponRequest.Update;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public class CouponService {
   private final CouponRepository couponRepository;
   private final UserCouponRepository userCouponRepository;
   private final EventRepository eventRepository;
+  private final UserService userService;
   private final KafkaTemplate<String, CouponRequest.Event> kafkaTemplate;
 
   @Transactional
@@ -45,6 +47,10 @@ public class CouponService {
 
   @Transactional
   public void provideEventCouponInternal(Long userId, Long couponId) {
+    UserDto userData = userService.getUserByUserId(userId);
+    if (userData == null) {
+      throw new PromotionException(PromotionErrorCode.INTERNAL_SERVER_ERROR);
+    }
     Coupon coupon = couponRepository
         .findById(couponId)
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
@@ -66,9 +72,11 @@ public class CouponService {
     return CouponResponse.Get.of(coupon);
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
   public Page<CouponResponse.Get> getCouponListBoyUserId(Long userId, Pageable pageable) {
-    // UserDto userData = userService.getUser(userId);
+    UserDto userData = userService.getUserByUserId(userId);
+    if (userData == null) {
+      throw new PromotionException(PromotionErrorCode.INTERNAL_SERVER_ERROR);
+    }
     Page<UserCoupon> userCoupons = userCouponRepository.findByUserId(userId, pageable);
 
     return userCoupons.map(userCoupon -> {
