@@ -1,6 +1,7 @@
 package com.sparta.payment.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.common.domain.entity.KafkaTopicConstant;
 import com.sparta.payment.domain.entity.Payment;
 import com.sparta.payment.domain.entity.PaymentHistory;
 import com.sparta.payment.domain.entity.PaymentState;
@@ -147,7 +148,7 @@ public class PaymentService {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       String jsonMessage = objectMapper.writeValueAsString(event);
-      kafkaTemplate.send("payment-completed-topic", jsonMessage);
+      kafkaTemplate.send(KafkaTopicConstant.PAYMENT_COMPLETED, jsonMessage);
 
     } catch (Exception e) {
       log.error(e.getMessage());
@@ -178,7 +179,7 @@ public class PaymentService {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       String jsonMessage = objectMapper.writeValueAsString(event);
-      kafkaTemplate.send("payment-completed-topic", jsonMessage);
+      kafkaTemplate.send(KafkaTopicConstant.PAYMENT_COMPLETED, jsonMessage);
 
     } catch (Exception e) {
       log.error(e.getMessage());

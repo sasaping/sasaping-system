@@ -1,33 +1,34 @@
 @Port=19091
 @couponId=1
 @userId=11
+@URL=43.203.175.136
 
 ### 로그인
-POST http://localhost:{{Port}}/api/auth/sign-in
+POST http://{{URL}}:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser12",
-  "password": "password123"
+  "username": "bug-user",
+  "password": "password"
 }
 > {%
   client.global.set("access_token", "Bearer " + response.body.data.token);
 %}
 
 ### 로그인
-POST http://localhost:{{Port}}/api/auth/sign-in
+POST http://{{URL}}:{{Port}}/api/auth/sign-in
 Content-Type: application/json
 
 {
-  "username": "newUser",
-  "password": "password123"
+  "username": "bug-admin",
+  "password": "password"
 }
 > {%
   client.global.set("access_token_admin", "Bearer " + response.body.data.token);
 %}
 
 ### 이벤트 생성
-POST http://localhost:{{Port}}/api/events
+POST http://{{URL}}:{{Port}}/api/events
 Content-Type: application/json
 Authorization: {{access_token_admin}}
 
@@ -40,46 +41,46 @@ Authorization: {{access_token_admin}}
 }
 
 ### 이벤트 쿠폰 생성
-POST http://localhost:{{Port}}/api/coupons/event
+POST http://{{URL}}:{{Port}}/api/coupons/event
 Content-Type: application/json
 Authorization: {{access_token_admin}}
 
 {
-  "name": "Test Coupon5",
+  "name": "Test Coupon",
   "type": "EVENT",
   "discountType": "PRICE",
   "discountValue": 1000.00,
   "minBuyPrice": null,
   "maxDiscountPrice": null,
-  "quantity": 100000,
+  "quantity": 100,
   "startDate": "2024-01-01T00:00:00",
   "endDate": "2024-12-31T23:59:59",
   "userTier": null,
-  "eventId": 1
+  "eventId": 2
 }
 
 ### 이벤트 쿠폰 발급
-POST http://localhost:{{Port}}/api/coupons/event/{{couponId}}
+POST http://{{URL}}:{{Port}}/api/coupons/event/{{couponId}}
 Authorization: {{access_token}}
 
 ### 쿠폰 전체 조회
-GET http://localhost:{{Port}}/api/coupons
+GET http://{{URL}}:{{Port}}/api/coupons
 Authorization: {{access_token}}
 
 ### 쿠폰 단일 조회
-GET http://localhost:{{Port}}/api/coupons/{{couponId}}
+GET http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
 Authorization: {{access_token}}
 
 ### 특정 사용자 쿠폰 전체 조회
-GET http://localhost:{{Port}}/api/coupons/users/{{userId}}
+GET http://{{URL}}:{{Port}}/api/coupons/users/{{userId}}
 Authorization: {{access_token}}
 
 ### 내 쿠폰 전체 조회
-GET http://localhost:{{Port}}/api/coupons/me
+GET http://{{URL}}:{{Port}}/api/coupons/me
 Authorization: {{access_token}}
 
 ### 쿠폰 수정
-PATCH localhost:{{Port}}/api/coupons/{{couponId}}
+PATCH http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
 Content-Type: application/json
 Authorization: {{access_token}}
 
@@ -98,13 +99,13 @@ Authorization: {{access_token}}
 }
 
 ### 쿠폰 삭제
-DELETE localhost:{{Port}}/api/coupons/{{couponId}}
+DELETE http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
 Authorization: {{access_token}}
 
 ### 쿠폰 사용
-PATCH http://localhost:19021/internal/coupons/{{couponId}}/use?userId={{userId}}
+PATCH http://{{URL}}:19021/internal/coupons/{{couponId}}/use?userId={{userId}}
 Authorization: {{access_token}}
 
 ### 쿠폰 환불
-PATCH http://localhost:19021/internal/coupons/{{couponId}}/refund?userId={{userId}}
+PATCH http://{{URL}}:19021/internal/coupons/{{couponId}}/refund?userId={{userId}}
 Authorization: {{access_token}}

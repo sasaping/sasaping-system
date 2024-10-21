@@ -5,11 +5,13 @@ import com.sparta.promotion.server.application.service.CouponService;
 import com.sparta.promotion.server.application.service.DistributedLockComponent;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-@Service
+@Slf4j(topic = "CouponEventConsumer")
 @RequiredArgsConstructor
+@Service
 public class CouponEventConsumer {
 
   private final CouponService couponService;
@@ -20,6 +22,7 @@ public class CouponEventConsumer {
     Long userId = couponEvent.getUserId();
     Long couponId = couponEvent.getCouponId();
 
+    log.info("provide coupon userId: {}", userId);
     lockComponent.execute(
         "couponProvideLock_%s".formatted(couponId),
         3000,
@@ -28,6 +31,7 @@ public class CouponEventConsumer {
           couponService.provideEventCouponInternal(userId, couponId);
         }
     );
+    log.info("provide coupon couponId: {}", couponId);
   }
 
 }

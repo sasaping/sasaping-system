@@ -1,6 +1,7 @@
 package com.sparta.order.server.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.common.domain.entity.KafkaTopicConstant;
 import com.sparta.order.server.domain.model.Order;
 import com.sparta.order.server.exception.OrderErrorCode;
 import com.sparta.order.server.exception.OrderException;
@@ -19,7 +20,7 @@ public class OrderEventHandler {
   private final OrderService orderService;
 
   @Transactional
-  @KafkaListener(topics = "payment-completed-topic", groupId = "order-service-group")
+  @KafkaListener(topics = KafkaTopicConstant.PAYMENT_COMPLETED, groupId = "order-service-group")
   public void handlePaymentCompletedEvent(String event) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
