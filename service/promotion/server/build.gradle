@@ -31,8 +31,11 @@ ext {
 
 dependencies {
     implementation project(':common:domain')
+    implementation project(':service:user:user_dto')
     implementation project(':service:auth:auth_dto')
 
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.redisson:redisson:3.35.0'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'

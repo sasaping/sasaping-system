@@ -147,7 +147,7 @@ services:
     depends_on:
       - zookeeper
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9092
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9092
@@ -211,12 +211,24 @@ services:
     networks:
       - sasaping-network
 
-  gateway-cache:
-    container_name: gateway-cache
+  coupon-cache:
+    container_name: coupon-cache
     image: redis:7.4.0
     ports:
       - "6381:6381"
     command: [ "redis-server", "--port", "6381" ]
+    volumes:
+      - redis-coupon-data:/data
+    restart: always
+    networks:
+      - sasaping-network
+
+  gateway-cache:
+    container_name: gateway-cache
+    image: redis:7.4.0
+    ports:
+      - "6382:6382"
+    command: [ "redis-server", "--port", "6382" ]
     volumes:
       - redis-gateway-data:/data
     restart: always
@@ -229,6 +241,8 @@ volumes:
   redis-cart-data:
     driver: local
   redis-product-data:
+    driver: local
+  redis-coupon-data:
     driver: local
   redis-gateway-data:
     driver: local
