@@ -33,7 +33,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        run: ./gradlew clean build -D spring.profiles.active=prod -x test
+        run: ./gradlew clean build -x test
 
       # AWS ECR 에 이미지 업로드 권한을 얻기 위해 인증
       - name: Configure AWS credentials

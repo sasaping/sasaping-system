@@ -7,6 +7,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /app
 
+ENV SPRING_PROFILES_ACTIVE=prod
+
 ARG FILE_DIRECTORY
 
 COPY $FILE_DIRECTORY/build/libs/*.jar /app/app.jar

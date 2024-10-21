@@ -28,4 +28,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        run: ./gradlew clean build -D spring.profiles.active=prod -x test
+        run: ./gradlew clean build -x test
