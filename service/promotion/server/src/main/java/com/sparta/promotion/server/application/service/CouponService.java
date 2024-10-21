@@ -1,5 +1,6 @@
 package com.sparta.promotion.server.application.service;
 
+import com.sparta.common.domain.entity.KafkaTopicConstant;
 import com.sparta.promotion.server.domain.model.Coupon;
 import com.sparta.promotion.server.domain.model.UserCoupon;
 import com.sparta.promotion.server.domain.repository.CouponRepository;
@@ -12,6 +13,7 @@ import com.sparta.promotion.server.presentation.response.CouponResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class CouponService {
 
   private final CouponRepository couponRepository;
   private final UserCouponRepository userCouponRepository;
+  private final KafkaTemplate<String, CouponRequest.Event> kafkaTemplate;
 
   // TODO(경민): 이벤트 테이블을 만들어서 이벤트 ID가 들어올 경우, 해당 이벤트가 있는지 검사해야함.
   @Transactional
@@ -34,6 +37,11 @@ public class CouponService {
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.EVENT_NOT_FOUND));
     */
     couponRepository.save(Coupon.create(request));
+  }
+
+  public void provideEventCouponRequest(Long userId, Long couponId) {
+    CouponRequest.Event couponEvent = new CouponRequest.Event(userId, couponId);
+    kafkaTemplate.send(KafkaTopicConstant.PROVIDE_EVENT_COUPON, couponEvent);
   }
 
   @Transactional

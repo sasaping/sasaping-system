@@ -42,7 +42,7 @@ public class CouponController {
       @PathVariable(name = "couponId") Long couponId,
       @AuthenticationPrincipal JwtClaim claim
   ) {
-    couponLockService.provideEventCoupon(claim.getUserId(), couponId);
+    couponService.provideEventCouponRequest(claim.getUserId(), couponId);
     return ApiResponse.ok();
   }
 
