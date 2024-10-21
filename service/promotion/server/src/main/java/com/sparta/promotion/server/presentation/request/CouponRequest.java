@@ -88,4 +88,14 @@ public class CouponRequest {
 
   }
 
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Event {
+
+    private Long userId;
+    private Long couponId;
+
+  }
+
 }

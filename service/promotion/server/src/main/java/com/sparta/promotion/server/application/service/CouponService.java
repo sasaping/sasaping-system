@@ -1,17 +1,21 @@
 package com.sparta.promotion.server.application.service;
 
+import com.sparta.common.domain.entity.KafkaTopicConstant;
 import com.sparta.promotion.server.domain.model.Coupon;
 import com.sparta.promotion.server.domain.model.UserCoupon;
 import com.sparta.promotion.server.domain.repository.CouponRepository;
+import com.sparta.promotion.server.domain.repository.EventRepository;
 import com.sparta.promotion.server.domain.repository.UserCouponRepository;
 import com.sparta.promotion.server.exception.PromotionErrorCode;
 import com.sparta.promotion.server.exception.PromotionException;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import com.sparta.promotion.server.presentation.request.CouponRequest.Update;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
+import com.sparta.user.user_dto.infrastructure.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,27 +25,34 @@ public class CouponService {
 
   private final CouponRepository couponRepository;
   private final UserCouponRepository userCouponRepository;
+  private final EventRepository eventRepository;
+  private final UserService userService;
+  private final KafkaTemplate<String, CouponRequest.Event> kafkaTemplate;
 
-  // TODO(경민): 이벤트 테이블을 만들어서 이벤트 ID가 들어올 경우, 해당 이벤트가 있는지 검사해야함.
   @Transactional
   public void createEventCoupon(CouponRequest.Create request) {
-    /* 이벤트 검사 코드
     if (request.getEventId() == null) {
       throw new PromotionException(PromotionErrorCode.EVENT_NOT_FOUND);
     }
     eventRepository
         .findById(request.getEventId())
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.EVENT_NOT_FOUND));
-    */
     couponRepository.save(Coupon.create(request));
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
+  public void provideEventCouponRequest(Long userId, Long couponId) {
+    CouponRequest.Event couponEvent = new CouponRequest.Event(userId, couponId);
+    kafkaTemplate.send(KafkaTopicConstant.PROVIDE_EVENT_COUPON, couponEvent);
+  }
+
   @Transactional
-  public void provideEventCoupon(Long userId, Long couponId) {
-    // UserDto userData = userService.getUser(userId);
+  public void provideEventCouponInternal(Long userId, Long couponId) {
+    UserDto userData = userService.getUserByUserId(userId);
+    if (userData == null) {
+      throw new PromotionException(PromotionErrorCode.INTERNAL_SERVER_ERROR);
+    }
     Coupon coupon = couponRepository
-        .findByIdWithPessimisticLock(couponId)
+        .findById(couponId)
         .orElseThrow(() -> new PromotionException(PromotionErrorCode.COUPON_NOT_FOUND));
     if (coupon.getQuantity() - 1 < 0) {
       throw new PromotionException(PromotionErrorCode.INSUFFICIENT_COUPON);
@@ -61,9 +72,11 @@ public class CouponService {
     return CouponResponse.Get.of(coupon);
   }
 
-  // TODO(경민): 유저 아이디로 해당 유저가 존재하는지 확인해야 함
   public Page<CouponResponse.Get> getCouponListBoyUserId(Long userId, Pageable pageable) {
-    // UserDto userData = userService.getUser(userId);
+    UserDto userData = userService.getUserByUserId(userId);
+    if (userData == null) {
+      throw new PromotionException(PromotionErrorCode.INTERNAL_SERVER_ERROR);
+    }
     Page<UserCoupon> userCoupons = userCouponRepository.findByUserId(userId, pageable);
 
     return userCoupons.map(userCoupon -> {
