@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    default: prod
+    default: local
   main:
     web-application-type: reactive
   application:

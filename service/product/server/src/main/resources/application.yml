@@ -5,7 +5,7 @@ spring:
   application:
     name: product
   profiles:
-    active: prod
+    active: local
 
 management:
   endpoints:

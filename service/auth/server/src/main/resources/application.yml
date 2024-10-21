@@ -5,7 +5,7 @@ spring:
   application:
     name: auth
   profiles:
-    default: prod
+    default: local
 
 management:
   endpoints:
