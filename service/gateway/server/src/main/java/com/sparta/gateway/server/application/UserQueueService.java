@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,7 +23,8 @@ public class UserQueueService {
   private final String USER_QUEUE_WAIT_KEY = "users:queue:wait";
   private final String USER_QUEUE_PROCEED_KEY = "users:queue:proceed";
   private final String USER_ACTIVE_SET_KEY = "users:active";
-  private final long MAX_ACTIVE_USERS = 2;
+  @Value("${MAX_ACTIVE_USERS}")
+  private long MAX_ACTIVE_USERS;
   private final long INACTIVITY_THRESHOLD = 300;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
