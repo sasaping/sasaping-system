@@ -9,4 +9,4 @@ management:
 
 spring:
   profiles:
-    include: prod
+    include: local

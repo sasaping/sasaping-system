@@ -7,6 +7,8 @@ plugins {
 group = 'com.sparta.product'
 version = '0.0.1-SNAPSHOT'
 
+jar.enabled = false
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -42,6 +44,9 @@ dependencies {
     implementation 'co.elastic.clients:elasticsearch-java:8.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.4'
     implementation 'jakarta.json:jakarta.json-api:2.0.1'
+
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
+    implementation 'com.amazonaws:aws-java-sdk-s3'
 
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'

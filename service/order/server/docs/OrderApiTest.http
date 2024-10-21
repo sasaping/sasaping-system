@@ -52,3 +52,26 @@ Authorization: Bearer {{access_token}}
 ### 결제 실패
 GET http://localhost:19061/payments/fail?paymentKey=tviva20241017164604o7BU8
 Authorization: Bearer {{access_token}}
+
+### 재고 감소
+PATCH http://localhost:{{Port}}/api/products/reduce-stock
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "60660fc6-b27b-4162-8726-979e1a257f8c": 10
+}
+
+### 재고 롤백
+POST http://localhost:{{Port}}/api/products/rollback-stock
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "60660fc6-b27b-4162-8726-979e1a257f8c": 10
+}
+
+
+### 단일 상품 조회
+GET http://localhost:{{Port}}/api/products/search/60660fc6-b27b-4162-8726-979e1a257f8c
+Authorization: Bearer {{access_token}}

@@ -1,15 +1,11 @@
-x-build-args:
-  dockerfile_name: &dockerfile_name Dockerfile-prod
-
 services:
   eureka-service:
     container_name: eureka-service
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/eureka-artifact
         - FILE_DIRECTORY=./service/eureka/server
     networks:
       - sasaping-network
@@ -22,9 +18,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/gateway-artifact
         - FILE_DIRECTORY=./service/gateway/server
     depends_on:
       - eureka-service
@@ -39,9 +34,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/user-artifact
         - FILE_DIRECTORY=./service/user/server
     depends_on:
       - eureka-service
@@ -54,9 +48,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/auth-artifact
         - FILE_DIRECTORY=./service/auth/server
     depends_on:
       - eureka-service
@@ -69,9 +62,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/order-artifact
         - FILE_DIRECTORY=./service/order/server
     depends_on:
       - eureka-service
@@ -84,9 +76,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/payment-artifact
         - FILE_DIRECTORY=./service/payment/server
     depends_on:
       - eureka-service
@@ -101,9 +92,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/slack-artifact
         - FILE_DIRECTORY=./service/slack/server
     depends_on:
       - eureka-service
@@ -116,9 +106,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/product-artifact
         - FILE_DIRECTORY=./service/product/server
     depends_on:
       - eureka-service
@@ -131,9 +120,8 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/promotion-artifact
         - FILE_DIRECTORY=./service/promotion/server
     depends_on:
       - eureka-service
@@ -146,236 +134,14 @@ services:
     env_file:
       - .env
     build:
-      dockerfile: *dockerfile_name
+      dockerfile: Dockerfile
       args:
-        - ARTIFACT_DIRECTORY=./service/search-artifact
         - FILE_DIRECTORY=./service/search/server
     depends_on:
       - eureka-service
     networks:
       - sasaping-network
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/search
-
-  setup:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-    user: "0"
-    command: >
-      bash -c '
-        if [ x${ELASTIC_PASSWORD} == x ]; then
-          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
-          exit 1;
-        elif [ x${KIBANA_PASSWORD} == x ]; then
-          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
-          exit 1;
-        fi;
-        if [ ! -f config/certs/ca.zip ]; then
-          echo "Creating CA";
-          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
-          unzip config/certs/ca.zip -d config/certs;
-        fi;
-        if [ ! -f config/certs/certs.zip ]; then
-          echo "Creating certs";
-          echo -ne \
-          "instances:\n"\
-          "  - name: es01\n"\
-          "    dns:\n"\
-          "      - es01\n"\
-          "      - localhost\n"\
-          "    ip:\n"\
-          "      - 127.0.0.1\n"\
-          > config/certs/instances.yml;
-          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
-          unzip config/certs/certs.zip -d config/certs;
-        fi;
-        echo "Setting file permissions"
-        chown -R root:root config/certs;
-        find . -type d -exec chmod 750 \{\} \;;
-        find . -type f -exec chmod 640 \{\} \;;
-        echo "Waiting for Elasticsearch availability";
-        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
-        echo "Setting kibana_system password";
-        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
-        echo "All done!";
-      '
-    healthcheck:
-      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
-      interval: 1s
-      timeout: 5s
-      retries: 120
-
-  es01:
-    depends_on:
-      setup:
-        condition: service_healthy
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - esdata01:/usr/share/elasticsearch/data
-    ports:
-      - ${ES_PORT}:9200
-    environment:
-      - node.name=es01
-      - cluster.name=${CLUSTER_NAME}
-      - cluster.initial_master_nodes=es01
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - bootstrap.memory_lock=true
-      - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=certs/es01/es01.key
-      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
-      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=certs/es01/es01.key
-      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
-      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.verification_mode=certificate
-      - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: ${MEM_LIMIT}
-    networks:
-      - sasaping-network
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
-        ]
-      interval: 10s
-      timeout: 10s
-      retries: 120
-
-  kibana:
-    depends_on:
-      es01:
-        condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/kibana/config/certs
-      - kibanadata:/usr/share/kibana/data
-    ports:
-      - ${KIBANA_PORT}:5601
-    environment:
-      - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es01:9200
-      - ELASTICSEARCH_USERNAME=kibana_system
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-    mem_limit: ${MEM_LIMIT}
-    networks:
-      - sasaping-network
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
-        ]
-      interval: 10s
-      timeout: 10s
-      retries: 120
-
-  zookeeper:
-    image: wurstmeister/zookeeper:latest
-    platform: linux/amd64
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - sasaping-network
-
-  kafka:
-    container_name: kafka
-    image: wurstmeister/kafka:latest
-    platform: linux/amd64
-    ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    networks:
-      - sasaping-network
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  cassandra:
-    image: cassandra:latest
-    container_name: cassandra-node-01
-    environment:
-      - CASSANDRA_SEEDS=cassandra-node-01
-      - CASSANDRA_CLUSTER_NAME=sasaping
-      - CASSANDRA_DC=datacenter01
-      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
-    networks:
-      - sasaping-network
-    ports:
-      - "7001:7001"      # 노드간 클러스터 포트
-      - "7002:7002"      # 노드간 보안 포트
-      - "9042:9042"      # CQL 클라이언트 포트
-    volumes:
-      - cassandra_data:/var/lib/cassandra
-
-  cart-cache:
-    container_name: cart-cache
-    image: redis:7.4.0
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-cart-data:/data
-    restart: always
-    networks:
-      - sasaping-network
-
-  product-cache:
-    container_name: product-cache
-    image: redis:7.4.0
-    ports:
-      - "6380:6380"
-    command: [ "redis-server", "--port", "6380" ]
-    volumes:
-      - redis-product-data:/data
-    restart: always
-    networks:
-      - sasaping-network
-
-  coupon-cache:
-    container_name: coupon-cache
-    image: redis:7.4.0
-    ports:
-      - "6381:6381"
-    command: [ "redis-server", "--port", "6381" ]
-    volumes:
-      - redis-coupon-data:/data
-    restart: always
-    networks:
-      - sasaping-network
-
-volumes:
-  cassandra_data:
-    driver: local
-  redis-cart-data:
-    driver: local
-  redis-product-data:
-    driver: local
-  redis-coupon-data:
-    driver: local
-  certs:
-    driver: local
-  esdata01:
-    driver: local
-  kibanadata:
-    driver: local
 
 networks:
   sasaping-network:
