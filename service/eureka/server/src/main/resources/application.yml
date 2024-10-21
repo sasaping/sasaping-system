@@ -2,7 +2,7 @@ spring:
   application:
     name: eureka
   profiles:
-    active: prod
+    active: local
 
 server:
   port: 19090

@@ -28,6 +28,7 @@ public class Product extends BaseEntity implements Persistable {
   @Column private Double discountPercent;
   @Column private int stock;
 
+  @Column private String originImgUrl;
   @Column private String thumbnailImgUrl;
   @Column private String detailImgUrl;
 
@@ -64,6 +65,7 @@ public class Product extends BaseEntity implements Persistable {
       Double discountPercent,
       int stock,
       String description,
+      String originImgUrl,
       String thumbnailImgUrl,
       String detailImgUrl,
       int limitCountPerUser,
@@ -78,6 +80,7 @@ public class Product extends BaseEntity implements Persistable {
     applyDiscount(discountPercent);
     this.stock = stock;
     this.description = description;
+    this.originImgUrl = originImgUrl;
     this.thumbnailImgUrl = thumbnailImgUrl;
     this.detailImgUrl = detailImgUrl;
     this.limitCountPerUser = limitCountPerUser;
@@ -94,7 +97,7 @@ public class Product extends BaseEntity implements Persistable {
       Double discountPercent,
       Integer stock,
       String description,
-      String thumbnailImgUrl,
+      String originImgUrl,
       String detailImgUrl,
       Integer limitCountPerUser,
       List<String> tags,
@@ -109,7 +112,7 @@ public class Product extends BaseEntity implements Persistable {
     applyDiscount(discountPercent);
     this.stock = stock;
     this.description = description;
-    this.thumbnailImgUrl = thumbnailImgUrl;
+    this.originImgUrl = originImgUrl;
     this.detailImgUrl = detailImgUrl;
     this.tags = tags;
     this.limitCountPerUser = limitCountPerUser;
@@ -150,5 +153,4 @@ public class Product extends BaseEntity implements Persistable {
   public void rollbackStock(int rollbackCount) {
     this.stock += rollbackCount;
   }
-
 }

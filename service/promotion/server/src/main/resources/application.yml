@@ -5,7 +5,7 @@ spring:
   application:
     name: promotion
   profiles:
-    default: prod
+    default: local
 
 management:
   endpoints:

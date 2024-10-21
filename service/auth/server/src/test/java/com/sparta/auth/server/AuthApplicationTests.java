@@ -21,6 +21,7 @@ import com.sparta.user.user_dto.infrastructure.UserDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
@@ -31,13 +32,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles("test")
 @SpringBootTest
 class AuthApplicationTests {
 
-  @MockBean private UserService userService;
+  @MockBean
+  private UserService userService;
 
-  @Autowired private AuthService authService;
+  @Autowired
+  private AuthService authService;
 
   @Value("${jwt.secret-key}")
   private String secretKeyString;
@@ -62,7 +67,10 @@ class AuthApplicationTests {
             1L,
             "testuser",
             "$2a$10$YZ2cP0PF11iqNqNrwk4pUOKQnAGxqLtGxO1F6XZomixg73EYQoduC",
-            "ROLE_ADMIN");
+            "test@test.com",
+            "ROLE_ADMIN",
+            BigDecimal.ZERO
+        );
 
     // Mock the user service to return the userDto when called
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
@@ -78,7 +86,13 @@ class AuthApplicationTests {
   void test_로그인_실패_비밀번호_불일치() {
     // Arrange
     AuthRequest.SignIn request = new AuthRequest.SignIn("testuser", "wrongpassword");
-    UserDto userDto = new UserDto(1L, "testuser", "correctpassword", "ROLE_USER");
+    UserDto userDto = new UserDto(
+        1L,
+        "testuser",
+        "$2a$10$YZ2cP0PF11iqNqNrwk4pUOKQnAGxqLtGxO1F6XZomixg73EYQoduC",
+        "test@test.com",
+        "ROLE_ADMIN",
+        BigDecimal.ZERO);
     when(userService.getUserByUsername("testuser")).thenReturn(userDto);
 
     // Act & Assert
@@ -160,4 +174,5 @@ class AuthApplicationTests {
     assertEquals(
         AuthErrorCode.INVALID_TOKEN.getMessage(), thrownException.getErrorCode().getMessage());
   }
+
 }
