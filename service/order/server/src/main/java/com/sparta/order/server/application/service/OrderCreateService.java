@@ -124,7 +124,7 @@ public class OrderCreateService {
     paymentClient.payment(payment);
   }
 
-  private void validateAddress(AddressDto address, Long userId) {
+  public void validateAddress(AddressDto address, Long userId) {
     if (!address.getUserId().equals(userId)) {
       throw new OrderException(OrderErrorCode.ADDRESS_MISMATCH, address.getAddressId());
     }

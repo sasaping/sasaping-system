@@ -1,13 +1,42 @@
 @Port=19091
 @InternalPort=19092
+@userId=17
+@pointHistoryId=12
 
-## 내부 API
+### 로그인(유저)
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser12",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token_user", "Bearer " + response.body.data.token);
+%}
+
+### 로그인(관리자)
+POST http://localhost:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "newUser",
+  "password": "password123"
+}
+> {%
+  client.global.set("access_token_admin", "Bearer " + response.body.data.token);
+%}
+
+### 마이페이지 조회
+GET http://localhost:{{Port}}/api/users/me
+Authorization: {{access_token_user}}
+
 ### 포인트 적립
 POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 7,
+  "userId": {{userId}},
   "orderId": 10,
   "point": 50,
   "type": "적립",
@@ -19,9 +48,25 @@ POST http://localhost:{{InternalPort}}/internal/users/point
 Content-Type: application/json
 
 {
-  "userId": 7,
+  "userId": {{userId}},
   "orderId": 11,
   "point": 30,
   "type": "사용",
   "description": "포인트 사용입니다."
 }
+
+### 내 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point/me
+Authorization: {{access_token_user}}
+
+### 특정 사용자 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point/{{userId}}
+Authorization: {{access_token_admin}}
+
+### 전체 사용자 포인트 내역 조회
+GET http://localhost:{{Port}}/api/users/point
+Authorization: {{access_token_admin}}
+
+### 단일 포인트 내역 삭제(사용자)
+DELETE localhost:{{Port}}/api/users/point/11
+Authorization: {{access_token_admin}}

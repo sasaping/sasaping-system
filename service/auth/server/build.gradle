@@ -11,6 +11,8 @@ ext {
 group = 'com.sparta.auth'
 version = '0.0.1-SNAPSHOT'
 
+jar.enabled = false
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)

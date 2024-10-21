@@ -76,6 +76,7 @@ public class ProductService {
               String productId = entry.getKey();
               int reduceCount = entry.getValue();
               Product product = getSavedProduct(UUID.fromString(productId));
+              validateProductStock(product, reduceCount);
               product.updateStock(reduceCount);
               productRepository.save(product);
             });
@@ -139,5 +140,12 @@ public class ProductService {
     return productRepository
         .findByProductIdAndIsDeletedFalse(productId)
         .orElseThrow(() -> new ProductServerException(ProductErrorCode.NOT_FOUND_PRODUCT));
+  }
+
+  private void validateProductStock(Product product, int reduceCount) {
+    if (product.getStock() < reduceCount) {
+      throw new ProductServerException(ProductErrorCode.STOCK_NOT_AVAILABLE);
+    }
+
   }
 }

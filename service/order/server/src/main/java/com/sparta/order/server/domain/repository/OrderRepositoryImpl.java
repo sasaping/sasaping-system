@@ -18,7 +18,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public Page<Order> myOrderFind(Pageable pageable, Long userId, String keyword) {
+  public Page<Order> getMyOrder(Pageable pageable, Long userId, String keyword) {
 
     JPAQuery<Order> query = queryFactory.selectFrom(order)
         .join(order.orderProducts, orderProduct).fetchJoin()
@@ -39,6 +39,38 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         .where(order.userId.eq(userId).and(keyword != null && !keyword.trim().isEmpty()
             ? orderProduct.productName.containsIgnoreCase(keyword)
             : null))
+        .fetchOne();
+
+    long totalElements = (totalSize != null) ? totalSize : 0;
+
+    return new PageImpl<>(orders, pageable, totalElements);
+  }
+
+  @Override
+  public Page<Order> getAllOrder(Pageable pageable, Long orderUserId, String productId) {
+    JPAQuery<Order> query = queryFactory.selectFrom(order)
+        .join(order.orderProducts, orderProduct).fetchJoin();
+
+    if (orderUserId != null) {
+      query.where(order.userId.eq(orderUserId));
+    }
+
+    if (productId != null && !productId.trim().isEmpty()) {
+      query.where(orderProduct.productId.eq(productId));
+    }
+
+    List<Order> orders = query
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
+        .fetch();
+
+    Long totalSize = queryFactory.select(order.count())
+        .from(order)
+        .join(order.orderProducts, orderProduct)
+        .where(orderUserId != null ?
+                order.userId.eq(orderUserId) : null,
+            productId != null && !productId.trim().isEmpty() ?
+                orderProduct.productId.eq(productId) : null)
         .fetchOne();
 
     long totalElements = (totalSize != null) ? totalSize : 0;

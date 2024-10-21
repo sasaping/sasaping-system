@@ -56,4 +56,14 @@ public class UserRequest {
 
   }
 
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class UpdateTier {
+
+    @NotBlank(message = "등급은 비어있을 수 없습니다.")
+    private String tier;
+
+  }
+
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sparta.user.application.dto.PointResponse;
 import com.sparta.user.application.service.PointHistoryService;
 import com.sparta.user.domain.model.PointHistory;
 import com.sparta.user.domain.model.User;
@@ -18,11 +19,17 @@ import com.sparta.user.exception.UserException;
 import com.sparta.user.presentation.request.UserRequest;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 public class PointHistoryServiceTests {
@@ -109,6 +116,91 @@ public class PointHistoryServiceTests {
     });
 
     assertEquals(UserErrorCode.INSUFFICIENT_POINTS.getMessage(), exception.getMessage());
+  }
+
+  @Test
+  void test_단일_사용자_포인트_내역_조회_성공() {
+    // given
+    UserRequest.Create userRequest = new UserRequest.Create(
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
+    );
+    User user = User.create(userRequest, "encodedPassword");
+    PointHistoryDto request = new PointHistoryDto(
+        1L,
+        10L,
+        new BigDecimal("50.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory1 = PointHistory.create(user, request);
+    PointHistoryDto request2 = new PointHistoryDto(
+        1L,
+        11L,
+        new BigDecimal("100.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory2 = PointHistory.create(user, request2);
+
+    List<PointHistory> pointHistories = Arrays.asList(pointHistory1, pointHistory2);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<PointHistory> pointHistoryPage = new PageImpl<>(pointHistories, pageable,
+        pointHistories.size());
+
+    // when
+    when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+    when(pointHistoryRepository.findAllByUserId(user.getId(), pageable)).thenReturn(
+        pointHistoryPage);
+
+    Page<PointResponse.Get> result = pointHistoryService.getPointHistoryByUserId(user.getId(),
+        pageable);
+
+    // then
+    assertEquals(2, result.getTotalElements());
+    assertEquals(pointHistory1.getPoint(), result.getContent().get(0).getPoint());
+    assertEquals(pointHistory2.getPoint(), result.getContent().get(1).getPoint());
+  }
+
+  @Test
+  void test_전체_사용자_포인트_내역_조회() {
+    // given
+    UserRequest.Create userRequest1 = new UserRequest.Create(
+        "username", "password", "test@email.com", "nickname", UserRole.ROLE_USER
+    );
+    User user1 = User.create(userRequest1, "encodedPassword");
+    UserRequest.Create userRequest2 = new UserRequest.Create(
+        "username2", "password", "test2@email.com", "nickname2", UserRole.ROLE_USER
+    );
+    User user2 = User.create(userRequest2, "encodedPassword");
+    PointHistoryDto request = new PointHistoryDto(
+        1L,
+        10L,
+        new BigDecimal("50.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory1 = PointHistory.create(user1, request);
+    PointHistoryDto request2 = new PointHistoryDto(
+        1L,
+        11L,
+        new BigDecimal("100.0"),
+        "적립",
+        "포인트 적립"
+    );
+    PointHistory pointHistory2 = PointHistory.create(user2, request2);
+
+    List<PointHistory> pointHistories = Arrays.asList(pointHistory1, pointHistory2);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<PointHistory> pointHistoryPage = new PageImpl<>(pointHistories, pageable,
+        pointHistories.size());
+
+    // when
+    when(pointHistoryRepository.findAll(pageable)).thenReturn(pointHistoryPage);
+
+    Page<PointResponse.Get> result = pointHistoryService.getPointHistoryList(pageable);
+
+    // then
+    assertEquals(2, result.getTotalElements());
   }
 
 }
