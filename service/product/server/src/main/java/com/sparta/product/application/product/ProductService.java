@@ -1,5 +1,6 @@
 package com.sparta.product.application.product;
 
+import com.sparta.product.application.dto.ImgDto;
 import com.sparta.product.domain.model.Product;
 import com.sparta.product.domain.model.SortOption;
 import com.sparta.product.domain.repository.cassandra.ProductRepository;
@@ -33,19 +34,20 @@ public class ProductService {
   private final ProductRepository productRepository;
 
   @Transactional
-  public ProductResponse createProduct(ProductCreateRequest request) {
-    Product newProduct = ProductMapper.toEntity(request);
+  public ProductResponse createProduct(
+      ProductCreateRequest request, String productImgUrl, String detailImgUrl) {
+    Product newProduct = ProductMapper.toEntity(request, productImgUrl, detailImgUrl);
     newProduct.setIsNew(true);
     Product savedProduct = productRepository.save(newProduct);
     return ProductResponse.fromEntity(savedProduct);
   }
 
   @Transactional
-  public ProductResponse updateProduct(ProductUpdateRequest request) {
-    Product product = getSavedProduct(request.productId());
-    ProductMapper.updateProduct(request, product);
-    productRepository.save(product);
-    return ProductResponse.fromEntity(product);
+  public ProductResponse updateProduct(
+      ProductUpdateRequest request, Product savedProduct, ImgDto imgUrls) {
+    ProductMapper.updateProduct(request, savedProduct, imgUrls);
+    productRepository.save(savedProduct);
+    return ProductResponse.fromEntity(savedProduct);
   }
 
   @Transactional
@@ -134,7 +136,7 @@ public class ProductService {
         .collect(Collectors.toList());
   }
 
-  private Product getSavedProduct(UUID productId) {
+  public Product getSavedProduct(UUID productId) {
     return productRepository
         .findByProductIdAndIsDeletedFalse(productId)
         .orElseThrow(() -> new ProductServerException(ProductErrorCode.NOT_FOUND_PRODUCT));
@@ -146,6 +148,4 @@ public class ProductService {
     }
 
   }
-
-
 }

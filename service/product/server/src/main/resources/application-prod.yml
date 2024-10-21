@@ -54,6 +54,17 @@ spring:
 product:
   search-index: "sasaping-ecommerce-products"
 
+aws:
+  credentials:
+    access-key: ${AWS-S3-ACCESS-KEY}
+    secret-key: ${AWS-S3-SECRET_KEY}
+    region: ${AWS-REGION}
+  s3:
+    bucket-name:
+      product-origin: "sasaping-products-origin"
+      product-thumbnail: "sasaping-products-thumbnail"
+      product-detail: "sasaping-products-detail"
+
 eureka:
   client:
     service-url:

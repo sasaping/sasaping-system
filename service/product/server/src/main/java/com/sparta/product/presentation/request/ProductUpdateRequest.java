@@ -17,8 +17,6 @@ public record ProductUpdateRequest(
     Double discountPercent,
     @NotNull(message = "상품재고수량은 필수입니다") Integer stock,
     @NotBlank(message = "상품설명은 필수입니다") String description,
-    @NotBlank(message = "썸네일이미지주소는 필수입니다") String thumbnailImgUrl,
-    @NotBlank(message = "상세이미지주소는 필수입니다") String detailImgUrl,
     @NotNull(message = "상품이름은 필수입니다") Integer limitCountPerUser,
     @NotNull(message = "공개여부는 필수입니다") Boolean isPublic,
     List<String> tags) {}
