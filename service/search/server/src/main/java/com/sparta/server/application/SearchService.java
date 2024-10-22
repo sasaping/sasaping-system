@@ -71,7 +71,6 @@ public class SearchService {
       searchQuery.setSort(sort);
     }
 
-    log.info("searchQuery: {}", searchQuery);
     return elasticsearchOperations.search(searchQuery, ProductSearchDto.class);
   }
 

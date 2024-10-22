@@ -10,7 +10,7 @@
   <!-- Logstash로 로그 전송 -->
   <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
     <param name="Encoding" value="UTF-8"/>
-    <destination>127.0.0.1:50000</destination>
+    <destination>logstash01:50000</destination>
 
     <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
       <providers>
