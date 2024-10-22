@@ -85,7 +85,7 @@ public class Order extends BaseEntity {
   @Column(nullable = false, columnDefinition = "int default 0")
   private BigDecimal pointPrice;
 
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "int default 0")
   private BigDecimal couponPrice;
 
   @Column(nullable = true, length = 255)
@@ -107,6 +107,7 @@ public class Order extends BaseEntity {
   private String shippingAddress;
 
   @Column(nullable = false)
+  @Builder.Default
   private Boolean isDeleted = false;
 
   @OneToMany(mappedBy = "order")
@@ -167,8 +168,8 @@ public class Order extends BaseEntity {
         .totalAmount(priceInfo.totalAmount)
         .shippingAmount(priceInfo.shippingAmount)
         .totalRealAmount(priceInfo.totalRealAmount)
-        .pointPrice(request.getPointPrice())
-        .couponPrice(couponPrice)
+        .pointPrice(request.getPointPrice() != null ? request.getPointPrice() : BigDecimal.ZERO)
+        .couponPrice(couponPrice != null ? couponPrice : BigDecimal.ZERO)
         .addressAlias(address.getAlias())
         .recipient(address.getRecipient())
         .phoneNumber(address.getPhoneNumber())
@@ -200,8 +201,8 @@ public class Order extends BaseEntity {
     final BigDecimal totalAmount = totalProductAmount.add(shippingAmount);
 
     final BigDecimal totalRealAmount = totalAmount
-        .subtract(request.getPointPrice())
-        .subtract(couponPrice);
+        .subtract(request.getPointPrice() != null ? request.getPointPrice() : BigDecimal.ZERO)
+        .subtract(couponPrice != null ? couponPrice : BigDecimal.ZERO);
 
     return new PriceInfo(totalQuantity, totalAmount, shippingAmount, totalRealAmount);
   }

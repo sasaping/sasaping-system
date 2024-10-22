@@ -2,6 +2,7 @@ package com.sparta.order.server.application.service;
 
 import com.sparta.order.server.domain.model.Order;
 import com.sparta.order.server.domain.model.OrderProduct;
+import com.sparta.order.server.domain.model.vo.OrderType;
 import com.sparta.order.server.domain.repository.OrderProductRepository;
 import com.sparta.order.server.domain.repository.OrderRepository;
 import com.sparta.order.server.exception.OrderErrorCode;
@@ -80,7 +81,8 @@ public class OrderCreateService {
       Long savedOrderId = orderRepository.save(order).getOrderId();
 
       // 포인트 유효성 검사 및 사용
-      if (request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
+      if (request.getPointPrice() != null
+          && request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
         PointHistoryDto pointHistoryRequest = new PointHistoryDto(userId, savedOrderId,
             request.getPointPrice(), POINT_HISTORY_TYPE_USE, POINT_DESCRIPTION_ORDER_PAYMENT);
 
@@ -104,7 +106,10 @@ public class OrderCreateService {
                   productPrices.get(productInfo.getProductId()),
                   productNames.get(productInfo.getProductId()), order));
 
-      cartService.orderCartProduct(userId, productQuantities);
+      if (order.getType().equals(OrderType.STANDARD)) {
+        cartService.orderCartProduct(userId, productQuantities);
+      }
+      
       payment(userId, order, user.getEmail());
       return savedOrderId;
 
