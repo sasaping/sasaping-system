@@ -66,10 +66,15 @@ public class UserQueueService {
     return reactiveRedisTemplate.opsForZSet()
         .add(USER_QUEUE_PROCEED_KEY, userId, unixTime)
         .filter(i -> i)
-        .switchIfEmpty(
-            Mono.error(new GatewayException(GatewayErrorCode.TOO_MANY_REQUESTS)))
-        .then(reactiveRedisTemplate.opsForSet().add(USER_ACTIVE_SET_KEY, userId))
-        .map(i -> new RegisterUserResponse(0L));
+        .flatMap(success -> {
+          if (success) {
+            return reactiveRedisTemplate.opsForSet()
+                .add(USER_ACTIVE_SET_KEY, userId)
+                .map(i -> new RegisterUserResponse(0L));
+          } else {
+            return checkAndAddToQueue(userId);
+          }
+        });
   }
 
   private Mono<RegisterUserResponse> addToWaitQueue(String userId) {

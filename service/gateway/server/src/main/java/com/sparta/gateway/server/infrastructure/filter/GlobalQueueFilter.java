@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.gateway.server.application.UserQueueService;
+import com.sparta.gateway.server.application.dto.RegisterUserResponse;
 import com.sparta.gateway.server.infrastructure.exception.GatewayErrorCode;
 import com.sparta.gateway.server.infrastructure.exception.GatewayException;
 import java.net.URLDecoder;
@@ -78,11 +79,20 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
                   if (response.rank() == 0) {
                     return chain.filter(exchange);
                   } else {
-                    exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                    exchange.getResponse().setStatusCode(HttpStatus.OK);
                     exchange.getResponse().getHeaders()
                         .add("X-Queue-Rank", String.valueOf(response.rank()));
-                    return exchange.getResponse().setComplete()
-                        ;
+                    RegisterUserResponse responseWithRank = new RegisterUserResponse(
+                        response.rank());
+                    try {
+                      return exchange.getResponse()
+                          .writeWith(Mono.just(exchange.getResponse()
+                              .bufferFactory()
+                              .wrap(objectMapper.writeValueAsBytes(responseWithRank))));
+                    } catch (JsonProcessingException e) {
+                      throw new GatewayException(GatewayErrorCode.INTERNAL_SERVER_ERROR);
+                    }
+
                   }
                 });
           }
