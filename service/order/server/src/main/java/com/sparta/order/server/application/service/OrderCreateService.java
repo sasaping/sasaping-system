@@ -80,7 +80,8 @@ public class OrderCreateService {
       Long savedOrderId = orderRepository.save(order).getOrderId();
 
       // 포인트 유효성 검사 및 사용
-      if (request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
+      if (request.getPointPrice() != null
+          && request.getPointPrice().compareTo(BigDecimal.ZERO) > 0) {
         PointHistoryDto pointHistoryRequest = new PointHistoryDto(userId, savedOrderId,
             request.getPointPrice(), POINT_HISTORY_TYPE_USE, POINT_DESCRIPTION_ORDER_PAYMENT);
 

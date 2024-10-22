@@ -4,6 +4,7 @@ import com.sparta.product.domain.model.PreOrder;
 import com.sparta.product.presentation.request.PreOrderCreateRequest;
 import dto.OrderCreateRequest;
 import dto.OrderProductInfo;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class PreOrderMapper {
@@ -21,7 +22,7 @@ public class PreOrderMapper {
 
   public static OrderCreateRequest toDto(String productId, Long addressId) {
     OrderProductInfo orderProduct = new OrderProductInfo(productId, 1, null);
-    return new OrderCreateRequest("PREORDER", List.of(orderProduct), null, addressId);
+    return new OrderCreateRequest("PREORDER", List.of(orderProduct), BigDecimal.ZERO, addressId);
   }
 
 }
