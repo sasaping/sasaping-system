@@ -1,3 +1,3 @@
 package com.sparta.product.application.dto;
 
-public record ImgDto(String originImgUrl, String detailImgUrl) {}
+public record ImgDto(String originImgUrl, String detailImgUrl, String thumbnailImgUrl) {}

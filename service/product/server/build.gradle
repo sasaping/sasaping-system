@@ -44,6 +44,7 @@ dependencies {
     implementation 'co.elastic.clients:elasticsearch-java:8.6.0'
     implementation 'org.springframework.boot:spring-boot-starter-json:3.3.4'
     implementation 'jakarta.json:jakarta.json-api:2.0.1'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
     implementation 'com.amazonaws:aws-java-sdk-s3'
