@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.auth.auth_dto.jwt.JwtClaim;
 import com.sparta.gateway.server.application.UserQueueService;
-import com.sparta.gateway.server.application.dto.RegisterUserResponse;
 import com.sparta.gateway.server.infrastructure.exception.GatewayErrorCode;
 import com.sparta.gateway.server.infrastructure.exception.GatewayException;
 import java.net.URLDecoder;
@@ -34,6 +33,7 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
     String path = exchange.getRequest().getURI().getPath();
 
     if (isPublicPath(path)) {
@@ -69,33 +69,16 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
 
   private Mono<Void> processRequest(ServerWebExchange exchange, GatewayFilterChain chain,
       String userId) {
-    return userQueueService.isAllowed(userId)
-        .flatMap(isAllowed -> {
-          if (isAllowed) {
+    return userQueueService.registerUser(userId)
+        .flatMap(response -> {
+          if (response.getRank() == 0) {
             return chain.filter(exchange);
-          } else {
-            return userQueueService.registerUser(userId)
-                .flatMap(response -> {
-                  if (response.rank() == 0) {
-                    return chain.filter(exchange);
-                  } else {
-                    exchange.getResponse().setStatusCode(HttpStatus.OK);
-                    exchange.getResponse().getHeaders()
-                        .add("X-Queue-Rank", String.valueOf(response.rank()));
-                    RegisterUserResponse responseWithRank = new RegisterUserResponse(
-                        response.rank());
-                    try {
-                      return exchange.getResponse()
-                          .writeWith(Mono.just(exchange.getResponse()
-                              .bufferFactory()
-                              .wrap(objectMapper.writeValueAsBytes(responseWithRank))));
-                    } catch (JsonProcessingException e) {
-                      throw new GatewayException(GatewayErrorCode.INTERNAL_SERVER_ERROR);
-                    }
-
-                  }
-                });
           }
+          var responseHeaders = exchange.getResponse().getHeaders();
+          responseHeaders.add("X-Queue-Rank", String.valueOf(response.getRank()));
+          exchange.getResponse().setStatusCode(HttpStatus.OK);
+
+          return exchange.getResponse().setComplete();
         });
   }
 
