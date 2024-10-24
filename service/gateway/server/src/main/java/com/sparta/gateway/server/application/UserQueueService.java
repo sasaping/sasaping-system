@@ -30,13 +30,24 @@ public class UserQueueService {
   private Long activeUsers;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
+    return reactiveRedisTemplate.opsForZSet()
+        .rank(USER_QUEUE_PROCEED_KEY, userId)
+        .defaultIfEmpty(-1L)
+        .flatMap(rank -> {
+          if (rank >= 0) {
+            return updateUserActivityTime(userId)
+                .thenReturn(new RegisterUserResponse(0L));
+          }
 
-    lockComponent.execute("registerUser", 1000, 1000, () -> {
-      activeUsers = reactiveRedisTemplate.opsForSet().size(USER_ACTIVE_SET_KEY).block();
-    });
-
-    return activeUsers < MAX_ACTIVE_USERS ? addToProceedQueue(userId) : checkAndAddToQueue(userId);
-
+          return reactiveRedisTemplate.opsForSet().size(USER_ACTIVE_SET_KEY)
+              .flatMap(activeUsers -> {
+                if (activeUsers < MAX_ACTIVE_USERS) {
+                  return addToProceedQueue(userId);
+                } else {
+                  return checkAndAddToQueue(userId);
+                }
+              });
+        });
   }
 
   private Mono<RegisterUserResponse> checkAndAddToQueue(String userId) {
