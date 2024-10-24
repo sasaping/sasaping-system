@@ -69,19 +69,23 @@ public class GlobalQueueFilter implements GlobalFilter, Ordered {
 
   private Mono<Void> processRequest(ServerWebExchange exchange, GatewayFilterChain chain,
       String userId) {
-    return userQueueService.registerUser(userId)
-        .flatMap(response -> {
-          if (response.getRank() == 0) {
+    return userQueueService.isAllowed(userId)
+        .flatMap(allowed -> {
+          if (allowed) {
             return chain.filter(exchange);
           }
-          var responseHeaders = exchange.getResponse().getHeaders();
-          responseHeaders.add("X-Queue-Rank", String.valueOf(response.getRank()));
-          exchange.getResponse().setStatusCode(HttpStatus.OK);
-
-          return exchange.getResponse().setComplete();
+          return userQueueService.registerUser(userId)
+              .flatMap(response -> {
+                if (response.getRank() == 0) {
+                  return chain.filter(exchange);
+                }
+                var responseHeaders = exchange.getResponse().getHeaders();
+                responseHeaders.add("X-Queue-Rank", String.valueOf(response.getRank()));
+                exchange.getResponse().setStatusCode(HttpStatus.OK);
+                return exchange.getResponse().setComplete();
+              });
         });
   }
-
 
   @Override
   public int getOrder() {
