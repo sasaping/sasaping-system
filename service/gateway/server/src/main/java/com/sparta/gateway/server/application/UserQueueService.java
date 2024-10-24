@@ -22,19 +22,18 @@ public class UserQueueService {
   private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
   private final String USER_QUEUE_WAIT_KEY = "users:queue:wait";
   private final String USER_QUEUE_PROCEED_KEY = "users:queue:proceed";
+  private final DistributedLockComponent lockComponent;
+  private Long activeUsers = 0L;
+
   @Value("${MAX_ACTIVE_USERS}")
   private long MAX_ACTIVE_USERS;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
-    reactiveRedisTemplate.opsForZSet().size(USER_QUEUE_PROCEED_KEY).block();
-    return reactiveRedisTemplate.opsForZSet().size(USER_QUEUE_PROCEED_KEY)
-        .flatMap(activeUsers -> {
-          if (activeUsers < MAX_ACTIVE_USERS) {
-            return addToProceedQueue(userId);
-          } else {
-            return checkAndAddToQueue(userId);
-          }
-        });
+    lockComponent.execute("registerUser", 1000, 1000, () -> {
+      activeUsers = reactiveRedisTemplate.opsForZSet().size(USER_QUEUE_PROCEED_KEY).block();
+    });
+    return activeUsers < MAX_ACTIVE_USERS ? addToProceedQueue(userId) : checkAndAddToQueue(userId);
+
   }
 
   private Mono<RegisterUserResponse> checkAndAddToQueue(String userId) {
@@ -45,7 +44,6 @@ public class UserQueueService {
             return updateWaitQueueScore(userId);
           }
           return addToWaitQueue(userId);
-
         });
   }
 
@@ -74,9 +72,8 @@ public class UserQueueService {
     return reactiveRedisTemplate.opsForZSet()
         .add(USER_QUEUE_WAIT_KEY, userId, unixTime)
         .filter(i -> i)
-        .switchIfEmpty(Mono.error(new GatewayException(GatewayErrorCode.TOO_MANY_REQUESTS)))
-        .flatMap(i -> reactiveRedisTemplate.opsForZSet()
-            .rank(USER_QUEUE_WAIT_KEY, userId))
+        .switchIfEmpty(Mono.error(new GatewayException(GatewayErrorCode.INTERNAL_SERVER_ERROR)))
+        .then(reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY, userId))
         .map(rank -> new RegisterUserResponse(rank + 1))
         ;
   }
