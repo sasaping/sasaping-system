@@ -63,7 +63,7 @@ public class PaymentController {
 
 
   @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-  @GetMapping("/payments/all")
+  @GetMapping("/api/payments/all")
   public ApiResponse<?> getAllPayments(Pageable pageable,
       @RequestParam(required = false) String userId,
       @RequestParam(required = false) String paymentKey,
