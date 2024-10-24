@@ -10,6 +10,11 @@ spring:
     name: gateway
   cloud:
     gateway:
+      httpclient:
+        pool:
+          max-connections: 200
+          max-idle-time: 20s
+        connect-timeout: 20000
       routes:
         - id: auth
           uri: lb://auth

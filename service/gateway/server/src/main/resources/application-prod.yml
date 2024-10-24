@@ -2,3 +2,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-service:19090/eureka/
+
+spring:
+  data:
+    redis:
+      host: gateway-cache
+      port: 6382

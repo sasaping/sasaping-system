@@ -6,6 +6,7 @@ import com.sparta.promotion.server.application.service.CouponService;
 import com.sparta.promotion.server.presentation.request.CouponRequest;
 import com.sparta.promotion.server.presentation.response.CouponResponse;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +42,7 @@ public class CouponController {
       @AuthenticationPrincipal JwtClaim claim
   ) {
     couponService.provideEventCouponRequest(claim.getUserId(), couponId);
-    return ApiResponse.ok();
+    return ApiResponse.ok(Map.of("message", "쿠폰 발급 중입니다."));
   }
 
   @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
