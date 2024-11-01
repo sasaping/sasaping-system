@@ -4,14 +4,11 @@ server:
 spring:
   application:
     name: user
+  profiles:
+    active: local
 
 management:
   endpoints:
     web:
       exposure:
         include: health, info
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:19090/eureka/

@@ -1,0 +1,8 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expire-in: 3600000

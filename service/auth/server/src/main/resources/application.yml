@@ -1,0 +1,14 @@
+server:
+  port: 19093
+
+spring:
+  application:
+    name: auth
+  profiles:
+    default: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

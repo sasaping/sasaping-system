@@ -1,0 +1,111 @@
+@Port=19091
+@couponId=1
+@userId=11
+@URL=43.203.175.136
+
+### 로그인
+POST http://{{URL}}:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "bug-user",
+  "password": "password"
+}
+> {%
+  client.global.set("access_token", "Bearer " + response.body.data.token);
+%}
+
+### 로그인
+POST http://{{URL}}:{{Port}}/api/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "bug-admin",
+  "password": "password"
+}
+> {%
+  client.global.set("access_token_admin", "Bearer " + response.body.data.token);
+%}
+
+### 이벤트 생성
+POST http://{{URL}}:{{Port}}/api/events
+Content-Type: application/json
+Authorization: {{access_token_admin}}
+
+{
+  "title": "2024 가을 세일 이벤트",
+  "imgUrl": "https://example.com/images/fall-sale.jpg",
+  "content": "올 가을, 특별한 세일을 놓치지 마세요! 다양한 상품이 최대 50% 할인됩니다.",
+  "startAt": "2024-10-21T10:00:00",
+  "endAt": "2024-10-31T23:59:59"
+}
+
+### 이벤트 쿠폰 생성
+POST http://{{URL}}:{{Port}}/api/coupons/event
+Content-Type: application/json
+Authorization: {{access_token_admin}}
+
+{
+  "name": "Test Coupon",
+  "type": "EVENT",
+  "discountType": "PRICE",
+  "discountValue": 1000.00,
+  "minBuyPrice": null,
+  "maxDiscountPrice": null,
+  "quantity": 100,
+  "startDate": "2024-01-01T00:00:00",
+  "endDate": "2024-12-31T23:59:59",
+  "userTier": null,
+  "eventId": 2
+}
+
+### 이벤트 쿠폰 발급
+POST http://{{URL}}:{{Port}}/api/coupons/event/{{couponId}}
+Authorization: {{access_token}}
+
+### 쿠폰 전체 조회
+GET http://{{URL}}:{{Port}}/api/coupons
+Authorization: {{access_token}}
+
+### 쿠폰 단일 조회
+GET http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}
+
+### 특정 사용자 쿠폰 전체 조회
+GET http://{{URL}}:{{Port}}/api/coupons/users/{{userId}}
+Authorization: {{access_token}}
+
+### 내 쿠폰 전체 조회
+GET http://{{URL}}:{{Port}}/api/coupons/me
+Authorization: {{access_token}}
+
+### 쿠폰 수정
+PATCH http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
+Content-Type: application/json
+Authorization: {{access_token}}
+
+{
+  "name": "Updated Coupon Name",
+  "type": "EVENT",
+  "discountType": "PERCENTAGE",
+  "discountValue": 10.00,
+  "minBuyPrice": 100.00,
+  "maxDiscountPrice": 50.00,
+  "quantity": 100,
+  "startDate": "2024-01-01T00:00:00",
+  "endDate": "2024-12-31T23:59:59",
+  "userTier": "GOLD",
+  "eventId": 1
+}
+
+### 쿠폰 삭제
+DELETE http://{{URL}}:{{Port}}/api/coupons/{{couponId}}
+Authorization: {{access_token}}
+
+### 쿠폰 사용
+PATCH http://{{URL}}:19021/internal/coupons/{{couponId}}/use?userId={{userId}}
+Authorization: {{access_token}}
+
+### 쿠폰 환불
+PATCH http://{{URL}}:19021/internal/coupons/{{couponId}}/refund?userId={{userId}}
+Authorization: {{access_token}}

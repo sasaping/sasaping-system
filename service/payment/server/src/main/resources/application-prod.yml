@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: payment
+  datasource:
+    url: ${DB_URL}/payment
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/
+
+TOSS_SECRET_KEY: ${TOSS_SECRET_KEY}
+
+PAYMENT:
+  SUCCESS_URL: ${EC2_HOST}:19061/payments/success
+  FAIL_URL: ${EC2_HOST}:19061/payments/fail

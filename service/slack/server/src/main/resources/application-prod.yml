@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: slack
+  datasource:
+    url: ${DB_URL}/payment
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/
+
+SLACK_TOKEN: ${SLACK_TOKEN}

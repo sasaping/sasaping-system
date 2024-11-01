@@ -1,0 +1,71 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}/product
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  cassandra:
+    contact-points: cassandra
+    port: 9042
+    keyspace-name: product
+    schema-action: create_if_not_exists
+    local-datacenter: datacenter01
+
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  elasticsearch:
+    rest:
+      host: es01
+      port: 9200
+      uris: http://es01:9200
+    fingerprint: ${ELASTIC_FINGERPRINT}
+    account: elastic
+    password: ${ELASTIC_PASSWORD}
+
+  data:
+    redis:
+      host: product-cache
+      port: 6380
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    listener:
+      ack-mode: MANUAL
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: product
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
+product:
+  search-index: "sasaping-ecommerce-products"
+
+aws:
+  credentials:
+    access-key: ${AWS_S3_ACCESS_KEY}
+    secret-key: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+  s3:
+    bucket-name:
+      product-origin: "sasaping-products-origin"
+      product-thumbnail: "sasaping-products-thumbnail"
+      product-detail: "sasaping-products-detail"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/

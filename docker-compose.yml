@@ -1,0 +1,148 @@
+services:
+  eureka-service:
+    container_name: eureka-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/eureka/server
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+    ports:
+      - "19090:19090"
+
+  gateway:
+    container_name: gateway-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/gateway/server
+    depends_on:
+      - eureka-service
+    ports:
+      - "19091:19091"
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
+
+  user:
+    container_name: user-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/user/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
+
+  auth:
+    container_name: auth-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/auth/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/auth
+
+  order:
+    container_name: order-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/order/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+
+  payment:
+    container_name: payment-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/payment/server
+    depends_on:
+      - eureka-service
+    ports:
+      - "19061:19061"
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
+
+  slack:
+    container_name: slack-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/slack/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/slack
+
+  product:
+    container_name: product-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/product/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/product
+
+  promotion:
+    container_name: promotion-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/promotion/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/promotion
+
+  search:
+    container_name: search-service
+    env_file:
+      - .env
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./service/search/server
+    depends_on:
+      - eureka-service
+    networks:
+      - sasaping-network
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/search
+
+networks:
+  sasaping-network:
+    driver: bridge

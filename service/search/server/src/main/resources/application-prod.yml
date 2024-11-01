@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${DB_URL}/product
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  elasticsearch:
+    rest:
+      host: es01
+      port: 9200
+      uris: http://es01:9200
+    fingerprint: ${ELASTIC_FINGERPRINT}
+    account: elastic
+    password: ${ELASTIC_PASSWORD}
+
+product:
+  search-index: "sasaping-ecommerce-products"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:19090/eureka/

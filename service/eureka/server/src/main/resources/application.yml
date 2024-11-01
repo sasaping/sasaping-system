@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: eureka
+  profiles:
+    active: local
+
+server:
+  port: 19090

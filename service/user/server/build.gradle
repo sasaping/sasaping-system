@@ -7,6 +7,8 @@ plugins {
 group = 'com.sparta.user'
 version = '0.0.1-SNAPSHOT'
 
+jar.enabled = false
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -29,13 +31,22 @@ ext {
 
 dependencies {
     implementation project(':common:domain')
+    implementation project(':service:user:user_dto')
+    implementation project(':service:auth:auth_dto')
 
+    implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+
 }
 
 dependencyManagement {

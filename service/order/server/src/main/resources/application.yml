@@ -1,0 +1,14 @@
+server:
+  port: 19071
+
+spring:
+  application:
+    name: order
+  profiles:
+    active: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

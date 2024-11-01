@@ -1,0 +1,14 @@
+server:
+  port: 19011
+
+spring:
+  application:
+    name: search
+  profiles:
+    include: local
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
