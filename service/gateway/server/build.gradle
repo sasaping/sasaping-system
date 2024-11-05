@@ -33,7 +33,7 @@ dependencies {
     implementation project(':common:domain')
     implementation project(':service:auth:auth_dto')
 
-    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+//    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
