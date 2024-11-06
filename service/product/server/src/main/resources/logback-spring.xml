@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<configuration scan="true" scanPeriod="30 seconds">
+<configuration>
+
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} springboot-elk [%thread] %-5level %logger{36} - %msg%n
@@ -7,28 +7,35 @@
     </encoder>
   </appender>
 
-  <!-- Logstash로 로그 전송 -->
-  <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-    <param name="Encoding" value="UTF-8"/>
-    <destination>logstash01:50000</destination>
+  <!-- Logstash appender는 prod 프로파일에서만 사용 -->
+  <springProfile name="prod">
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+      <param name="Encoding" value="UTF-8"/>
+      <destination>127.0.0.1:50000</destination>
+      <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+        <providers>
+          <timestamp>
+            <timeZone>UTC</timeZone>
+          </timestamp>
+          <logLevel/>
+          <threadName/>
+          <loggerName/>
+          <message/>
+          <stackTrace/>
+        </providers>
+      </encoder>
+    </appender>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="LOGSTASH"/>
+    </root>
+  </springProfile>
 
-    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-      <providers>
-        <timestamp>
-          <timeZone>UTC</timeZone>
-        </timestamp>
-        <logLevel/>
-        <threadName/>
-        <loggerName/>
-        <message/>
-        <stackTrace/>
-      </providers>
-    </encoder>
-  </appender>
-
-  <root level="INFO">
-    <appender-ref ref="CONSOLE"/>
-    <appender-ref ref="LOGSTASH"/>
-  </root>
+  <!-- prod가 아닌 환경에서는 CONSOLE appender만 사용 -->
+  <springProfile name="!prod">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
 
 </configuration>
