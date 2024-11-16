@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum NotificationType {
-  ORDER_UPDATE("주문 갱신 알림"),
+  ORDER("주문 알림"),
   RESTOCK("재입고 알림"),
   EVENT("이벤트 알림");
 
@@ -12,5 +12,17 @@ public enum NotificationType {
 
   private NotificationType(String description) {
     this.description = description;
+  }
+
+  public boolean isOrder() {
+    return this == ORDER;
+  }
+
+  public boolean isRestock() {
+    return this == RESTOCK;
+  }
+
+  public boolean isEvent() {
+    return this == EVENT;
   }
 }
