@@ -11,9 +11,11 @@ import dto.NotificationCreateRequest;
 import feign.FeignException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j(topic = "NotificationFacade")
 @RequiredArgsConstructor
 public class NotificationFacade {
 
@@ -35,8 +37,13 @@ public class NotificationFacade {
   private void validateUserExists(Long userId) {
     try {
       UserDto user = userClient.getUser(userId);
-    } catch (FeignException e) {
+    } catch (FeignException.NotFound e) {
+      log.error("User Not Found : {}", userId, e);
       throw new NotificationException(NotificationErrorCode.USER_NOT_FOUND, userId);
+    } catch (FeignException e) {
+      log.error("User Feign 요청 실패 : ID {}. HTTP status: {}, reason: {}.", userId,
+          e.status(), e.getMessage(), e);
+      throw new NotificationException(NotificationErrorCode.USER_SERVICE_UNAVAILABLE, userId);
     } catch (Exception e) {
       throw new NotificationException(NotificationErrorCode.INTERNAL_SERVER_ERROR);
     }

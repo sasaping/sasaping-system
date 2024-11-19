@@ -53,9 +53,13 @@ public class CreateOrderNotificationStrategy implements CreateNotificationServic
       NotificationOrderDto order = orderClient.getOrder(orderId);
       log.info("Order found: {}", order);
       return order;
-    } catch (FeignException e) {
-      log.error("Order not found: {}", orderId, e);
+    } catch (FeignException.NotFound e) {
+      log.error("Order Not Found : {}", orderId, e);
       throw new NotificationException(NotificationErrorCode.ORDER_NOT_FOUND, orderId);
+    } catch (FeignException e) {
+      log.error("Order Feign 요청 실패 : ID {}. HTTP status: {}, reason: {}.", orderId,
+          e.status(), e.getMessage(), e);
+      throw new NotificationException(NotificationErrorCode.ORDER_SERVICE_UNAVAILABLE, orderId);
     } catch (Exception e) {
       throw new NotificationException(NotificationErrorCode.INTERNAL_SERVER_ERROR);
     }
