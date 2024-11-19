@@ -27,28 +27,25 @@ public class UserQueueService {
   @Value("${MAX_ACTIVE_USERS}")
   private long MAX_ACTIVE_USERS;
   private final long INACTIVITY_THRESHOLD = 300;
-  private Long activeUsers;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
     return reactiveRedisTemplate.opsForZSet()
         .rank(USER_QUEUE_PROCEED_KEY, userId)
         .defaultIfEmpty(-1L)
-        .flatMap(rank -> {
-          if (rank >= 0) {
-            return updateUserActivityTime(userId)
-                .thenReturn(new RegisterUserResponse(0L));
-          }
-
-          return reactiveRedisTemplate.opsForSet().size(USER_ACTIVE_SET_KEY)
-              .flatMap(activeUsers -> {
-                if (activeUsers < MAX_ACTIVE_USERS) {
-                  return addToProceedQueue(userId);
-                } else {
-                  return checkAndAddToQueue(userId);
-                }
-              });
-        });
+        .flatMap(rank -> rank >= 0 ? handleProceedUser(userId) : handleNewUser(userId));
   }
+
+  private Mono<RegisterUserResponse> handleProceedUser(String userId) {
+    return updateUserActivityTime(userId)
+        .thenReturn(new RegisterUserResponse(0L));
+  }
+
+  private Mono<RegisterUserResponse> handleNewUser(String userId) {
+    return reactiveRedisTemplate.opsForSet().size(USER_ACTIVE_SET_KEY)
+        .flatMap(activeUsers -> activeUsers < MAX_ACTIVE_USERS ? addToProceedQueue(userId)
+            : checkAndAddToQueue(userId));
+  }
+
 
   private Mono<RegisterUserResponse> checkAndAddToQueue(String userId) {
     return reactiveRedisTemplate.opsForZSet().score(USER_QUEUE_WAIT_KEY, userId)
@@ -73,21 +70,41 @@ public class UserQueueService {
         ;
   }
 
-  private Mono<RegisterUserResponse> addToProceedQueue(String userId) {
+  public Mono<RegisterUserResponse> addToProceedQueue(String userId) {
+    return Mono.create(sink -> {
+      lockComponent.execute(userId, 1000, 1000, () -> {
+        try {
+          addUserToQueue(userId)
+              .doOnSuccess(sink::success)
+              .doOnError(sink::error)
+              .subscribe();
+        } catch (Exception e) {
+          sink.error(e);
+        }
+      });
+    });
+  }
+  
+  private Mono<RegisterUserResponse> addUserToQueue(String userId) {
     var unixTime = Instant.now().getEpochSecond();
     return reactiveRedisTemplate.opsForZSet()
         .add(USER_QUEUE_PROCEED_KEY, userId, unixTime)
-        .filter(i -> i)
+        .filter(success -> success)
         .flatMap(success -> {
           if (success) {
-            return reactiveRedisTemplate.opsForSet()
-                .add(USER_ACTIVE_SET_KEY, userId)
-                .map(i -> new RegisterUserResponse(0L));
+            return addToActiveSet(userId);
           } else {
             return checkAndAddToQueue(userId);
           }
         });
   }
+
+  private Mono<RegisterUserResponse> addToActiveSet(String userId) {
+    return reactiveRedisTemplate.opsForSet()
+        .add(USER_ACTIVE_SET_KEY, userId)
+        .map(i -> new RegisterUserResponse(0L));
+  }
+
 
   private Mono<RegisterUserResponse> addToWaitQueue(String userId) {
     var unixTime = Instant.now().getEpochSecond();
