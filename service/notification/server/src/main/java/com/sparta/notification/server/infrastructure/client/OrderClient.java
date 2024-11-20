@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "order")
 public interface OrderClient {
 
-  @GetMapping("/internal/orders/order-id")
+  @GetMapping("/internal/orders")
   NotificationOrderDto getOrder(@RequestParam(value = "orderId") Long orderId);
 
 }

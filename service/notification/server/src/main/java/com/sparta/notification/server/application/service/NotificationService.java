@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j(topic = "NotificationFacade")
 @RequiredArgsConstructor
-public class NotificationFacade {
+public class NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final UserClient userClient;
@@ -25,7 +25,6 @@ public class NotificationFacade {
 
   public Long createNotification(NotificationCreateRequest request) {
     validateUserExists(request.getUserId());
-
     return createNotificationServices.stream()
         .filter(service -> service.isMatched(
             NotificationType.valueOf(request.getNotificationType())))

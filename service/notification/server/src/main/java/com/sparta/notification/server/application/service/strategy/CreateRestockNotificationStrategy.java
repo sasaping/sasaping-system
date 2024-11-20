@@ -2,7 +2,9 @@ package com.sparta.notification.server.application.service.strategy;
 
 import com.sparta.notification.server.domain.model.vo.NotificationType;
 import dto.NotificationCreateRequest;
+import org.springframework.stereotype.Service;
 
+@Service
 public class CreateRestockNotificationStrategy implements CreateNotificationService {
 
   @Override
