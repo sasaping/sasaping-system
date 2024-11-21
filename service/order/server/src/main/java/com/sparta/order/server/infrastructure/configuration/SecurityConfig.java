@@ -35,6 +35,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorize ->
                 authorize
+                    .requestMatchers("/internal/**").permitAll()
                     .anyRequest()
                     .authenticated())
         .addFilterAfter(

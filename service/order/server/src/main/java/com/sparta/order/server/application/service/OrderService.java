@@ -1,5 +1,6 @@
 package com.sparta.order.server.application.service;
 
+import com.sparta.order.server.application.service.mapper.OrderMapper;
 import com.sparta.order.server.domain.model.Order;
 import com.sparta.order.server.domain.model.OrderProduct;
 import com.sparta.order.server.domain.model.vo.OrderState;
@@ -21,6 +22,7 @@ import com.sparta.user.user_dto.infrastructure.AddressDto;
 import com.sparta.user.user_dto.infrastructure.PointHistoryDto;
 import com.sparta.user.user_dto.infrastructure.UserDto;
 import com.sparta.user.user_dto.infrastructure.UserDto.UserRole;
+import dto.NotificationOrderDto;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,6 +147,12 @@ public class OrderService {
         order -> responses.add(AllOrderGetResponse.from(order)));
 
     return new PageImpl<>(responses, pageable, orders.getTotalElements());
+  }
+
+  public NotificationOrderDto getNotificationOrder(Long orderId) {
+    Order order = validateOrderExists(orderId);
+    String displayProductName = order.getOrderProducts().get(0).getProductName();
+    return OrderMapper.toNotificationOrderDto(order, displayProductName);
   }
 
   @Transactional

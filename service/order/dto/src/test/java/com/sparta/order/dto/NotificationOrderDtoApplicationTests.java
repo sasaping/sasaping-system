@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class OrderDtoApplicationTests {
+class NotificationOrderDtoApplicationTests {
 
   @Test
-  void contextLoads() {}
+  void contextLoads() {
+  }
+
 }
