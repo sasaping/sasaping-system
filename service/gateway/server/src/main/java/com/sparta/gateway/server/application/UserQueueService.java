@@ -22,26 +22,26 @@ public class UserQueueService {
   private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
   private final DistributedLockComponent lockComponent;
   private final String USER_QUEUE_WAIT_KEY = "users:queue:wait";
-  private final String USER_QUEUE_PROCEED_KEY = "users:queue:proceed";
+  private final String USER_QUEUE_ACTIVE_KEY = "users:queue:active";
   @Value("${MAX_ACTIVE_USERS}")
   private long MAX_ACTIVE_USERS;
   private final long INACTIVITY_THRESHOLD = 300;
 
   public Mono<RegisterUserResponse> registerUser(String userId) {
     return reactiveRedisTemplate.opsForZSet()
-        .rank(USER_QUEUE_PROCEED_KEY, userId)
+        .rank(USER_QUEUE_ACTIVE_KEY, userId)
         .defaultIfEmpty(-1L)
-        .flatMap(rank -> rank >= 0 ? handleProceedUser(userId) : handleNewUser(userId));
+        .flatMap(rank -> rank >= 0 ? handleActiveUser(userId) : handleNewUser(userId));
   }
 
-  private Mono<RegisterUserResponse> handleProceedUser(String userId) {
+  private Mono<RegisterUserResponse> handleActiveUser(String userId) {
     return updateUserActivityTime(userId)
         .thenReturn(new RegisterUserResponse(0L));
   }
 
   private Mono<RegisterUserResponse> handleNewUser(String userId) {
-    return reactiveRedisTemplate.opsForSet().size(USER_QUEUE_PROCEED_KEY)
-        .flatMap(activeUsers -> activeUsers < MAX_ACTIVE_USERS ? addToProceedQueue(userId)
+    return reactiveRedisTemplate.opsForSet().size(USER_QUEUE_ACTIVE_KEY)
+        .flatMap(activeUsers -> activeUsers < MAX_ACTIVE_USERS ? addToActiveQueue(userId)
             : checkAndAddToQueue(userId));
   }
 
@@ -69,7 +69,7 @@ public class UserQueueService {
         ;
   }
 
-  public Mono<RegisterUserResponse> addToProceedQueue(String userId) {
+  public Mono<RegisterUserResponse> addToActiveQueue(String userId) {
     return Mono.create(sink -> {
       lockComponent.execute(userId, 1000, 1000, () -> {
         try {
@@ -87,7 +87,7 @@ public class UserQueueService {
   private Mono<RegisterUserResponse> addUserToQueue(String userId) {
     var unixTime = Instant.now().getEpochSecond();
     return reactiveRedisTemplate.opsForZSet()
-        .add(USER_QUEUE_PROCEED_KEY, userId, unixTime)
+        .add(USER_QUEUE_ACTIVE_KEY, userId, unixTime)
         .filter(i -> i)
         .switchIfEmpty(Mono.error(new GatewayException(GatewayErrorCode.TOO_MANY_REQUESTS)))
         .thenReturn(new RegisterUserResponse(0L));
@@ -108,7 +108,7 @@ public class UserQueueService {
 
   public Mono<Boolean> isAllowed(String userId) {
     return reactiveRedisTemplate.opsForZSet()
-        .rank(USER_QUEUE_PROCEED_KEY, userId)
+        .rank(USER_QUEUE_ACTIVE_KEY, userId)
         .defaultIfEmpty(-1L)
         .map(rank -> rank >= 0)
         .flatMap(isAllowed -> {
@@ -139,40 +139,40 @@ public class UserQueueService {
   private Mono<Void> removeInactiveUsers() {
     long currentTime = Instant.now().getEpochSecond();
     return reactiveRedisTemplate.opsForZSet()
-        .rangeWithScores(USER_QUEUE_PROCEED_KEY, Range.closed(0L, -1L))
+        .rangeWithScores(USER_QUEUE_ACTIVE_KEY, Range.closed(0L, -1L))
         .filter(userWithScore -> currentTime - userWithScore.getScore() > INACTIVITY_THRESHOLD)
         .flatMap(userWithScore -> {
           String userId = userWithScore.getValue();
-          return reactiveRedisTemplate.opsForZSet().remove(USER_QUEUE_PROCEED_KEY, userId);
+          return reactiveRedisTemplate.opsForZSet().remove(USER_QUEUE_ACTIVE_KEY, userId);
         })
         .then();
   }
 
   private Mono<Long> allowUserTask() {
-    return reactiveRedisTemplate.opsForSet().size(USER_QUEUE_PROCEED_KEY)
+    return reactiveRedisTemplate.opsForSet().size(USER_QUEUE_ACTIVE_KEY)
         .flatMap(activeUsers -> {
           long slotsAvailable = MAX_ACTIVE_USERS - activeUsers;
           if (slotsAvailable <= 0) {
             return Mono.just(0L);
           }
-          return moveUsersToProceeds(slotsAvailable);
+          return moveUsersToActives(slotsAvailable);
         });
   }
 
-  private Mono<Long> moveUsersToProceeds(long count) {
+  private Mono<Long> moveUsersToActives(long count) {
     return reactiveRedisTemplate.opsForZSet()
         .popMin(USER_QUEUE_WAIT_KEY, count)
         .flatMap(user -> {
           String userId = Objects.requireNonNull(user.getValue());
           return updateUserActivityTime(userId)
-              .then(reactiveRedisTemplate.opsForSet().add(USER_QUEUE_PROCEED_KEY, userId));
+              .then(reactiveRedisTemplate.opsForSet().add(USER_QUEUE_ACTIVE_KEY, userId));
         })
         .count();
   }
 
   private Mono<Boolean> updateUserActivityTime(String userId) {
     long currentTime = Instant.now().getEpochSecond();
-    return reactiveRedisTemplate.opsForZSet().add(USER_QUEUE_PROCEED_KEY, userId, currentTime);
+    return reactiveRedisTemplate.opsForZSet().add(USER_QUEUE_ACTIVE_KEY, userId, currentTime);
   }
 
 }
