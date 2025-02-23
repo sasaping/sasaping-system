@@ -134,7 +134,7 @@
 - 썸네일 생성도 서버리스인 Lambda에서 처리하여 기존 서버의 책임을 외부로 분할
 - [상세내용](https://github.com/sasaping/sasaping-system/wiki/Technical-Decision#%EC%9D%B4%EB%AF%B8%EC%A7%80-%EC%A0%80%EC%9E%A5%EA%B3%BC-%EC%8D%B8%EB%84%A4%EC%9D%BC-%EC%83%9D%EC%84%B1%EC%9D%84-%EC%99%B8%EB%B6%80%EC%97%90%EC%84%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EC%97%AC-api-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0)
 
-## 트러블 슈핑
+## 트러블 슈팅
 
 ## 1️⃣ **Elastic Search로 상품목록 조회성능 높이기**
 
